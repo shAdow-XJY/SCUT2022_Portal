@@ -87,10 +87,12 @@
     <OutDir>./../../../bin/vc16win64\</OutDir>
     <IntDir>./x64/GameDemo/debug\</IntDir>
     <TargetName>$(ProjectName)DEBUG</TargetName>
+    <LibraryPath>./../../../Lib/vc16win64;./../../../Bin/vc16win64;./../../../Snippets/Graphics/lib/win64/glut;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>./../../../bin/vc16win64\</OutDir>
     <IntDir>./x64/GameDemo/debug\</IntDir>
+    <LibraryPath>./../../../Lib/vc16win64;./../../../Bin/vc16win64;./../../../Snippets/Graphics/lib/win64/glut;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
