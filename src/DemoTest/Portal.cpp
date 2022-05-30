@@ -238,6 +238,8 @@ PxRigidDynamic* createDynamic( PxReal radius, const PxTransform& t, const PxVec3
 
 	//设置角阻尼系数，还有线性阻尼linearDamping；线性阻尼控制物理形体或约束抵抗平移的量,而角阻尼控制其抵抗旋转的量。如果设置为0，物体会一直旋转/平移
 	dynamic->setAngularDamping(10.0f);
+
+
 	//设置线性速度 
 	dynamic->setLinearVelocity(velocity);
 
