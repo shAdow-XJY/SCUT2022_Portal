@@ -22,5 +22,5 @@ public:
 	};
 	~Role();
 	void setRolePosition(PxVec3 position);
-};
 
+};

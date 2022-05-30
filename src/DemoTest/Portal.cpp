@@ -41,7 +41,9 @@
 #include "../Common/PVD.h"
 #include "../Utils/Utils.h"
 #include "../Role/Role.h"
+#include "../Role/CCT.h"
 #include<vector>
+
 
 using namespace physx;
 //默认的内存管理和错误报告器
@@ -73,6 +75,9 @@ const char* PigName = "pig";
 
 
 Role* role = NULL;
+//extern void roleJump(Role* role);
+CCTRole* cctRole = NULL;
+PxControllerFilters filters = NULL;
 
 struct FilterGroup
 {
@@ -336,7 +341,13 @@ void initPhysics(bool interactive)
 	gScene->addActor(*groundPlane);
 
 
-	role = new Role();
+	//role = new Role();
+
+	cctRole = new CCTRole();
+	cctRole->setPosition(PxExtendedVec3(0, 40, 100));
+	PxRigidBody* cctActor = cctRole->getActor();
+	gScene->addActor(*cctActor);
+	
 
 	//if (不交互)，在render中把交互设成false就有一个默认的球滚过去撞击堆。
 	if(!interactive)
@@ -377,7 +388,7 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	{
 	case 'B':	createStack(PxTransform(PxVec3(0,0,stackZ-=10.0f)), 10, 2.0f);						break;
 	//PxSphereGeometry Transform,geometry,velocity（速度）
-	case ' ':	createDynamic(10,camera,camera.rotate(PxVec3(0,0,-1))*200);	break;
+	case ' ':	cctRole->roleMove(filters);	break;
 	}
 }
 

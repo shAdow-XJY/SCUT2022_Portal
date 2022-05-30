@@ -9,11 +9,17 @@
     <ClCompile Include="..\..\src\Role\Role.cpp">
       <Filter>Role</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Role\CCT.cpp">
+      <Filter>Role</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Render\Camera.h" />
     <ClInclude Include="..\..\src\Render\Render.h" />
     <ClInclude Include="..\..\src\Role\Role.h">
+      <Filter>Role</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Role\CCT.h">
       <Filter>Role</Filter>
     </ClInclude>
   </ItemGroup>
