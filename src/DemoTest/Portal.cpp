@@ -42,6 +42,7 @@
 #include "../Utils/Utils.h"
 #include "../Role/Role.h"
 #include<vector>
+#include<iostream>
 
 using namespace physx;
 //默认的内存管理和错误报告器
@@ -73,6 +74,9 @@ const char* PigName = "pig";
 
 
 Role* role = NULL;
+PxControllerManager* cManager = NULL;
+
+
 
 struct FilterGroup
 {
@@ -331,6 +335,8 @@ void initPhysics(bool interactive)
 		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
 		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
 	}
+	cManager = PxCreateControllerManager(*gScene);
+	cManager->setOverlapRecoveryModule(true);
 	//静摩擦，动摩擦，restitution恢复原状(弹性)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
 
@@ -338,6 +344,7 @@ void initPhysics(bool interactive)
 	gScene->addActor(*groundPlane);
 
 
+	//role = new Role();
 	role = new Role();
 
 	//if (不交互)，在render中把交互设成false就有一个默认的球滚过去撞击堆。
@@ -377,9 +384,26 @@ void keyPress(unsigned char key, const PxTransform& camera)
 {
 	switch(toupper(key))
 	{
-	case 'B':	createStack(PxTransform(PxVec3(0,0,stackZ-=10.0f)), 10, 2.0f);						break;
+	case 'B':	createStack(PxTransform(PxVec3(0,0,stackZ-=10.0f)), 10, 2.0f);break;
 	//PxSphereGeometry Transform,geometry,velocity（速度）
 	case ' ':	createDynamic(10,camera,camera.rotate(PxVec3(0,0,-1))*200);	break;
+	}
+}
+
+void mousePress(int button, int state, int x, int y) {
+	switch (button)
+	{
+	//点击左键
+	case 0: {
+		//左键抬起
+		if (state == 1) {
+			/*PxVec3 nowPosition = changeScenetoWorld(x, y);
+			role->setRolePosition(nowPosition);*/
+			role->roleMoveByMouse(x, y);
+		}
+	}
+	default:
+		break;
 	}
 }
 

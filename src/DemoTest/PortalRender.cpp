@@ -35,6 +35,8 @@
 
 #include "../Render/Render.h"
 #include "../Render/Camera.h"
+#include "../Role/Role.h"
+
 
 using namespace physx;
 
@@ -42,7 +44,8 @@ extern void initPhysics(bool interactive);
 extern void stepPhysics(bool interactive);	
 extern void cleanupPhysics(bool interactive);
 extern void keyPress(unsigned char key, const PxTransform& camera);
-
+extern void mousePress(int button, int state, int x, int y);
+extern Role* role;
 
 namespace
 {
@@ -65,6 +68,7 @@ void keyboardCallback(unsigned char key, int x, int y)
 void mouseCallback(int button, int state, int x, int y)
 {
 	sCamera->handleMouse(button, state, x, y);
+	mousePress(button, state, x, y);
 }
 
 void idleCallback()
@@ -77,6 +81,10 @@ void renderCallback()
 	stepPhysics(true);
 
 	Snippets::startRender(sCamera->getEye(), sCamera->getDir());
+
+	if (role) {
+		role->move();
+	}
 
 	PxScene* scene;
 	PxGetPhysics().getScenes(&scene,1);

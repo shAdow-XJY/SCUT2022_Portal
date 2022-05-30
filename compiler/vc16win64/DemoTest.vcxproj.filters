@@ -9,6 +9,9 @@
     <ClCompile Include="..\..\src\Role\Role.cpp">
       <Filter>Role</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Utils\mouseUtils.cpp">
+      <Filter>InputEvent</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Render\Camera.h" />
@@ -20,6 +23,9 @@
   <ItemGroup>
     <Filter Include="Role">
       <UniqueIdentifier>{f6b14483-959c-4833-b660-4a1990949db9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="InputEvent">
+      <UniqueIdentifier>{fa2182ed-f80a-434d-bbb8-0b62ef536ac5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
