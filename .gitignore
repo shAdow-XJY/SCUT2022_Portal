@@ -36,3 +36,4 @@ compiler/vc16win64/DemoTest.vcxproj.user
 compiler/vc16win64/Utils.vcxproj.user
 compiler/vc16win64/x64/
 lib/
+.vs

@@ -35,14 +35,12 @@
 // ****************************************************************************
 
 #include <ctype.h>
-
 #include "PxPhysicsAPI.h"
 
 #include "../Common/Print.h"
 #include "../Common/PVD.h"
 #include "../Utils/Utils.h"
-
-
+#include "../Role/Role.h"
 #include<vector>
 
 using namespace physx;
@@ -72,6 +70,9 @@ PxRigidDynamic*                         ballPig;
 
 const char* BirdName = "bird";
 const char* PigName = "pig";
+
+
+Role* role = NULL;
 
 struct FilterGroup
 {
@@ -335,8 +336,7 @@ void initPhysics(bool interactive)
 	gScene->addActor(*groundPlane);
 
 
-	for(PxU32 i=0;i<1;i++)
-		createStack(PxTransform(PxVec3(0,0,stackZ-=10.0f)), 1, 2.0f);
+	role = new Role();
 
 	//if (不交互)，在render中把交互设成false就有一个默认的球滚过去撞击堆。
 	if(!interactive)
