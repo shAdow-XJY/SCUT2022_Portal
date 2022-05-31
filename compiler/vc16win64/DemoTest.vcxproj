@@ -26,6 +26,7 @@
     <ClCompile Include="..\..\src\Render\Render.cpp" />
     <ClCompile Include="..\..\src\Role\CCT.cpp" />
     <ClCompile Include="..\..\src\Role\Role.cpp" />
+    <ClCompile Include="..\..\src\Utils\mouseUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Render\Camera.h" />

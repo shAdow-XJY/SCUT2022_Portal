@@ -7,7 +7,7 @@ CCTRole::CCTRole() {
 	manager->setOverlapRecoveryModule(true);
 	PxCapsuleControllerDesc desc;
 	desc.radius = PxF32(4.0);
-	desc.height = PxF32(8.0);
+	desc.height = PxF32(10.0);
 	desc.material = gMaterial;
 	desc.upDirection = PxVec3(0.0, 1.0, 0.0);
 	//skin width/ 可以理解为碰撞盒子体积
@@ -28,7 +28,12 @@ PxRigidBody* CCTRole::getActor() {
 }
 
 void CCTRole::setPosition(PxExtendedVec3 position) {
-	controller->setPosition(position);
+	controller->setFootPosition(position);
+}
+
+PxVec3 CCTRole::getPosition() {
+	PxExtendedVec3 position = controller->getPosition();
+	return PxVec3(position.x, position.y, position.z);
 }
 
 void CCTRole::setDirect(PxVec3 cameraDirect) {
@@ -43,7 +48,7 @@ void CCTRole::resetDirect(){
 }
 
 void CCTRole::tryJump() {
-	if (!isJump) {
+	if (!isJump && !isFall) {
 		isJump = true;
 	}
 }
@@ -71,12 +76,10 @@ void CCTRole::roleJump() {
 
 void CCTRole::roleFall() {
 	if (!isJump) {
-		if (isFall) {
-			PxControllerCollisionFlags flag = controller->move(PxVec3(directX, -midFallSpeed, directZ), PxF32(0.00001), PxF32(0.1), NULL);
-			if (flag == PxControllerCollisionFlag::eCOLLISION_DOWN) {
-				isFall = false;
-				resetDirect();
-			}
+		PxControllerCollisionFlags flag = controller->move(PxVec3(directX, -midFallSpeed, directZ), PxF32(0.00001), PxF32(0.1), NULL);
+		if (flag == PxControllerCollisionFlag::eCOLLISION_DOWN) {
+			resetDirect();
+			isFall = false;
 		}
 	}
 }

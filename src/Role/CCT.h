@@ -22,7 +22,7 @@ private:
 	float nowJumpHeight = 0.0;
 	float maxJumpHeight = 20.0;
 
-	bool isFall = true;
+	bool isFall = false;
 	float midFallSpeed = 0.85;
 
 public:
@@ -30,6 +30,7 @@ public:
 	~CCTRole();
 	PxRigidBody* getActor();
 	void setPosition(PxExtendedVec3 position);
+	PxVec3 getPosition();
 
 	void setDirect(PxVec3 cameraDirect);
 	void resetDirect();

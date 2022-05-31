@@ -344,7 +344,7 @@ void initPhysics(bool interactive)
 	//role = new Role();
 
 	cctRole = new CCTRole();
-	cctRole->setPosition(PxExtendedVec3(0, 40, 100));
+	cctRole->setPosition(PxExtendedVec3(50, 16, 0));
 	cctActor = cctRole->getActor();
 	gScene->addActor(*cctActor);
 	
@@ -388,10 +388,36 @@ void keyPress(unsigned char key, const PxTransform& camera, PxVec3 cameraDirect)
 	{
 	case 'B':	createStack(PxTransform(PxVec3(0,0,stackZ-=10.0f)), 10, 2.0f);						break;
 	//PxSphereGeometry Transform,geometry,velocity£¨ËÙ¶È£©
-	case ' ': {
+	case ' ': 
+	{
 		cctRole->setDirect(cameraDirect);
 		cctRole->tryJump(); 
-	}	break;
+	}	
+	break;
+	case 'I':
+	{
+		cctRole->setDirect(PxVec3(0.0,0.0,-1.0));
+		cctRole->tryJump();
+	}
+	break;
+	case 'K':
+	{
+		cctRole->setDirect(PxVec3(0.0, 0.0, 1.0));
+		cctRole->tryJump();
+	}
+	break;
+	case 'J':
+	{
+		cctRole->setDirect(PxVec3(-1.0, 0.0, 0.0));
+		cctRole->tryJump();
+	}
+	break;
+	case 'L':
+	{
+		cctRole->setDirect(PxVec3(1.0, 0.0, 0.0));
+		cctRole->tryJump();
+	}
+	break;
 	}
 }
 

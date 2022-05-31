@@ -81,6 +81,8 @@ void renderCallback()
 	if (cctRole) {
 		cctRole->roleJump();
 		cctRole->roleFall();
+		//sCamera->setEye(cctRole->getPosition());
+		
 	}
 
 	PxScene* scene;
@@ -106,7 +108,7 @@ void exitCallback(void)
 
 void renderLoop()
 {
-	sCamera = new Snippets::Camera(PxVec3(50.0f, 50.0f, 50.0f), PxVec3(-0.6f,-0.2f,-0.7f));
+	sCamera = new Snippets::Camera(PxVec3(250.0f, 250.0f, 250.0f), PxVec3(-0.1f,-0.8f,-0.1f));
 
 	Snippets::setupDefaultWindow("PhysX Demo");
 	Snippets::setupDefaultRenderState();
