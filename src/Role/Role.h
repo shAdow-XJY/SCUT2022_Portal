@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <iostream>
 #include "PxPhysicsAPI.h"
+#include <glut.h>
 using namespace physx;
 
 extern PxScene* gScene;
@@ -16,24 +17,33 @@ private:
 	PxVec3 nowPostion;	//角色需要达到的位置
 	PxVec3 lastPostion;	//角色之前所在的位置
 	bool isMoving = false;
+
+	bool isJump = false;
+	float littleJumpSpeed = 0.8;
+	float bigJumpSpeed = 0.9;
+	float nowJumpHeight = 0.0;
+	float maxJumpHeight = 20.0;
+
+	bool isFall = false;
+	float midFallSpeed = 0.85;
+
 public:
 	Role();
 	~Role() {
 		this->role->release();
 		this->roleController->release();
 	};
-<<<<<<< HEAD
-	~Role();
-	void setRolePosition(PxVec3 position);
 
-};
-=======
 	bool getMovingStatus();
 	PxVec3 getFootPosition();
 	void roleMoveByMouse(int x, int y);
 	void move();
-	void move(char key);
+	void move(GLint key);
 	void stopMoving();
+
+	void tryJump();
+	void roleJump();
+	void roleFall();
 };
 
 class RoleHitCallback :public PxUserControllerHitReport {
@@ -57,6 +67,7 @@ public:
 	PxControllerBehaviorFlags getBehaviorFlags(const PxShape& shape, const PxActor& actor){	
 		//判断碰撞的物体若不为Ground，则停止移动
 		if (actor.getName() != "Ground") {
+			std::cout << "撞到了，停止移动" << std::endl;
 			this->role->stopMoving();
 		}
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
@@ -70,9 +81,3 @@ public:
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
 	}
 };
-
-
-
-
-
->>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e

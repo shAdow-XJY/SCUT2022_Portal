@@ -41,14 +41,10 @@
 #include "../Common/PVD.h"
 #include "../Utils/Utils.h"
 #include "../Role/Role.h"
-#include "../Role/CCT.h"
 #include<vector>
-<<<<<<< HEAD
 #include <glut.h>
-
-=======
 #include<iostream>
->>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
+
 
 using namespace physx;
 //默认的内存管理和错误报告器
@@ -80,15 +76,8 @@ const char* PigName = "pig";
 
 
 Role* role = NULL;
-<<<<<<< HEAD
-//extern void roleJump(Role* role);
-CCTRole* cctRole = NULL;
-PxRigidBody* cctActor = NULL;
-=======
 PxControllerManager* cManager = NULL;
 
-
->>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
 
 struct FilterGroup
 {
@@ -357,16 +346,8 @@ void initPhysics(bool interactive)
 	gScene->addActor(*groundPlane);
 
 
-	//role = new Role();
-<<<<<<< HEAD
-=======
 	role = new Role();
->>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
 
-	cctRole = new CCTRole();
-	cctRole->setPosition(PxExtendedVec3(50, 16, 0));
-	cctActor = cctRole->getActor();
-	gScene->addActor(*cctActor);
 	
 	
 	//if (不交互)，在render中把交互设成false就有一个默认的球滚过去撞击堆。
@@ -410,41 +391,8 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	//PxSphereGeometry Transform,geometry,velocity（速度）
 	case ' ': 
 	{
-		cctRole->tryJump(); 
+		role->tryJump();
 	}	
-	break;
-	default:
-		break;
-	}
-}
-
-//特殊按键设置——方向键等
-void specialKeyPress(GLint key) {
-	switch (key)
-	{
-	case GLUT_KEY_UP:
-	{
-		cctRole->setDirect(PxVec3(0.0, 0.0, -1.0));
-		cctRole->roleMove();
-	}
-	break;
-	case GLUT_KEY_DOWN:
-	{
-		cctRole->setDirect(PxVec3(0.0, 0.0, 1.0));
-		cctRole->roleMove();
-	}
-	break;
-	case GLUT_KEY_LEFT:
-	{
-		cctRole->setDirect(PxVec3(-1.0, 0.0, 0.0));
-		cctRole->roleMove();
-	}
-	break;
-	case GLUT_KEY_RIGHT:
-	{
-		cctRole->setDirect(PxVec3(1.0, 0.0, 0.0));
-		cctRole->roleMove();
-	}
 	break;
 	default:
 		break;

@@ -68,30 +68,17 @@ void Camera::handleMouse(int button, int state, int x, int y)
 	switch(toupper(key))
 	{
 		if (this->free) {
-<<<<<<< HEAD
 			case 'W':	mEye += mDir * 2.0f * speed;		break;
 			case 'S':	mEye -= mDir * 2.0f * speed;		break;
 			case 'A':	mEye -= viewY * 2.0f * speed;		break;
 			case 'D':	mEye += viewY * 2.0f * speed;		break;
-=======
-			case 'I':	mEye += mDir * 2.0f * speed;		break;
-			case 'K':	mEye -= mDir * 2.0f * speed;		break;
-			case 'J':	mEye -= viewY * 2.0f * speed;		break;
-			case 'L':	mEye += viewY * 2.0f * speed;		break;
->>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
 		}
 		//切换是否为自由视角
 		case 'T': {
 			this->free = !this->free; ;
-<<<<<<< HEAD
 			if (!this->free) this->mDir = PxVec3(0, -20, 50); //朝物体下方看
 			break;
 		}
-=======
-			if(!this->free) this->mDir = PxVec3(0, -20, 50); //朝物体下方看
-			break;
-		} 
->>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
 	default:							return false;
 	}
 	return true;

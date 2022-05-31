@@ -35,26 +35,17 @@
 
 #include "../Render/Render.h"
 #include "../Render/Camera.h"
-<<<<<<< HEAD
-#include "../Role/CCT.h"
-=======
 #include "../Role/Role.h"
 
 
->>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
 using namespace physx;
 
 extern void initPhysics(bool interactive);
 extern void stepPhysics(bool interactive);	
 extern void cleanupPhysics(bool interactive);
 extern void keyPress(unsigned char key, const PxTransform& camera);
-<<<<<<< HEAD
-extern void specialKeyPress(GLint key);
-extern CCTRole* cctRole;
-=======
 extern void mousePress(int button, int state, int x, int y);
 extern Role* role;
->>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
 
 namespace
 {
@@ -73,12 +64,11 @@ void keyboardCallback(unsigned char key, int x, int y)
 	if(!sCamera->handleKey(key, x, y))
 		keyPress(key, sCamera->getTransform());
 
-	role->move(key);
 }
 
 void SpecialKeyCallback(GLint key, GLint x, GLint y)
 {
-	specialKeyPress(key);
+	role->move(key);
 }
 
 void mouseCallback(int button, int state, int x, int y)
@@ -95,27 +85,32 @@ void idleCallback()
 void renderCallback()
 {
 	stepPhysics(true);
-<<<<<<< HEAD
 
-	if (!sCamera->isFree()) {
-		sCamera->setEye(cctRole->getFootPosition() + PxVec3(0, 50, -50));
-	}
-	Snippets::startRender(sCamera->getEye(), sCamera->getDir());
-
-	if (cctRole) {
-		cctRole->roleJump();
-		cctRole->roleFall();
-=======
 	
 	if (!sCamera->isFree()) {
 		sCamera->setEye(role->getFootPosition() + PxVec3(0,50,-50));
 	}
 	Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 
-	if (role) {
-		role->move();
->>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
+	if (sCamera->isFree())
+	{
+		//直接写这个键盘移动时跳跃会在一次性完成，过程动画失效
+		if (role)
+		{
+			role->move();
+			role->roleJump();
+			role->roleFall();
+		}
 	}
+	else {
+		if (role)
+		{
+			role->roleJump();
+			role->roleFall();
+		}
+	}
+	
+	
 
 	PxScene* scene;
 	PxGetPhysics().getScenes(&scene,1);
