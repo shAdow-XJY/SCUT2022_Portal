@@ -63,6 +63,8 @@ void keyboardCallback(unsigned char key, int x, int y)
 
 	if(!sCamera->handleKey(key, x, y))
 		keyPress(key, sCamera->getTransform());
+
+	role->move(key);
 }
 
 void mouseCallback(int button, int state, int x, int y)
@@ -79,7 +81,10 @@ void idleCallback()
 void renderCallback()
 {
 	stepPhysics(true);
-
+	
+	if (!sCamera->isFree()) {
+		sCamera->setEye(role->getFootPosition() + PxVec3(0,50,-50));
+	}
 	Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 
 	if (role) {

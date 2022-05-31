@@ -341,6 +341,7 @@ void initPhysics(bool interactive)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
 
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
+	groundPlane->setName("Ground");
 	gScene->addActor(*groundPlane);
 
 
@@ -397,8 +398,7 @@ void mousePress(int button, int state, int x, int y) {
 	case 0: {
 		//×ó¼üÌ§Æð
 		if (state == 1) {
-			/*PxVec3 nowPosition = changeScenetoWorld(x, y);
-			role->setRolePosition(nowPosition);*/
+			if (role->getMovingStatus())return;
 			role->roleMoveByMouse(x, y);
 		}
 	}

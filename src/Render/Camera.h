@@ -45,14 +45,18 @@ public:
 	void				handleMotion(int x, int y);
 	void				handleAnalogMove(float x, float y);
 	void				goFront(float speed);
+	void				setEye(physx::PxVec3 position);
+	void				setDir(physx::PxVec3 direction);
 	physx::PxVec3		getEye()	const;
 	physx::PxVec3		getDir()	const;
 	physx::PxTransform	getTransform() const;
+	bool				isFree();
 private:
 	physx::PxVec3	mEye;
 	physx::PxVec3	mDir;
 	int				mMouseX;
 	int				mMouseY;
+	bool			free = true; //相机是否可以自由移动
 };
 
 
