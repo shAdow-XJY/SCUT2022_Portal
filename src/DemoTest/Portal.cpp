@@ -77,7 +77,7 @@ const char* PigName = "pig";
 Role* role = NULL;
 //extern void roleJump(Role* role);
 CCTRole* cctRole = NULL;
-PxControllerFilters filters = NULL;
+PxRigidBody* cctActor = NULL;
 
 struct FilterGroup
 {
@@ -345,10 +345,10 @@ void initPhysics(bool interactive)
 
 	cctRole = new CCTRole();
 	cctRole->setPosition(PxExtendedVec3(0, 40, 100));
-	PxRigidBody* cctActor = cctRole->getActor();
+	cctActor = cctRole->getActor();
 	gScene->addActor(*cctActor);
 	
-
+	
 	//if (不交互)，在render中把交互设成false就有一个默认的球滚过去撞击堆。
 	if(!interactive)
 		//PxSphereGeometry Transform,geometry,velocity（速度）
@@ -382,13 +382,16 @@ void cleanupPhysics(bool interactive)
 }
 
 //按键设置
-void keyPress(unsigned char key, const PxTransform& camera)
+void keyPress(unsigned char key, const PxTransform& camera, PxVec3 cameraDirect)
 {
 	switch(toupper(key))
 	{
 	case 'B':	createStack(PxTransform(PxVec3(0,0,stackZ-=10.0f)), 10, 2.0f);						break;
 	//PxSphereGeometry Transform,geometry,velocity（速度）
-	case ' ':	cctRole->roleMove(filters);	break;
+	case ' ': {
+		cctRole->setDirect(cameraDirect);
+		cctRole->tryJump(); 
+	}	break;
 	}
 }
 

@@ -35,14 +35,14 @@
 
 #include "../Render/Render.h"
 #include "../Render/Camera.h"
-
+#include "../Role/CCT.h"
 using namespace physx;
 
 extern void initPhysics(bool interactive);
 extern void stepPhysics(bool interactive);	
 extern void cleanupPhysics(bool interactive);
-extern void keyPress(unsigned char key, const PxTransform& camera);
-
+extern void keyPress(unsigned char key, const PxTransform& camera, PxVec3 cameraDirect);
+extern CCTRole* cctRole;
 
 namespace
 {
@@ -59,7 +59,7 @@ void keyboardCallback(unsigned char key, int x, int y)
 		exit(0);
 
 	if(!sCamera->handleKey(key, x, y))
-		keyPress(key, sCamera->getTransform());
+		keyPress(key, sCamera->getTransform(),sCamera->getDir());
 }
 
 void mouseCallback(int button, int state, int x, int y)
@@ -77,6 +77,11 @@ void renderCallback()
 	stepPhysics(true);
 
 	Snippets::startRender(sCamera->getEye(), sCamera->getDir());
+
+	if (cctRole) {
+		cctRole->roleJump();
+		cctRole->roleFall();
+	}
 
 	PxScene* scene;
 	PxGetPhysics().getScenes(&scene,1);

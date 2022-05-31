@@ -12,10 +12,29 @@ private:
 	PxRigidBody* role;
 	PxControllerManager* manager;
 	PxController* controller;
+
+	float directX = 0.0;
+	float directZ = 0.0;
+
+	bool isJump = false;
+	float littleJumpSpeed = 0.8;
+	float bigJumpSpeed = 0.9;
+	float nowJumpHeight = 0.0;
+	float maxJumpHeight = 20.0;
+
+	bool isFall = true;
+	float midFallSpeed = 0.85;
+
 public:
 	CCTRole();
 	~CCTRole();
 	PxRigidBody* getActor();
 	void setPosition(PxExtendedVec3 position);
-	void roleMove(PxControllerFilters filters);
+
+	void setDirect(PxVec3 cameraDirect);
+	void resetDirect();
+
+	void tryJump();
+	void roleJump();
+	void roleFall();
 };
