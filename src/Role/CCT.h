@@ -29,11 +29,14 @@ public:
 	CCTRole();
 	~CCTRole();
 	PxRigidBody* getActor();
+
 	void setPosition(PxExtendedVec3 position);
-	PxVec3 getPosition();
+	PxVec3 getFootPosition();
 
 	void setDirect(PxVec3 cameraDirect);
 	void resetDirect();
+
+	void roleMove();
 
 	void tryJump();
 	void roleJump();

@@ -43,6 +43,7 @@
 #include "../Role/Role.h"
 #include "../Role/CCT.h"
 #include<vector>
+#include <glut.h>
 
 
 using namespace physx;
@@ -382,7 +383,7 @@ void cleanupPhysics(bool interactive)
 }
 
 //按键设置
-void keyPress(unsigned char key, const PxTransform& camera, PxVec3 cameraDirect)
+void keyPress(unsigned char key, const PxTransform& camera)
 {
 	switch(toupper(key))
 	{
@@ -390,34 +391,44 @@ void keyPress(unsigned char key, const PxTransform& camera, PxVec3 cameraDirect)
 	//PxSphereGeometry Transform,geometry,velocity（速度）
 	case ' ': 
 	{
-		cctRole->setDirect(cameraDirect);
 		cctRole->tryJump(); 
 	}	
 	break;
-	case 'I':
+	default:
+		break;
+	}
+}
+
+//特殊按键设置——方向键等
+void specialKeyPress(GLint key) {
+	switch (key)
 	{
-		cctRole->setDirect(PxVec3(0.0,0.0,-1.0));
-		cctRole->tryJump();
+	case GLUT_KEY_UP:
+	{
+		cctRole->setDirect(PxVec3(0.0, 0.0, -1.0));
+		cctRole->roleMove();
 	}
 	break;
-	case 'K':
+	case GLUT_KEY_DOWN:
 	{
 		cctRole->setDirect(PxVec3(0.0, 0.0, 1.0));
-		cctRole->tryJump();
+		cctRole->roleMove();
 	}
 	break;
-	case 'J':
+	case GLUT_KEY_LEFT:
 	{
 		cctRole->setDirect(PxVec3(-1.0, 0.0, 0.0));
-		cctRole->tryJump();
+		cctRole->roleMove();
 	}
 	break;
-	case 'L':
+	case GLUT_KEY_RIGHT:
 	{
 		cctRole->setDirect(PxVec3(1.0, 0.0, 0.0));
-		cctRole->tryJump();
+		cctRole->roleMove();
 	}
 	break;
+	default:
+		break;
 	}
 }
 

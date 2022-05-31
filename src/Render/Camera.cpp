@@ -67,10 +67,18 @@ void Camera::handleMouse(int button, int state, int x, int y)
 	PxVec3 viewY = mDir.cross(PxVec3(0,1,0)).getNormalized();
 	switch(toupper(key))
 	{
-	case 'W':	mEye += mDir*2.0f*speed;		break;
-	case 'S':	mEye -= mDir*2.0f*speed;		break;
-	case 'A':	mEye -= viewY*2.0f*speed;		break;
-	case 'D':	mEye += viewY*2.0f*speed;		break;
+		if (this->free) {
+			case 'W':	mEye += mDir * 2.0f * speed;		break;
+			case 'S':	mEye -= mDir * 2.0f * speed;		break;
+			case 'A':	mEye -= viewY * 2.0f * speed;		break;
+			case 'D':	mEye += viewY * 2.0f * speed;		break;
+		}
+		//切换是否为自由视角
+		case 'T': {
+			this->free = !this->free; ;
+			if (!this->free) this->mDir = PxVec3(0, -20, 50); //朝物体下方看
+			break;
+		}
 	default:							return false;
 	}
 	return true;
@@ -111,6 +119,18 @@ PxTransform Camera::getTransform() const
 
 	PxMat33 m(mDir.cross(viewY), viewY, -mDir);
 	return PxTransform(mEye, PxQuat(m));
+}
+
+void Camera::setEye(PxVec3 position) {
+	this->mEye = position;
+}
+
+void Camera::setDir(PxVec3 direction) {
+	this->mDir = direction;
+}
+
+bool Camera::isFree() {
+	return this->free;
 }
 
 PxVec3 Camera::getEye() const

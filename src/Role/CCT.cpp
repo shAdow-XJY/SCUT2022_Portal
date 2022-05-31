@@ -31,7 +31,7 @@ void CCTRole::setPosition(PxExtendedVec3 position) {
 	controller->setFootPosition(position);
 }
 
-PxVec3 CCTRole::getPosition() {
+PxVec3 CCTRole::getFootPosition() {
 	PxExtendedVec3 position = controller->getPosition();
 	return PxVec3(position.x, position.y, position.z);
 }
@@ -45,6 +45,12 @@ void CCTRole::setDirect(PxVec3 cameraDirect) {
 void CCTRole::resetDirect(){
 	directX = 0.0;
 	directZ = 0.0;
+}
+
+void CCTRole::roleMove() {
+	if (!isJump) {
+		PxControllerCollisionFlags flag = controller->move(PxVec3(directX, 0.0, directZ), PxF32(0.00001), PxF32(0.1), NULL);
+	}
 }
 
 void CCTRole::tryJump() {

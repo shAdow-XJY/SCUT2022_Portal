@@ -41,7 +41,8 @@ using namespace physx;
 extern void initPhysics(bool interactive);
 extern void stepPhysics(bool interactive);	
 extern void cleanupPhysics(bool interactive);
-extern void keyPress(unsigned char key, const PxTransform& camera, PxVec3 cameraDirect);
+extern void keyPress(unsigned char key, const PxTransform& camera);
+extern void specialKeyPress(GLint key);
 extern CCTRole* cctRole;
 
 namespace
@@ -59,7 +60,12 @@ void keyboardCallback(unsigned char key, int x, int y)
 		exit(0);
 
 	if(!sCamera->handleKey(key, x, y))
-		keyPress(key, sCamera->getTransform(),sCamera->getDir());
+		keyPress(key, sCamera->getTransform());
+}
+
+void SpecialKeyCallback(GLint key, GLint x, GLint y)
+{
+	specialKeyPress(key);
 }
 
 void mouseCallback(int button, int state, int x, int y)
@@ -76,13 +82,14 @@ void renderCallback()
 {
 	stepPhysics(true);
 
+	if (!sCamera->isFree()) {
+		sCamera->setEye(cctRole->getFootPosition() + PxVec3(0, 50, -50));
+	}
 	Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 
 	if (cctRole) {
 		cctRole->roleJump();
 		cctRole->roleFall();
-		//sCamera->setEye(cctRole->getPosition());
-		
 	}
 
 	PxScene* scene;
@@ -108,7 +115,7 @@ void exitCallback(void)
 
 void renderLoop()
 {
-	sCamera = new Snippets::Camera(PxVec3(250.0f, 250.0f, 250.0f), PxVec3(-0.1f,-0.8f,-0.1f));
+	sCamera = new Snippets::Camera(PxVec3(0.0f, 250.0f, 0.0f), PxVec3(-0.1f,-0.8f,-0.1f));
 
 	Snippets::setupDefaultWindow("PhysX Demo");
 	Snippets::setupDefaultRenderState();
@@ -116,6 +123,7 @@ void renderLoop()
 	glutIdleFunc(idleCallback);
 	glutDisplayFunc(renderCallback);
 	glutKeyboardFunc(keyboardCallback);
+	glutSpecialFunc(SpecialKeyCallback);
 	glutMouseFunc(mouseCallback);
 	glutMotionFunc(motionCallback);
 	motionCallback(0,0);
