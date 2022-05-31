@@ -9,9 +9,12 @@
     <ClCompile Include="..\..\src\Role\Role.cpp">
       <Filter>Role</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="..\..\src\Role\CCT.cpp">
       <Filter>Role</Filter>
     </ClCompile>
+=======
+>>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
     <ClCompile Include="..\..\src\Utils\mouseUtils.cpp">
       <Filter>InputEvent</Filter>
     </ClCompile>
@@ -31,7 +34,11 @@
       <UniqueIdentifier>{f6b14483-959c-4833-b660-4a1990949db9}</UniqueIdentifier>
     </Filter>
     <Filter Include="InputEvent">
+<<<<<<< HEAD
       <UniqueIdentifier>{f4228f95-f8bb-4668-8966-49d342dc1000}</UniqueIdentifier>
+=======
+      <UniqueIdentifier>{fa2182ed-f80a-434d-bbb8-0b62ef536ac5}</UniqueIdentifier>
+>>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
     </Filter>
   </ItemGroup>
 </Project>

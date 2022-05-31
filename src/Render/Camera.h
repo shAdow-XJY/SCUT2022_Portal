@@ -56,7 +56,11 @@ private:
 	physx::PxVec3	mDir;
 	int				mMouseX;
 	int				mMouseY;
+<<<<<<< HEAD
 	bool			free = true;
+=======
+	bool			free = true; //相机是否可以自由移动
+>>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
 };
 
 

@@ -43,8 +43,12 @@
 #include "../Role/Role.h"
 #include "../Role/CCT.h"
 #include<vector>
+<<<<<<< HEAD
 #include <glut.h>
 
+=======
+#include<iostream>
+>>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
 
 using namespace physx;
 //默认的内存管理和错误报告器
@@ -76,9 +80,15 @@ const char* PigName = "pig";
 
 
 Role* role = NULL;
+<<<<<<< HEAD
 //extern void roleJump(Role* role);
 CCTRole* cctRole = NULL;
 PxRigidBody* cctActor = NULL;
+=======
+PxControllerManager* cManager = NULL;
+
+
+>>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
 
 struct FilterGroup
 {
@@ -244,6 +254,8 @@ PxRigidDynamic* createDynamic( PxReal radius, const PxTransform& t, const PxVec3
 
 	//设置角阻尼系数，还有线性阻尼linearDamping；线性阻尼控制物理形体或约束抵抗平移的量,而角阻尼控制其抵抗旋转的量。如果设置为0，物体会一直旋转/平移
 	dynamic->setAngularDamping(10.0f);
+
+
 	//设置线性速度 
 	dynamic->setLinearVelocity(velocity);
 
@@ -335,14 +347,21 @@ void initPhysics(bool interactive)
 		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
 		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
 	}
+	cManager = PxCreateControllerManager(*gScene);
+	cManager->setOverlapRecoveryModule(true);
 	//静摩擦，动摩擦，restitution恢复原状(弹性)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
 
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
+	groundPlane->setName("Ground");
 	gScene->addActor(*groundPlane);
 
 
 	//role = new Role();
+<<<<<<< HEAD
+=======
+	role = new Role();
+>>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
 
 	cctRole = new CCTRole();
 	cctRole->setPosition(PxExtendedVec3(50, 16, 0));
@@ -387,7 +406,7 @@ void keyPress(unsigned char key, const PxTransform& camera)
 {
 	switch(toupper(key))
 	{
-	case 'B':	createStack(PxTransform(PxVec3(0,0,stackZ-=10.0f)), 10, 2.0f);						break;
+	case 'B':	createStack(PxTransform(PxVec3(0,0,stackZ-=10.0f)), 10, 2.0f);break;
 	//PxSphereGeometry Transform,geometry,velocity（速度）
 	case ' ': 
 	{
@@ -427,6 +446,22 @@ void specialKeyPress(GLint key) {
 		cctRole->roleMove();
 	}
 	break;
+	default:
+		break;
+	}
+}
+
+void mousePress(int button, int state, int x, int y) {
+	switch (button)
+	{
+	//点击左键
+	case 0: {
+		//左键抬起
+		if (state == 1) {
+			if (role->getMovingStatus())return;
+			role->roleMoveByMouse(x, y);
+		}
+	}
 	default:
 		break;
 	}
