@@ -37,25 +37,30 @@ bool Role::getMovingStatus() {
 * @param x 屏幕坐标x值 y 屏幕坐标y值
 **/
 void Role::roleMoveByMouse(int x, int y) {
-	if (this->isMoving) return;
+	if (this->isMoving || this->isJump || this->isFall) return;
 	PxVec3 nowPosition = ScenetoWorld(x, y);
+	//std::cout << nowPosition.x << " " << nowPosition.y << std::endl;
 	this->lastPostion = PxVec3(this->nowPostion.x,this->nowPostion.y,this->nowPostion.z);
 	this->nowPostion = nowPosition;
-	
+	this->isMoving = true;
 }
 
 /**
 * @brief 角色鼠标移动核心函数
 **/
 void Role::move() {
+	if(!this->isMoving) return;
 	PxExtendedVec3 position = this->roleController->getFootPosition();
 	float offsetX = this->nowPostion.x - position.x;
 	float offsetZ = this->nowPostion.z - position.z;
+	std::cout << offsetX << std::endl;
+	std::cout << offsetZ << std::endl;
 	if (abs(offsetX) <= 0.01f && abs(offsetZ) <= 0.01f) {
 		this->roleController->setFootPosition(PxExtendedVec3(this->nowPostion.x, this->nowPostion.y, this->nowPostion.z));
 		this->isMoving = false;
 		return;
 	}
+
 	this->isMoving = true;
 	float speed = 0.05f;
 	if (abs(offsetX) > 0.05f) {
@@ -90,6 +95,7 @@ void Role::stopMoving() {
 * @brief 键盘输入控制角色
 **/
 void Role::move(GLint key) {
+	this->isMoving = false;
 	PxVec3 dir = PxVec3(0,0,0);
 	switch (key) {
 		case GLUT_KEY_UP:{
@@ -110,11 +116,10 @@ void Role::move(GLint key) {
 
 		}
 	}
-	float speed = 0.5f;
-	this->roleController->move(dir * speed, 0.0001, 1.0f / 60.0f, NULL);
-	PxExtendedVec3 position = this->roleController->getFootPosition();
-	this->lastPostion = PxVec3(this->nowPostion.x, this->nowPostion.y, this->nowPostion.z);
-	this->nowPostion = PxVec3(position.x, position.y, position.z);
+	this->speed = dir * 0.3f;
+	if (this->isJump || this->isFall) return;
+	this->roleController->move(this->speed, 0.0001,1.0f/60.0f, NULL);
+	this->updatePosition();
 }
 
 
@@ -125,6 +130,12 @@ void Role::move(GLint key) {
 PxVec3 Role::getFootPosition() {
 	PxExtendedVec3 pos = this->roleController->getFootPosition();
 	return PxVec3(pos.x, pos.y, pos.z);
+}
+
+void Role::updatePosition() {
+	PxExtendedVec3 position = this->roleController->getFootPosition();
+	this->lastPostion = PxVec3(this->nowPostion.x, this->nowPostion.y, this->nowPostion.z);
+	this->nowPostion = PxVec3(position.x, position.y, position.z);
 }
 
 /**
@@ -143,13 +154,15 @@ void Role::roleJump() {
 	if (isJump) {
 		float speed = 0.0;
 		if (nowJumpHeight <= maxJumpHeight / 2) {
-			speed = bigJumpSpeed;
+			speed = bigJumpSpeed ;
 		}
 		else
 		{
 			speed = littleJumpSpeed;
 		}
-		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, speed, 0.0), PxF32(0.001), PxF32(0.1), NULL);
+
+		std::cout << this->speed.x << " " << this->speed.z << std::endl;
+		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, speed, 0.0) + this->speed * 0.4, PxF32(0.001), 1.0f / 60.0f, NULL);
 		nowJumpHeight += speed;
 		std::cout << "maxJumpHeight" << maxJumpHeight << std::endl;
 		std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;
@@ -163,6 +176,7 @@ void Role::roleJump() {
 			isJump = false;
 			isFall = true;
 		}
+		//this->updatePosition();
 	}
 }
 
@@ -170,10 +184,13 @@ void Role::roleJump() {
 * @brief 角色下降阶段
 **/
 void Role::roleFall() {
-	if (!isJump) {
-		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, -midFallSpeed, 0.0), PxF32(0.00001), PxF32(0.1), NULL);
+	if (isFall) {
+		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, -midFallSpeed, 0.0) + this->speed * 0.4, PxF32(0.00001), 1.0f / 60.0f, NULL);		
 		if (flag == PxControllerCollisionFlag::eCOLLISION_DOWN) {
 			isFall = false;
+			this->speed = PxVec3(0,0,0);
+			this->updatePosition();
 		}
+		
 	}
 }

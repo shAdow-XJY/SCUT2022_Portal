@@ -19,13 +19,13 @@ private:
 	bool isMoving = false;
 
 	bool isJump = false;
-	float littleJumpSpeed = 0.8;
-	float bigJumpSpeed = 0.9;
+	float littleJumpSpeed = 0.08;
+	float bigJumpSpeed = 0.1;
 	float nowJumpHeight = 0.0;
-	float maxJumpHeight = 20.0;
+	float maxJumpHeight = 10.0;
 
 	bool isFall = false;
-	float midFallSpeed = 0.85;
+	float midFallSpeed = 0.1;
 
 public:
 	Role();
@@ -33,14 +33,14 @@ public:
 		this->role->release();
 		this->roleController->release();
 	};
-
+	PxVec3 speed = PxVec3(0,0,0);
 	bool getMovingStatus();
 	PxVec3 getFootPosition();
 	void roleMoveByMouse(int x, int y);
 	void move();
 	void move(GLint key);
 	void stopMoving();
-
+	void updatePosition();
 	void tryJump();
 	void roleJump();
 	void roleFall();

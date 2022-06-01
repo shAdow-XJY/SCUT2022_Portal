@@ -109,7 +109,14 @@ void renderCallback()
 			role->roleFall();
 		}
 	}
-	
+	if (role)
+	{
+		if (role->getMovingStatus() ||sCamera->isFree()) {
+			role->move();
+		}	
+		role->roleJump();
+		role->roleFall();
+	}
 	
 
 	PxScene* scene;
@@ -135,7 +142,7 @@ void exitCallback(void)
 
 void renderLoop()
 {
-	sCamera = new Snippets::Camera(PxVec3(0.0f, 250.0f, 0.0f), PxVec3(-0.1f,-0.8f,-0.1f));
+	sCamera = new Snippets::Camera(PxVec3(50.0f, 50.0f, 50.0f), PxVec3(-0.6f, -0.2f, -0.7f));
 
 	Snippets::setupDefaultWindow("PhysX Demo");
 	Snippets::setupDefaultRenderState();

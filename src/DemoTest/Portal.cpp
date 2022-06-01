@@ -392,8 +392,8 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	case ' ': 
 	{
 		role->tryJump();
+		break;
 	}	
-	break;
 	default:
 		break;
 	}
