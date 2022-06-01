@@ -28,7 +28,7 @@
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
 #include "Render.h"
-
+#include <iostream>
 using namespace physx;
 
 static float gCylinderData[]={
@@ -229,6 +229,10 @@ void renderGeometry(const PxGeometryHolder& h)
 		break;
 	}
 }
+
+// settings
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
 
 namespace Snippets
 {

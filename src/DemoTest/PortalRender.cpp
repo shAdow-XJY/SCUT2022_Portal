@@ -151,6 +151,7 @@ void renderLoop()
 	glutDisplayFunc(renderCallback);
 	glutKeyboardFunc(keyboardCallback);
 	glutSpecialFunc(SpecialKeyCallback);
+	glutKeyboardUpFunc();
 	glutMouseFunc(mouseCallback);
 	glutMotionFunc(motionCallback);
 	motionCallback(0,0);
@@ -159,5 +160,29 @@ void renderLoop()
 
 	initPhysics(true);
 	glutMainLoop();
+	
+
 }
 #endif
+
+LRESULT CALLBACK HostWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_KEYDOWN:
+		if (wParam == VK_LEFT)
+		{
+			std::cout << "...." << std::endl;
+		}
+		break;
+
+		if (wParam == VK_F1)
+		{
+			std::cout << "...." << std::endl;
+		}
+		break;
+	default:
+		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+	return 0;
+}
