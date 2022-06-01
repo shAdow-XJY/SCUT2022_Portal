@@ -76,7 +76,7 @@ void Camera::handleMouse(int button, int state, int x, int y)
 		//切换是否为自由视角
 		case 'T': {
 			this->free = !this->free; ;
-			if(!this->free) this->mDir = PxVec3(0, -20, 50); //朝物体下方看
+			if(!this->free) this->mDir = PxVec3(0, -20, 50).getNormalized(); //朝物体下方看
 			break;
 		} 
 	default:							return false;
