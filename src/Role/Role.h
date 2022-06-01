@@ -14,18 +14,19 @@ class Role {
 private:
 	PxRigidBody* role;
 	PxController* roleController;
+	PxVec3 speed = PxVec3(0, 0, 0);
 	PxVec3 nowPostion;	//角色需要达到的位置
 	PxVec3 lastPostion;	//角色之前所在的位置
-	bool isMoving = false;
+	bool isMoving = false; //是否为自动移动
 
 	bool isJump = false;
-	float littleJumpSpeed = 0.08;
-	float bigJumpSpeed = 0.1;
+	float littleJumpSpeed = 0.06;
+	float bigJumpSpeed = 0.08;
 	float nowJumpHeight = 0.0;
-	float maxJumpHeight = 10.0;
+	float maxJumpHeight = 15.0;
 
 	bool isFall = false;
-	float midFallSpeed = 0.1;
+	float midFallSpeed = 0.08;
 
 public:
 	Role();
@@ -33,14 +34,24 @@ public:
 		this->role->release();
 		this->roleController->release();
 	};
-	PxVec3 speed = PxVec3(0,0,0);
-	bool getMovingStatus();
+
+
 	PxVec3 getFootPosition();
+	void updatePosition();
+
+	//速度相关
+	PxVec3 getSpeed();
+	void setSpeed(PxVec3 speed);
+
+	//移动相关
 	void roleMoveByMouse(int x, int y);
 	void move();
-	void move(GLint key);
+	void move(GLint key, bool status);
+	bool getMovingStatus();
 	void stopMoving();
-	void updatePosition();
+
+	
+
 	void tryJump();
 	void roleJump();
 	void roleFall();

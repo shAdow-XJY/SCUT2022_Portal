@@ -6,15 +6,10 @@
     <ClCompile Include="..\..\src\DemoTest\PortalRender.cpp" />
     <ClCompile Include="..\..\src\Render\Camera.cpp" />
     <ClCompile Include="..\..\src\Render\Render.cpp" />
+    <ClCompile Include="..\..\src\Role\CCT.cpp" />
     <ClCompile Include="..\..\src\Role\Role.cpp">
       <Filter>Role</Filter>
     </ClCompile>
-<<<<<<< HEAD
-    <ClCompile Include="..\..\src\Role\CCT.cpp">
-      <Filter>Role</Filter>
-    </ClCompile>
-=======
->>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
     <ClCompile Include="..\..\src\Utils\mouseUtils.cpp">
       <Filter>InputEvent</Filter>
     </ClCompile>
@@ -22,23 +17,17 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\Render\Camera.h" />
     <ClInclude Include="..\..\src\Render\Render.h" />
+    <ClInclude Include="..\..\src\Role\CCT.h" />
     <ClInclude Include="..\..\src\Role\Role.h">
-      <Filter>Role</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\Role\CCT.h">
       <Filter>Role</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Role">
-      <UniqueIdentifier>{f6b14483-959c-4833-b660-4a1990949db9}</UniqueIdentifier>
+      <UniqueIdentifier>{107b6cab-0587-40fb-8714-20433919e16c}</UniqueIdentifier>
     </Filter>
     <Filter Include="InputEvent">
-<<<<<<< HEAD
-      <UniqueIdentifier>{f4228f95-f8bb-4668-8966-49d342dc1000}</UniqueIdentifier>
-=======
-      <UniqueIdentifier>{fa2182ed-f80a-434d-bbb8-0b62ef536ac5}</UniqueIdentifier>
->>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
+      <UniqueIdentifier>{244dbdf3-6f4f-49f3-83af-291d1195b287}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
