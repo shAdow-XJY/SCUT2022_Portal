@@ -391,9 +391,23 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	//PxSphereGeometry Transform,geometry,velocity£¨ËÙ¶È£©
 	case ' ': 
 	{
-		role->tryJump();
+		role->tryJump(false);
 		break;
 	}	
+	default:
+		break;
+	}
+}
+
+void keyRelease(unsigned char key)
+{
+	switch (toupper(key))
+	{
+	case ' ':
+	{
+		role->tryJump(true);
+		break;
+	}
 	default:
 		break;
 	}

@@ -44,6 +44,7 @@ extern void initPhysics(bool interactive);
 extern void stepPhysics(bool interactive);	
 extern void cleanupPhysics(bool interactive);
 extern void keyPress(unsigned char key, const PxTransform& camera);
+extern void keyRelease(unsigned char key);
 extern void mousePress(int button, int state, int x, int y);
 extern Role* role;
 
@@ -67,7 +68,7 @@ void keyboardDownCallback(unsigned char key, int x, int y)
 }
 void keyboardUpCallback(unsigned char key, int x, int y)
 {
-
+	keyRelease(key);
 }
 
 void specialKeyDownCallback(GLint key, GLint x, GLint y)

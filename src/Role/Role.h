@@ -23,6 +23,7 @@ private:
 	float littleJumpSpeed = 0.06;
 	float bigJumpSpeed = 0.08;
 	float nowJumpHeight = 0.0;
+	float wantJumpHeight = 0.0;
 	float maxJumpHeight = 15.0;
 
 	bool isFall = false;
@@ -52,7 +53,7 @@ public:
 
 	
 
-	void tryJump();
+	void tryJump(bool release);
 	void roleJump();
 	void roleFall();
 };

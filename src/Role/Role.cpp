@@ -161,9 +161,16 @@ void Role::updatePosition() {
 /**
 * @brief ÅÐ¶ÏÌøÔ¾Ìõ¼þ
 **/
-void Role::tryJump() {
+void Role::tryJump(bool release) {
 	if (!isJump && !isFall) {
-		isJump = true;
+		if (!release) {
+			std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
+			wantJumpHeight = wantJumpHeight <= maxJumpHeight ? (wantJumpHeight + bigJumpSpeed*5) : maxJumpHeight;
+		}
+		else
+		{
+			isJump = true;
+		}
 	}
 }
 
@@ -173,7 +180,7 @@ void Role::tryJump() {
 void Role::roleJump() {
 	if (isJump) {
 		float speed = 0.0;
-		if (nowJumpHeight <= maxJumpHeight / 2) {
+		if (nowJumpHeight <= wantJumpHeight / 2) {
 			speed = bigJumpSpeed ;
 		}
 		else
@@ -182,15 +189,16 @@ void Role::roleJump() {
 		}
 		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, speed, 0.0) + this->speed * 0.2, PxF32(0.001), 1.0f / 60.0f, NULL);
 		nowJumpHeight += speed;
-		std::cout << "maxJumpHeight" << maxJumpHeight << std::endl;
+		std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
 		std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;
-		if (nowJumpHeight >= maxJumpHeight)
+		if (nowJumpHeight >= wantJumpHeight)
 		{
 			std::cout << "max height" << std::endl;
-			std::cout << "maxJumpHeight" << maxJumpHeight << std::endl;
+			std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
 			std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;
 
 			nowJumpHeight = 0.0;
+			wantJumpHeight = 0.0;
 			isJump = false;
 			isFall = true;
 		}
