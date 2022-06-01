@@ -46,6 +46,10 @@
 #error platform not supported.
 #endif
 
+#include"../ImGui/imgui.h"
+#include"../ImGui/imgui_impl_glut.h"
+#include"../ImGui/imgui_impl_opengl2.h"
+
 namespace Snippets
 {
 void setupDefaultWindow(const char* name);

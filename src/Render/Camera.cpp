@@ -54,15 +54,15 @@ void Camera::handleMouse(int button, int state, int x, int y)
 	mMouseY = y;
 }
 
-	void Camera::goFront(float speed)
-	{
-		mEye.z -= speed;
-	}
+void Camera::goFront(float speed)
+{
+	mEye.z -= speed;
+}
 
-	bool Camera::handleKey(unsigned char key, int x, int y, float speed)
-	{
-		PX_UNUSED(x);
-		PX_UNUSED(y);
+bool Camera::handleKey(unsigned char key, int x, int y, float speed)
+{
+	PX_UNUSED(x);
+	PX_UNUSED(y);
 
 	PxVec3 viewY = mDir.cross(PxVec3(0,1,0)).getNormalized();
 	switch(toupper(key))
@@ -79,7 +79,8 @@ void Camera::handleMouse(int button, int state, int x, int y)
 			if (!this->free) this->mDir = PxVec3(0, -20, 50); //朝物体下方看
 			break;
 		}
-	default:							return false;
+		default:							
+			return false;
 	}
 	return true;
 }

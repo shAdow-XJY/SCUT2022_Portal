@@ -47,6 +47,10 @@ static float gCylinderData[]={
 	1.0f,0.0f,1.0f,1.0f,0.0f,1.0f,1.0f,0.0f,0.0f,1.0f,0.0f,0.0f
 };
 
+static bool show_demo_window = true;
+static bool show_another_window = false;
+static ImVec4 clear_color = ImVec4(.45f, .55f, .6f, 1.0f);
+
 #define MAX_NUM_MESH_VEC3S  1024
 static PxVec3 gVertexBuffer[MAX_NUM_MESH_VEC3S];
 
@@ -279,9 +283,50 @@ void setupDefaultRenderState()
 	glEnable(GL_LIGHT0);
 }
 
+void renderImGui() {
+
+	{
+		static float f = 0.0f;
+		static int counter = 0;
+
+		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+		ImGui::Checkbox("Another Window", &show_another_window);
+
+		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+		ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+			counter++;
+		ImGui::SameLine();
+		ImGui::Text("counter = %d", counter);
+
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::End();
+	}
+
+	// 3. Show another simple window.
+	if (show_another_window)
+	{
+		ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+		ImGui::Text("Hello from another window!");
+		if (ImGui::Button("Close Me"))
+			show_another_window = false;
+		ImGui::End();
+	}
+
+	ImGui::Render();
+	ImGuiIO& io = ImGui::GetIO();
+	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+}
 
 void startRender(const PxVec3& cameraEye, const PxVec3& cameraDir, PxReal clipNear, PxReal clipFar)
 {
+	ImGui_ImplOpenGL2_NewFrame();
+	ImGui_ImplGLUT_NewFrame();
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Setup camera
@@ -294,6 +339,10 @@ void startRender(const PxVec3& cameraEye, const PxVec3& cameraDir, PxReal clipNe
 	gluLookAt(GLdouble(cameraEye.x), GLdouble(cameraEye.y), GLdouble(cameraEye.z), GLdouble(cameraEye.x + cameraDir.x), GLdouble(cameraEye.y + cameraDir.y), GLdouble(cameraEye.z + cameraDir.z), 0.0, 1.0, 0.0);
 
 	glColor4f(0.4f, 0.4f, 0.4f, 1.0f);
+
+	
+	
+
 }
 
 void renderGameOver(const char text[], int len) 
@@ -354,6 +403,9 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 
 void finishRender()
 {
+	// 把ui渲染放在这里 是为了其能显示在最上层
+	renderImGui();
+
 	glutSwapBuffers();
 }
 

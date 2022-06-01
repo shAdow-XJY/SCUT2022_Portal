@@ -49,96 +49,103 @@ extern Role* role;
 
 namespace
 {
-Snippets::Camera*	sCamera;
+	Snippets::Camera*	sCamera;
 
-void motionCallback(int x, int y)
-{
-	sCamera->handleMotion(x, y);
-}
-
-void keyboardCallback(unsigned char key, int x, int y)
-{
-	if(key==27)
-		exit(0);
-
-	if(!sCamera->handleKey(key, x, y))
-		keyPress(key, sCamera->getTransform());
-
-}
-
-void SpecialKeyCallback(GLint key, GLint x, GLint y)
-{
-	role->move(key);
-}
-
-void mouseCallback(int button, int state, int x, int y)
-{
-	sCamera->handleMouse(button, state, x, y);
-	mousePress(button, state, x, y);
-}
-
-void idleCallback()
-{
-	glutPostRedisplay();
-}
-
-void renderCallback()
-{
-	stepPhysics(true);
-
-	
-	if (!sCamera->isFree()) {
-		sCamera->setEye(role->getFootPosition() + PxVec3(0,50,-50));
-	}
-	Snippets::startRender(sCamera->getEye(), sCamera->getDir());
-
-	if (sCamera->isFree())
+	void motionCallback(int x, int y)
 	{
-		//直接写这个键盘移动时跳跃会在一次性完成，过程动画失效
-		if (role)
-		{
-			role->move();
-			role->roleJump();
-			role->roleFall();
-		}
+		sCamera->handleMotion(x, y);
 	}
-	else {
-		if (role)
-		{
-			role->roleJump();
-			role->roleFall();
-		}
-	}
-	
-	
 
-	PxScene* scene;
-	PxGetPhysics().getScenes(&scene,1);
-	PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
-	if(nbActors)
+	void keyboardCallback(unsigned char key, int x, int y)
 	{
-		std::vector<PxRigidActor*> actors(nbActors);
-		scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
-		Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
+		if(key==27)
+			exit(0);
+
+		if(!sCamera->handleKey(key, x, y))
+			keyPress(key, sCamera->getTransform());
+
 	}
 
-	Snippets::finishRender();
-}
+	void SpecialKeyCallback(GLint key, GLint x, GLint y)
+	{
+		role->move(key);
+	}
 
-void exitCallback(void)
-{
-	delete sCamera;
-	cleanupPhysics(true);
-}
+	void mouseCallback(int button, int state, int x, int y)
+	{
+		sCamera->handleMouse(button, state, x, y);
+		mousePress(button, state, x, y);
+	}
+
+	void idleCallback()
+	{
+		glutPostRedisplay();
+	}
+
+	void renderCallback()
+	{
+		stepPhysics(true);
+
+	
+		if (!sCamera->isFree()) {
+			sCamera->setEye(role->getFootPosition() + PxVec3(0,50,-50));
+		}
+		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
+
+		if (sCamera->isFree())
+		{
+			//直接写这个键盘移动时跳跃会在一次性完成，过程动画失效
+			if (role)
+			{
+				role->move();
+				role->roleJump();
+				role->roleFall();
+			}
+		}
+		else {
+			if (role)
+			{
+				role->roleJump();
+				role->roleFall();
+			}
+		}
+	
+		PxScene* scene;
+		PxGetPhysics().getScenes(&scene,1);
+		PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
+		if(nbActors)
+		{
+			std::vector<PxRigidActor*> actors(nbActors);
+			scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
+			Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
+		}
+
+		Snippets::finishRender();
+	}
+
+	void exitCallback(void)
+	{
+		delete sCamera;
+		cleanupPhysics(true);
+	}
 }
 
 
 void renderLoop()
 {
-	sCamera = new Snippets::Camera(PxVec3(0.0f, 250.0f, 0.0f), PxVec3(-0.1f,-0.8f,-0.1f));
+	sCamera = new Snippets::Camera(PxVec3(0.0f, 50.0f, 0.0f), PxVec3(-0.1f,-0.8f,-0.1f));
 
 	Snippets::setupDefaultWindow("PhysX Demo");
 	Snippets::setupDefaultRenderState();
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui::StyleColorsDark();
+
+	ImGui_ImplGLUT_Init();
+	ImGui_ImplGLUT_InstallFuncs();
+	ImGui_ImplOpenGL2_Init();
 
 	glutIdleFunc(idleCallback);
 	glutDisplayFunc(renderCallback);
@@ -152,5 +159,9 @@ void renderLoop()
 
 	initPhysics(true);
 	glutMainLoop();
+
+	ImGui_ImplOpenGL2_Shutdown();
+	ImGui_ImplGLUT_Shutdown();
+	ImGui::DestroyContext();
 }
 #endif

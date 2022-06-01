@@ -6,39 +6,64 @@
     <ClCompile Include="..\..\src\DemoTest\PortalRender.cpp" />
     <ClCompile Include="..\..\src\Render\Camera.cpp" />
     <ClCompile Include="..\..\src\Render\Render.cpp" />
-    <ClCompile Include="..\..\src\Role\Role.cpp">
-      <Filter>Role</Filter>
+    <ClCompile Include="..\..\src\Role\CCT.cpp" />
+    <ClCompile Include="..\..\src\Role\Role.cpp" />
+    <ClCompile Include="..\..\src\Utils\mouseUtils.cpp" />
+    <ClCompile Include="..\..\src\ImGui\imgui.cpp">
+      <Filter>imgui</Filter>
     </ClCompile>
-<<<<<<< HEAD
-    <ClCompile Include="..\..\src\Role\CCT.cpp">
-      <Filter>Role</Filter>
+    <ClCompile Include="..\..\src\ImGui\imgui_demo.cpp">
+      <Filter>imgui</Filter>
     </ClCompile>
-=======
->>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
-    <ClCompile Include="..\..\src\Utils\mouseUtils.cpp">
-      <Filter>InputEvent</Filter>
+    <ClCompile Include="..\..\src\ImGui\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ImGui\imgui_impl_glut.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ImGui\imgui_impl_opengl2.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ImGui\imgui_tables.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ImGui\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Render\Camera.h" />
     <ClInclude Include="..\..\src\Render\Render.h" />
-    <ClInclude Include="..\..\src\Role\Role.h">
-      <Filter>Role</Filter>
+    <ClInclude Include="..\..\src\Role\CCT.h" />
+    <ClInclude Include="..\..\src\Role\Role.h" />
+    <ClInclude Include="..\..\src\ImGui\imconfig.h">
+      <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\Role\CCT.h">
-      <Filter>Role</Filter>
+    <ClInclude Include="..\..\src\ImGui\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ImGui\imgui_impl_glut.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ImGui\imgui_impl_opengl2.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ImGui\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ImGui\imstb_rectpack.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ImGui\imstb_textedit.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ImGui\imstb_truetype.h">
+      <Filter>imgui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Role">
-      <UniqueIdentifier>{f6b14483-959c-4833-b660-4a1990949db9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="InputEvent">
-<<<<<<< HEAD
-      <UniqueIdentifier>{f4228f95-f8bb-4668-8966-49d342dc1000}</UniqueIdentifier>
-=======
-      <UniqueIdentifier>{fa2182ed-f80a-434d-bbb8-0b62ef536ac5}</UniqueIdentifier>
->>>>>>> 03a4d8441bd50d8f97e38590362942f4dfb0fc4e
+    <Filter Include="imgui">
+      <UniqueIdentifier>{2f334416-f8d6-437c-9a05-bcd5a53d042e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
