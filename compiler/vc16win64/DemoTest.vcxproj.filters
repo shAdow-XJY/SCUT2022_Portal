@@ -7,14 +7,27 @@
     <ClCompile Include="..\..\src\Render\Camera.cpp" />
     <ClCompile Include="..\..\src\Render\Render.cpp" />
     <ClCompile Include="..\..\src\Role\CCT.cpp" />
-    <ClCompile Include="..\..\src\Role\Role.cpp" />
-    <ClCompile Include="..\..\src\Utils\mouseUtils.cpp" />
-    <ClCompile Include="glad.c" />
+    <ClCompile Include="..\..\src\Role\Role.cpp">
+      <Filter>Role</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Utils\mouseUtils.cpp">
+      <Filter>InputEvent</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Render\Camera.h" />
     <ClInclude Include="..\..\src\Render\Render.h" />
     <ClInclude Include="..\..\src\Role\CCT.h" />
-    <ClInclude Include="..\..\src\Role\Role.h" />
+    <ClInclude Include="..\..\src\Role\Role.h">
+      <Filter>Role</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Role">
+      <UniqueIdentifier>{107b6cab-0587-40fb-8714-20433919e16c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="InputEvent">
+      <UniqueIdentifier>{244dbdf3-6f4f-49f3-83af-291d1195b287}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

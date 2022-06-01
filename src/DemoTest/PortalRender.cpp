@@ -56,7 +56,7 @@ void motionCallback(int x, int y)
 	sCamera->handleMotion(x, y);
 }
 
-void keyboardCallback(unsigned char key, int x, int y)
+void keyboardDownCallback(unsigned char key, int x, int y)
 {
 	if(key==27)
 		exit(0);
@@ -65,10 +65,19 @@ void keyboardCallback(unsigned char key, int x, int y)
 		keyPress(key, sCamera->getTransform());
 
 }
-
-void SpecialKeyCallback(GLint key, GLint x, GLint y)
+void keyboardUpCallback(unsigned char key, int x, int y)
 {
-	role->move(key);
+
+}
+
+void specialKeyDownCallback(GLint key, GLint x, GLint y)
+{
+	role->move(key,true);
+}
+
+void specialKeyUpCallback(GLint key, GLint x, GLint y)
+{
+	role->move(key,false);
 }
 
 void mouseCallback(int button, int state, int x, int y)
@@ -149,9 +158,10 @@ void renderLoop()
 
 	glutIdleFunc(idleCallback);
 	glutDisplayFunc(renderCallback);
-	glutKeyboardFunc(keyboardCallback);
-	glutSpecialFunc(SpecialKeyCallback);
-	glutKeyboardUpFunc();
+	glutKeyboardFunc(keyboardDownCallback);
+	glutKeyboardUpFunc(keyboardUpCallback);
+	glutSpecialFunc(specialKeyDownCallback);
+	glutSpecialUpFunc(specialKeyUpCallback);
 	glutMouseFunc(mouseCallback);
 	glutMotionFunc(motionCallback);
 	motionCallback(0,0);

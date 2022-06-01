@@ -39,7 +39,6 @@ bool Role::getMovingStatus() {
 void Role::roleMoveByMouse(int x, int y) {
 	if (this->isMoving || this->isJump || this->isFall) return;
 	PxVec3 nowPosition = ScenetoWorld(x, y);
-	//std::cout << nowPosition.x << " " << nowPosition.y << std::endl;
 	this->lastPostion = PxVec3(this->nowPostion.x,this->nowPostion.y,this->nowPostion.z);
 	this->nowPostion = nowPosition;
 	this->isMoving = true;
@@ -93,12 +92,14 @@ void Role::stopMoving() {
 
 /**
 * @brief 键盘输入控制角色
+* @param key 按键 status true为按下，false为抬起
 **/
-void Role::move(GLint key) {
+void Role::move(GLint key,bool status) {
 	this->isMoving = false;
-	PxVec3 dir = PxVec3(0,0,0);
-	switch (key) {
-		case GLUT_KEY_UP:{
+	if (status) {
+		PxVec3 dir = this->speed.getNormalized();
+		switch (key) {
+		case GLUT_KEY_UP: {
 			dir = PxVec3(0, 0, 1);
 			break;
 		}
@@ -115,11 +116,26 @@ void Role::move(GLint key) {
 			break;
 
 		}
+		default: {
+			return;
+		}
+		}
+		this->speed = dir * 0.12f;
+		if (this->isJump || this->isFall) return;
+		this->roleController->move(this->speed * 4, 0.0001, 1.0f / 60.0f, NULL);
+		this->updatePosition();
 	}
-	this->speed = dir * 0.3f;
-	if (this->isJump || this->isFall) return;
-	this->roleController->move(this->speed, 0.0001,1.0f/60.0f, NULL);
-	this->updatePosition();
+	else
+	{
+		if (!this->isJump && !this->isFall) {
+			this->speed = PxVec3(0, 0, 0);
+		}
+		else
+		{
+			this->speed = this->speed * 0.5f;
+		}
+		
+	}
 }
 
 
@@ -132,6 +148,10 @@ PxVec3 Role::getFootPosition() {
 	return PxVec3(pos.x, pos.y, pos.z);
 }
 
+
+/**
+* @brief 更新函数位置
+**/
 void Role::updatePosition() {
 	PxExtendedVec3 position = this->roleController->getFootPosition();
 	this->lastPostion = PxVec3(this->nowPostion.x, this->nowPostion.y, this->nowPostion.z);
@@ -160,9 +180,7 @@ void Role::roleJump() {
 		{
 			speed = littleJumpSpeed;
 		}
-
-		std::cout << this->speed.x << " " << this->speed.z << std::endl;
-		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, speed, 0.0) + this->speed * 0.4, PxF32(0.001), 1.0f / 60.0f, NULL);
+		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, speed, 0.0) + this->speed * 0.2, PxF32(0.001), 1.0f / 60.0f, NULL);
 		nowJumpHeight += speed;
 		std::cout << "maxJumpHeight" << maxJumpHeight << std::endl;
 		std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;
@@ -185,12 +203,31 @@ void Role::roleJump() {
 **/
 void Role::roleFall() {
 	if (isFall) {
-		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, -midFallSpeed, 0.0) + this->speed * 0.4, PxF32(0.00001), 1.0f / 60.0f, NULL);		
+		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, -midFallSpeed, 0.0) + this->speed * 0.2, PxF32(0.00001), 1.0f / 60.0f, NULL);		
 		if (flag == PxControllerCollisionFlag::eCOLLISION_DOWN) {
 			isFall = false;
 			this->speed = PxVec3(0,0,0);
-			this->updatePosition();
+			if (!this->isMoving) {
+				this->updatePosition();
+			};
 		}
 		
 	}
+}
+
+
+/**
+* @brief 获取速度
+* @return PxVec3
+**/
+PxVec3 Role::getSpeed() {
+	return this->speed;
+}
+
+/**
+* @brief 设置速度
+* @Param speed
+**/
+void Role::setSpeed(PxVec3 speed) {
+	 this->speed = speed;
 }
