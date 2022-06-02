@@ -28,6 +28,7 @@
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
 #include "Render.h"
+#include<time.h>
 
 using namespace physx;
 
@@ -50,10 +51,17 @@ static float gCylinderData[]={
 static bool show_demo_window = true;
 static bool show_another_window = false;
 static ImVec4 clear_color = ImVec4(.45f, .55f, .6f, 1.0f);
+static clock_t lastTime, currTime;
+double rasterTime;
+static bool textShouldRaster = false;
 
 #define MAX_NUM_MESH_VEC3S  1024
 static PxVec3 gVertexBuffer[MAX_NUM_MESH_VEC3S];
-
+extern bool press;
+extern int mouseX;
+extern int mouseY;
+extern int textX;
+extern int textY;
 void renderGeometry(const PxGeometryHolder& h)
 {
 	switch(h.getType())
@@ -301,7 +309,8 @@ void renderImGui() {
 		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
 			counter++;
 		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
+		ImGui::Text("textX = %d", textX);
+		ImGui::Text("textY = %d", textY);
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
@@ -326,6 +335,15 @@ void startRender(const PxVec3& cameraEye, const PxVec3& cameraDir, PxReal clipNe
 {
 	ImGui_ImplOpenGL2_NewFrame();
 	ImGui_ImplGLUT_NewFrame();
+	lastTime = currTime;
+	currTime = clock();
+	 
+	if (press == true) {
+		textShouldRaster = true;
+		lastTime = currTime;
+		rasterTime = (double)0.;
+		press = false;
+	}
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -339,10 +357,6 @@ void startRender(const PxVec3& cameraEye, const PxVec3& cameraDir, PxReal clipNe
 	gluLookAt(GLdouble(cameraEye.x), GLdouble(cameraEye.y), GLdouble(cameraEye.z), GLdouble(cameraEye.x + cameraDir.x), GLdouble(cameraEye.y + cameraDir.y), GLdouble(cameraEye.z + cameraDir.z), 0.0, 1.0, 0.0);
 
 	glColor4f(0.4f, 0.4f, 0.4f, 1.0f);
-
-	
-	
-
 }
 
 void renderGameOver(const char text[], int len) 
@@ -405,7 +419,20 @@ void finishRender()
 {
 	// 把ui渲染放在这里 是为了其能显示在最上层
 	renderImGui();
-
+	if (textShouldRaster == true) {
+		rasterTime += double(currTime - lastTime)/CLOCKS_PER_SEC;
+		if (rasterTime >= 3) {
+			textShouldRaster = false;
+		}
+		else {
+			// TextX的范围[0,90], textY的范围[0,100]
+			// 这里的1024和768是窗口尺寸，后续应考虑换成变量表示
+			float x = ((float)mouseX / 1024) * 90;
+			float y= ((float)mouseY / 768) * 100;
+			renderText(x, 100-y, "Test Text.", 10);
+		}
+	}
+	
 	glutSwapBuffers();
 }
 
@@ -428,8 +455,6 @@ void renderText(int x, int y, const char text[], int len)
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
-
 }
-
 } //namespace Snippets
 

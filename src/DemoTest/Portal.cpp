@@ -46,6 +46,7 @@
 #include<iostream>
 
 
+
 using namespace physx;
 //默认的内存管理和错误报告器
 PxDefaultAllocator		gAllocator;
@@ -77,6 +78,15 @@ const char* PigName = "pig";
 
 Role* role = NULL;
 PxControllerManager* cManager = NULL;
+
+// 左键鼠标按下
+bool press = false;
+
+// 鼠标点击时的坐标
+int mouseX, mouseY;
+
+// 提示字符的位置（测试用）
+int textX = 0, textY = 0;
 
 
 struct FilterGroup
@@ -392,8 +402,29 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	case ' ': 
 	{
 		role->tryJump();
-	}	
-	break;
+		break;
+	}
+	case 'L':
+	{
+		textX += 1;
+		break;
+	}
+	case 'J':
+	{
+		textX -= 1;
+		break;
+	}
+	case 'I':
+	{
+		textY += 1;
+		break;
+	}
+	case'K':
+	{
+		textY -= 1;
+		break;
+	}
+	
 	default:
 		break;
 	}
@@ -408,6 +439,11 @@ void mousePress(int button, int state, int x, int y) {
 		if (state == 1) {
 			if (role->getMovingStatus())return;
 			role->roleMoveByMouse(x, y);
+			press = true;
+			mouseX = x;
+			mouseY = y;
+			std::cout << "mouseX: " << x << std::endl;
+			std::cout << "mouseY: " << y << std::endl;
 		}
 	}
 	default:
