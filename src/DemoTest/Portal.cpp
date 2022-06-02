@@ -346,7 +346,7 @@ void initPhysics(bool interactive)
 	//gScene->addActor(*groundPlane);
 
 	extern void createGameScene(const PxTransform & t);
-	createGameScene(PxTransform(PxVec3(-20, 0, 0)));
+	createGameScene(PxTransform(PxVec3(-100, 0, 0)));
 
 	role = new Role();
 
