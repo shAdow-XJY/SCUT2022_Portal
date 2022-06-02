@@ -46,6 +46,8 @@ extern void cleanupPhysics(bool interactive);
 extern void keyPress(unsigned char key, const PxTransform& camera);
 extern void keyRelease(unsigned char key);
 extern void mousePress(int button, int state, int x, int y);
+extern void specialKeyPress(GLint key);
+extern void specialKeyRelease(GLint key);
 extern Role* role;
 
 namespace
@@ -61,7 +63,6 @@ void keyboardDownCallback(unsigned char key, int x, int y)
 {
 	if(key==27)
 		exit(0);
-
 	if(!sCamera->handleKey(key, x, y))
 		keyPress(key, sCamera->getTransform());
 
@@ -74,11 +75,13 @@ void keyboardUpCallback(unsigned char key, int x, int y)
 void specialKeyDownCallback(GLint key, GLint x, GLint y)
 {
 	role->move(key,true);
+	specialKeyPress(key);
 }
 
 void specialKeyUpCallback(GLint key, GLint x, GLint y)
 {
 	role->move(key,false);
+	specialKeyRelease(key);
 }
 
 void mouseCallback(int button, int state, int x, int y)
@@ -127,7 +130,7 @@ void renderCallback()
 		role->roleJump();
 		role->roleFall();
 	}
-	
+
 
 	PxScene* scene;
 	PxGetPhysics().getScenes(&scene,1);
@@ -166,9 +169,8 @@ void renderLoop()
 	glutMouseFunc(mouseCallback);
 	glutMotionFunc(motionCallback);
 	motionCallback(0,0);
-
 	atexit(exitCallback);
-
+	
 	initPhysics(true);
 	glutMainLoop();
 	

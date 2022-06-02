@@ -14,20 +14,24 @@ class Role {
 private:
 	PxRigidBody* role;
 	PxController* roleController;
+
+	PxF32 roleRadius = 1.0f;
+	PxF32 roleHeight = 2.0f;
+
 	PxVec3 speed = PxVec3(0, 0, 0);
 	PxVec3 nowPostion;	//角色需要达到的位置
 	PxVec3 lastPostion;	//角色之前所在的位置
 	bool isMoving = false; //是否为自动移动
 
-	bool isJump = false;
-	float littleJumpSpeed = 0.06;
+	bool isJump = false; //跳跃状态
+	float littleJumpSpeed = 0.06; //跳跃速度
 	float bigJumpSpeed = 0.08;
-	float nowJumpHeight = 0.0;
-	float wantJumpHeight = 0.0;
-	float maxJumpHeight = 15.0;
+	float nowJumpHeight = 0.0; //现在的跳跃高度
+	float wantJumpHeight = 0.0; //目标跳跃高度
+	float maxJumpHeight = 15.0; //最大跳跃高度
 
-	bool isFall = false;
-	float midFallSpeed = 0.08;
+	bool isFall = false; //掉落状态
+	float midFallSpeed = 0.08; //掉落速度
 
 public:
 	Role();
@@ -51,11 +55,14 @@ public:
 	bool getMovingStatus();
 	void stopMoving();
 
-	
-
+	//跳跃功能
 	void tryJump(bool release);
 	void roleJump();
 	void roleFall();
+
+	//下蹲
+	void roleCrouch();
+	void roleNoCrouch();
 };
 
 class RoleHitCallback :public PxUserControllerHitReport {

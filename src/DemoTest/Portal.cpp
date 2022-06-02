@@ -393,7 +393,12 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	{
 		role->tryJump(false);
 		break;
-	}	
+	}
+	case 'Z':
+	{
+		role->roleCrouch();
+		break;
+	}
 	default:
 		break;
 	}
@@ -408,11 +413,30 @@ void keyRelease(unsigned char key)
 		role->tryJump(true);
 		break;
 	}
+	case 'Z':
+	{
+		role->roleNoCrouch();
+		break;
+	}
 	default:
 		break;
 	}
 }
 
+//特殊键设置
+void specialKeyPress(GLint key) {
+	switch (key) {
+	default: {
+		return;
+	}
+	}
+}
+
+void specialKeyRelease(GLint key) {
+
+}
+
+//鼠标点击
 void mousePress(int button, int state, int x, int y) {
 	switch (button)
 	{

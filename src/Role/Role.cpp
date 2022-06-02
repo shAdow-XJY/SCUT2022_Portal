@@ -5,8 +5,8 @@
 
 Role::Role() {
 	PxCapsuleControllerDesc desc;
-	desc.radius = 1.0f;
-	desc.height = 2.0f;
+	desc.radius = roleRadius;
+	desc.height = roleHeight;
 	desc.material = gMaterial;
 	desc.climbingMode = PxCapsuleClimbingMode::eEASY;
 	desc.upDirection = PxVec3(0.0, 1.0, 0.0);
@@ -223,6 +223,21 @@ void Role::roleFall() {
 	}
 }
 
+/**
+* @brief 角色下蹲阶段
+**/
+void Role::roleCrouch() {
+	if (!isJump && !isFall) {
+		this->roleController->resize(roleHeight/2.5);
+	}
+}
+
+/**
+* @brief 角色下蹲回恢复阶段
+**/
+void Role::roleNoCrouch() {
+	this->roleController->resize(roleHeight+roleRadius);
+}
 
 /**
 * @brief 获取速度
