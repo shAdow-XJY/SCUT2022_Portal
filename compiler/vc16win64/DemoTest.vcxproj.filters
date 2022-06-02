@@ -21,5 +21,8 @@
     <Filter Include="Role">
       <UniqueIdentifier>{f6b14483-959c-4833-b660-4a1990949db9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{f582b0dc-4d6f-48a3-83e5-478722f4ef91}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

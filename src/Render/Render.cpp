@@ -262,7 +262,7 @@ void setupDefaultWindow(const char *name)
 void setupDefaultRenderState()
 {
 	// Setup default render states ≥ı ºªØ…Ë÷√
-	glClearColor(0.7f, 0.9f, 0.86f, 1.0);
+	glClearColor(0.80392f, 0.36078f, 0.36078f, 1.0);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_COLOR_MATERIAL);
 
