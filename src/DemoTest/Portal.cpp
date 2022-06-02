@@ -371,7 +371,7 @@ void initPhysics(bool interactive)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
 	
-	groundPlane->setName("Ground");
+	groundPlane->setName("over");
 	gScene->addActor(*groundPlane);
 
 
@@ -444,15 +444,17 @@ void RayCastByRole() {
 	PxVec3 unitDir = PxVec3(0, -999, 0);
 	if (RayCast(origin, unitDir, role->standingBlock)) {
 		//碰撞到物体
-		std::cout << "碰到地面" << std::endl;
+		//std::cout << "碰到地面" << std::endl;
 		if (role->standingBlock.getBlockType() == BlockType::ground) {
-			std::cout << role->standingBlock.getName()<<std::endl;
+			//std::cout << role->standingBlock.getName()<<std::endl;
 		}
 	}
 	else {
+		if (role->standingBlock.getBlockType() != BlockType::error) {
+			role->setFootPosition(role->getFootPosition() + role->getSpeed()*5.0f);
+		}
 		role->standingBlock = Block();
-		std::cout << "未碰到地面" << std::endl;
-		role->setFootPosition(role->getFootPosition() + role->getSpeed()*1.8f);
+		//std::cout << "未碰到地面" << std::endl;	
 		//role->gameOver();
 		role->fall();
 	}
@@ -493,14 +495,52 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	//PxSphereGeometry Transform,geometry,velocity（速度）
 	case ' ': 
 	{
-		role->tryJump();
+		role->tryJump(false);
 		break;
-	}	
+	}
+	case 'Z':
+	{
+		role->roleCrouch();
+		break;
+	}
 	default:
 		break;
 	}
 }
 
+void keyRelease(unsigned char key)
+{
+	switch (toupper(key))
+	{
+	case ' ':
+	{
+		role->tryJump(true);
+		break;
+	}
+	case 'Z':
+	{
+		role->roleNoCrouch();
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+//特殊键设置
+void specialKeyPress(GLint key) {
+	switch (key) {
+	default: {
+		return;
+	}
+	}
+}
+
+void specialKeyRelease(GLint key) {
+
+}
+
+//鼠标点击
 void mousePress(int button, int state, int x, int y) {
 	switch (button)
 	{

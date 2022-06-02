@@ -5,14 +5,14 @@
 
 Role::Role() {
 	PxCapsuleControllerDesc desc;
-	desc.radius = 1.0f;
-	desc.height = 2.0f;
+	desc.radius = roleRadius;
+	desc.height = roleHeight;
 	desc.material = gMaterial;
 	//desc.climbingMode = PxCapsuleClimbingMode::eCONSTRAINED;
 	desc.stepOffset = 0.0f;
 	desc.contactOffset = 0.001;
 	desc.upDirection = PxVec3(0.0, 1.0, 0.0);
-	//设置碰撞回调函数
+
 	RoleHitBehaviorCallback* bCallBack = new RoleHitBehaviorCallback(this);
 	desc.behaviorCallback = bCallBack;
 
@@ -28,16 +28,15 @@ Role::Role() {
 }
 
 /**
-* @brief 判断角色是否正在移动
-* @return bool 是否正在移动的标识
+* @brief 获取角色是否自动移动
 **/
 bool Role::getMovingStatus() {
 	return this->isMoving;
 }
 
 /**
-* @brief 鼠标输入移动函数
-* @param x 屏幕坐标x值 y 屏幕坐标y值
+* @brief 鼠标点击移动获取目标坐标
+* @Param x 鼠标屏幕坐标x y鼠标屏幕坐标y
 **/
 void Role::roleMoveByMouse(int x, int y) {
 	if (this->isMoving || this->isJump || this->isFall || !this->isAlive) return;
@@ -48,8 +47,8 @@ void Role::roleMoveByMouse(int x, int y) {
 }
 
 /**
-* @brief 鼠标输入移动函数
-* @param position 移动的目标坐标点
+* @brief 鼠标点击移动获取目标坐标
+* @Param position 三维空间坐标
 **/
 void Role::roleMoveByMouse(PxVec3 position) {
 	if (this->isMoving || this->isJump || this->isFall || !this->isAlive) return;
@@ -59,7 +58,7 @@ void Role::roleMoveByMouse(PxVec3 position) {
 }
 
 /**
-* @brief 角色鼠标移动核心函数
+* @brief 角色自动移动
 **/
 void Role::move() {
 	if(!this->isMoving || !this->isAlive) return;
@@ -95,7 +94,7 @@ void Role::move() {
 }
 
 /**
-* @brief 停止角色自动移动
+* @brief 角色停止自动移动
 **/
 void Role::stopMoving() {
 	this->isMoving = false;
@@ -103,8 +102,8 @@ void Role::stopMoving() {
 }
 
 /**
-* @brief 键盘输入控制角色
-* @param key 按键 status true为按下，false为抬起
+* @brief 键盘输入控制角色移动
+* @Param key输入特殊按键 status按下(T)/弹起(F)
 **/
 void Role::move(GLint key,bool status) {
 	if (!this->isAlive) {
@@ -138,7 +137,7 @@ void Role::move(GLint key,bool status) {
 		}
 		this->speed = dir * 0.12f;
 		if (this->isJump || this->isFall) return;
-		this->roleController->move(this->speed * 4, 0.0001, 1.0f / 60.0f, NULL);
+		this->roleController->move(this->speed * 4, 0.0001, 1.0f / 120.0f, NULL);
 		this->updatePosition();
 	}
 	else
@@ -156,21 +155,24 @@ void Role::move(GLint key,bool status) {
 
 
 /**
-* @brief 获取底部位置
-* @Retrun PxVec3 
+* @brief 获取角色controller的底部坐标
+* @Return PxVec3 
 **/
 PxVec3 Role::getFootPosition() {
 	PxExtendedVec3 pos = this->roleController->getFootPosition();
 	return PxVec3(pos.x, pos.y, pos.z);
 }
 
-
+/**
+* @brief 设置角色controller的底部坐标
+* @Param position 三维空间坐标点
+**/
 void Role::setFootPosition(PxVec3 position) {
 	this->roleController->setFootPosition(PxExtendedVec3(position.x,position.y,position.z));
 }
 
 /**
-* @brief 更新函数位置
+* @brief 更新同步角色坐标信息
 **/
 void Role::updatePosition() {
 	PxExtendedVec3 position = this->roleController->getFootPosition();
@@ -179,39 +181,47 @@ void Role::updatePosition() {
 }
 
 /**
-* @brief 判断跳跃条件
+* @brief 角色跳跃条件判断
 **/
-void Role::tryJump() {
+void Role::tryJump(bool release) {
 	if (!this->isAlive) return;
 	if (!isJump && !isFall) {
-		isJump = true;
+		if (!release) {
+			std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
+			wantJumpHeight = wantJumpHeight <= maxJumpHeight ? (wantJumpHeight + bigJumpSpeed*5) : maxJumpHeight;
+		}
+		else
+		{
+			isJump = true;
+		}
 	}
 }
 
 /**
-* @brief 角色跳跃上升阶段
+* @brief 角色跳跃
 **/
 void Role::roleJump() {
 	if (isJump) {
 		float speed = 0.0;
-		if (nowJumpHeight <= maxJumpHeight / 2) {
+		if (nowJumpHeight <= wantJumpHeight / 2) {
 			speed = bigJumpSpeed ;
 		}
 		else
 		{
 			speed = littleJumpSpeed;
 		}
-		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, speed, 0.0) + this->speed * 0.2, PxF32(0.001), 1.0f / 60.0f, NULL);
+		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, speed, 0.0) + this->speed * 0.3, PxF32(0.001), 1.0f / 60.0f, NULL);
 		nowJumpHeight += speed;
-		std::cout << "maxJumpHeight" << maxJumpHeight << std::endl;
+		std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
 		std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;
-		if (nowJumpHeight >= maxJumpHeight)
+		if (nowJumpHeight >= wantJumpHeight)
 		{
 			std::cout << "max height" << std::endl;
-			std::cout << "maxJumpHeight" << maxJumpHeight << std::endl;
+			std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
 			std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;
 
 			nowJumpHeight = 0.0;
+			wantJumpHeight = 6.0;
 			isJump = false;
 			isFall = true;
 		}
@@ -220,14 +230,13 @@ void Role::roleJump() {
 }
 
 /**
-* @brief 角色下降阶段
+* @brief 角色掉落
 **/
 void Role::roleFall() {
 	if (isFall) {
-		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, -midFallSpeed, 0.0) + this->speed * 0.2, PxF32(0.00001), 1.0f / 60.0f, NULL);		
+		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, -midFallSpeed, 0.0) + this->speed * 0.3, PxF32(0.00001), 1.0f / 60.0f, NULL);		
 		if (flag == PxControllerCollisionFlag::eCOLLISION_DOWN) {
 			isFall = false;
-			this->speed = PxVec3(0,0,0);
 			if (!this->isMoving) {
 				this->updatePosition();
 			};
@@ -236,7 +245,18 @@ void Role::roleFall() {
 	}
 }
 
+/**
+* @brief 角色下蹲
+**/
+void Role::roleCrouch() {
+	if (!isJump && !isFall) {
+		this->roleController->resize(roleHeight/2.5);
+	}
+}
 
+/**
+* @brief 角色重力模拟
+**/
 void Role::fall() {
 	if (!isJump) {
 		this->isFall = true;
@@ -244,26 +264,37 @@ void Role::fall() {
 	
 }
 
+
 /**
-* @brief 获取速度
-* @return PxVec3
+* @brief 角色下蹲恢复阶段
+**/
+void Role::roleNoCrouch() {
+	this->roleController->resize(roleHeight+roleRadius);
+}
+
+/**
+* @brief 角色设置速度
 **/
 PxVec3 Role::getSpeed() {
 	return this->speed;
 }
 
 /**
-* @brief 设置速度
-* @Param speed
+* @brief 角色获取速度
 **/
 void Role::setSpeed(PxVec3 speed) {
 	 this->speed = speed;
 }
 
+/**
+* @brief 角色是否存活
+**/
 bool Role::getRoleStatus() {
 	return this->isAlive;
 }
-
+/**
+* @brief 角色死亡
+**/
 void Role::gameOver() {
 	this->isAlive = false;
 }

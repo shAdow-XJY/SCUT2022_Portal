@@ -43,7 +43,10 @@ extern void initPhysics(bool interactive);
 extern void stepPhysics(bool interactive);	
 extern void cleanupPhysics(bool interactive);
 extern void keyPress(unsigned char key, const PxTransform& camera);
+extern void keyRelease(unsigned char key);
 extern void mousePress(int button, int state, int x, int y);
+extern void specialKeyPress(GLint key);
+extern void specialKeyRelease(GLint key);
 extern Role* role;
 extern void RayCastByRole();
 
@@ -60,24 +63,25 @@ void keyboardDownCallback(unsigned char key, int x, int y)
 {
 	if(key==27)
 		exit(0);
-
 	if(!sCamera->handleKey(key, x, y))
 		keyPress(key, sCamera->getTransform());
 
 }
 void keyboardUpCallback(unsigned char key, int x, int y)
 {
-
+	keyRelease(key);
 }
 
 void specialKeyDownCallback(GLint key, GLint x, GLint y)
 {
 	role->move(key,true);
+	specialKeyPress(key);
 }
 
 void specialKeyUpCallback(GLint key, GLint x, GLint y)
 {
 	role->move(key,false);
+	specialKeyRelease(key);
 }
 
 void mouseCallback(int button, int state, int x, int y)
@@ -103,7 +107,6 @@ void renderCallback()
 
 	if (sCamera->isFree())
 	{
-		//直接写这个键盘移动时跳跃会在一次性完成，过程动画失效
 		if (role)
 		{
 			role->move();
@@ -167,10 +170,33 @@ void renderLoop()
 	glutMouseFunc(mouseCallback);
 	glutMotionFunc(motionCallback);
 	motionCallback(0,0);
-
 	atexit(exitCallback);
-
+	
 	initPhysics(true);
 	glutMainLoop();
+	
+
 }
 #endif
+
+LRESULT CALLBACK HostWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_KEYDOWN:
+		if (wParam == VK_LEFT)
+		{
+			std::cout << "...." << std::endl;
+		}
+		break;
+
+		if (wParam == VK_F1)
+		{
+			std::cout << "...." << std::endl;
+		}
+		break;
+	default:
+		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+	return 0;
+}
