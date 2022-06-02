@@ -3,8 +3,13 @@
 #include "PxPhysicsAPI.h"
 using namespace physx;
 using namespace std;
-//普通盒子的高度
-const int commonBoxHeight = 10;
+
+//用于过滤的属性
+const PxFilterData collisionGroupIgnore(0, 0, 0, 1);  //忽略碰撞的
+const PxFilterData collisionGroup(1, 0, 0, 0); // 检测碰撞的
+
+//盒子的高度
+extern float boxHeight;
 
 enum BlockType
 {
@@ -18,7 +23,7 @@ class Block {
 private:
 	PxReal halfExtent = 0;
 	//高度层数
-	PxReal height = commonBoxHeight;
+	PxReal height = 2 * boxHeight;
 	PxVec3 position = PxVec3(0, 0, 0);
 	BlockType type = BlockType::error;
 	string name = "";

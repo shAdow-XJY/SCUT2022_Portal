@@ -11,6 +11,8 @@ extern PxPhysics* gPhysics;
 extern PxControllerManager* cManager;
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
 
+const int primaryJumpHeight = 6.0f;
+
 class Role {
 private:
 	PxRigidBody* role;
@@ -28,8 +30,8 @@ private:
 	float littleJumpSpeed = 0.06;
 	float bigJumpSpeed = 0.08;
 	float nowJumpHeight = 0.0;
-	float wantJumpHeight = 12.0;
-	float maxJumpHeight = 20.0;
+	float wantJumpHeight = primaryJumpHeight;
+	float maxJumpHeight = 12.0;
 
 	bool isFall = false;
 	bool isAlive = true;

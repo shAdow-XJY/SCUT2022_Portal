@@ -17,7 +17,7 @@ Role::Role() {
 	desc.behaviorCallback = bCallBack;
 
 	roleController = cManager->createController(desc);
-	roleController->setFootPosition(PxExtendedVec3(0, commonBoxHeight + desc.contactOffset +10, 20));
+	roleController->setFootPosition(PxExtendedVec3(0, boxHeight + desc.contactOffset +10, 20));
 	roleController->resize(desc.height + desc.radius);
 	roleController->setContactOffset(0.001f);
 
@@ -221,7 +221,7 @@ void Role::roleJump() {
 			std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;
 
 			nowJumpHeight = 0.0;
-			wantJumpHeight = 6.0;
+			wantJumpHeight = primaryJumpHeight;
 			isJump = false;
 			isFall = true;
 		}

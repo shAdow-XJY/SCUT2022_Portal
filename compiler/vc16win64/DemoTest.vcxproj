@@ -32,8 +32,8 @@
     <ClCompile Include="..\..\src\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="..\..\src\Render\Camera.cpp" />
     <ClCompile Include="..\..\src\Render\Render.cpp" />
-    <ClCompile Include="..\..\src\Role\CCT.cpp" />
     <ClCompile Include="..\..\src\Role\Role.cpp" />
+    <ClCompile Include="..\..\src\Scene\gameScene.cpp" />
     <ClCompile Include="..\..\src\Utils\mouseUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -48,7 +48,6 @@
     <ClInclude Include="..\..\src\ImGui\imstb_truetype.h" />
     <ClInclude Include="..\..\src\Render\Camera.h" />
     <ClInclude Include="..\..\src\Render\Render.h" />
-    <ClInclude Include="..\..\src\Role\CCT.h" />
     <ClInclude Include="..\..\src\Role\Role.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
