@@ -60,8 +60,8 @@ static PxVec3 gVertexBuffer[MAX_NUM_MESH_VEC3S];
 extern bool press;
 extern int mouseX;
 extern int mouseY;
-extern int textX;
-extern int textY;
+extern int textX, textY;
+
 void renderGeometry(const PxGeometryHolder& h)
 {
 	switch(h.getType())
@@ -297,22 +297,15 @@ void renderImGui() {
 		static float f = 0.0f;
 		static int counter = 0;
 
-		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+		ImGui::Begin("Backstage");                          // Create a window called "Hello, world!" and append into it.
 
-		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-		ImGui::Checkbox("Another Window", &show_another_window);
+		//ImGui::Text("ImGui successfully deployed.");               // Display some text (you can use a format strings too)
 
-		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-		ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+		//ImGui::SameLine();
+		ImGui::Text("clickX = %d", textX);
+		ImGui::Text("clickY = %d", textY);
 
-		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-			counter++;
-		ImGui::SameLine();
-		ImGui::Text("textX = %d", textX);
-		ImGui::Text("textY = %d", textY);
-
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 		ImGui::End();
 	}
 
@@ -391,17 +384,24 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 				PxVec3 darkColor = color * 0.8f;/*sleeping的情况下颜色*0.8*/
 				glColor4f(darkColor.x, darkColor.y, darkColor.z, 1.0f);
 			}
-			else
+			else {
 				glColor4f(color.x, color.y, color.z, 1.0f);
+			}
 			renderGeometry(h);
 			glPopMatrix();
+
 
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 
 			if(shadows)/*阴影，，，效果表现上有瑕疵但不知道怎么优化*/
 			{
-				const PxVec3 shadowDir(0.0f, -0.7071067f, -0.7071067f);
-				const PxReal shadowMat[]={ 1,0,0,0, -shadowDir.x/shadowDir.y,0,-shadowDir.z/shadowDir.y,0, 0,0,1,0, 0,0,0,1 };
+				//const PxVec3 shadowDir(0.0f, -0.7071067f, -0.7071067f);
+				const PxVec3 shadowDir(1.0f, 1.0f, 0.0f);
+
+				const PxReal shadowMat[] = { 1,0,0,0,
+					-shadowDir.x / shadowDir.y,0,-shadowDir.z / shadowDir.y,0,
+					0,0,1,0,
+					0,0,0,1 };
 				glPushMatrix();						
 				glMultMatrixf(shadowMat);
 				glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
@@ -427,9 +427,9 @@ void finishRender()
 		else {
 			// TextX的范围[0,90], textY的范围[0,100]
 			// 这里的1024和768是窗口尺寸，后续应考虑换成变量表示
-			float x = ((float)mouseX / 1024) * 90;
-			float y= ((float)mouseY / 768) * 100;
-			renderText(x, 100-y, "Test Text.", 10);
+			textX = ((float)mouseX / 1024) * 90;
+			textY= ((float)mouseY / 768) * 100;
+			renderText(textX, 100-textY, "Test Text.", 10);
 		}
 	}
 	

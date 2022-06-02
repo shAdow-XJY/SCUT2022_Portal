@@ -439,12 +439,18 @@ void mousePress(int button, int state, int x, int y) {
 		if (state == 1) {
 			if (role->getMovingStatus())return;
 			role->roleMoveByMouse(x, y);
+		}
+		break;
+	}
+	case 2: {
+		if (state == 1) {
 			press = true;
 			mouseX = x;
 			mouseY = y;
 			std::cout << "mouseX: " << x << std::endl;
 			std::cout << "mouseY: " << y << std::endl;
 		}
+		break;
 	}
 	default:
 		break;
