@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <iostream>
 #include "PxPhysicsAPI.h"
+#include "../Block/Block.h"
 #include <glut.h>
 using namespace physx;
 
@@ -26,8 +27,9 @@ private:
 	float maxJumpHeight = 15.0;
 
 	bool isFall = false;
+	bool isAlive = true;
+	//重力加速度
 	float midFallSpeed = 0.08;
-
 public:
 	Role();
 	~Role() {
@@ -35,7 +37,9 @@ public:
 		this->roleController->release();
 	};
 
-
+	bool getRoleStatus();
+	void gameOver();
+	void setFootPosition(PxVec3 position);
 	PxVec3 getFootPosition();
 	void updatePosition();
 
@@ -45,16 +49,18 @@ public:
 
 	//移动相关
 	void roleMoveByMouse(int x, int y);
+	void roleMoveByMouse(PxVec3 position);
 	void move();
 	void move(GLint key, bool status);
 	bool getMovingStatus();
 	void stopMoving();
 
-	
+	Block standingBlock;
 
 	void tryJump();
 	void roleJump();
 	void roleFall();
+	void fall();
 };
 
 class RoleHitCallback :public PxUserControllerHitReport {

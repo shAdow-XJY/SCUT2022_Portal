@@ -8,15 +8,18 @@ Role::Role() {
 	desc.radius = 1.0f;
 	desc.height = 2.0f;
 	desc.material = gMaterial;
-	desc.climbingMode = PxCapsuleClimbingMode::eEASY;
+	//desc.climbingMode = PxCapsuleClimbingMode::eCONSTRAINED;
+	desc.stepOffset = 0.0f;
+	desc.contactOffset = 0.001;
 	desc.upDirection = PxVec3(0.0, 1.0, 0.0);
 	//设置碰撞回调函数
 	RoleHitBehaviorCallback* bCallBack = new RoleHitBehaviorCallback(this);
 	desc.behaviorCallback = bCallBack;
 
 	roleController = cManager->createController(desc);
-	roleController->setFootPosition(PxExtendedVec3(0, desc.contactOffset, 0));
-	roleController->resize(desc.height + desc.radius);	
+	roleController->setFootPosition(PxExtendedVec3(0, commonBoxHeight + desc.contactOffset +10, 20));
+	roleController->resize(desc.height + desc.radius);
+	roleController->setContactOffset(0.001f);
 
 	this->role = roleController->getActor();
 	this->roleController->setUserData(this);
@@ -37,7 +40,7 @@ bool Role::getMovingStatus() {
 * @param x 屏幕坐标x值 y 屏幕坐标y值
 **/
 void Role::roleMoveByMouse(int x, int y) {
-	if (this->isMoving || this->isJump || this->isFall) return;
+	if (this->isMoving || this->isJump || this->isFall || !this->isAlive) return;
 	PxVec3 nowPosition = ScenetoWorld(x, y);
 	this->lastPostion = PxVec3(this->nowPostion.x,this->nowPostion.y,this->nowPostion.z);
 	this->nowPostion = nowPosition;
@@ -45,15 +48,24 @@ void Role::roleMoveByMouse(int x, int y) {
 }
 
 /**
+* @brief 鼠标输入移动函数
+* @param position 移动的目标坐标点
+**/
+void Role::roleMoveByMouse(PxVec3 position) {
+	if (this->isMoving || this->isJump || this->isFall || !this->isAlive) return;
+	this->lastPostion = PxVec3(this->nowPostion.x, this->nowPostion.y, this->nowPostion.z);
+	this->nowPostion = position;
+	this->isMoving = true;
+}
+
+/**
 * @brief 角色鼠标移动核心函数
 **/
 void Role::move() {
-	if(!this->isMoving) return;
+	if(!this->isMoving || !this->isAlive) return;
 	PxExtendedVec3 position = this->roleController->getFootPosition();
 	float offsetX = this->nowPostion.x - position.x;
 	float offsetZ = this->nowPostion.z - position.z;
-	std::cout << offsetX << std::endl;
-	std::cout << offsetZ << std::endl;
 	if (abs(offsetX) <= 0.01f && abs(offsetZ) <= 0.01f) {
 		this->roleController->setFootPosition(PxExtendedVec3(this->nowPostion.x, this->nowPostion.y, this->nowPostion.z));
 		this->isMoving = false;
@@ -95,6 +107,10 @@ void Role::stopMoving() {
 * @param key 按键 status true为按下，false为抬起
 **/
 void Role::move(GLint key,bool status) {
+	if (!this->isAlive) {
+		this->setSpeed(PxVec3(0, 0, 0));
+		return;
+	}
 	this->isMoving = false;
 	if (status) {
 		PxVec3 dir = this->speed.getNormalized();
@@ -149,6 +165,10 @@ PxVec3 Role::getFootPosition() {
 }
 
 
+void Role::setFootPosition(PxVec3 position) {
+	this->roleController->setFootPosition(PxExtendedVec3(position.x,position.y,position.z));
+}
+
 /**
 * @brief 更新函数位置
 **/
@@ -162,6 +182,7 @@ void Role::updatePosition() {
 * @brief 判断跳跃条件
 **/
 void Role::tryJump() {
+	if (!this->isAlive) return;
 	if (!isJump && !isFall) {
 		isJump = true;
 	}
@@ -216,6 +237,13 @@ void Role::roleFall() {
 }
 
 
+void Role::fall() {
+	if (!isJump) {
+		this->isFall = true;
+	}
+	
+}
+
 /**
 * @brief 获取速度
 * @return PxVec3
@@ -230,4 +258,12 @@ PxVec3 Role::getSpeed() {
 **/
 void Role::setSpeed(PxVec3 speed) {
 	 this->speed = speed;
+}
+
+bool Role::getRoleStatus() {
+	return this->isAlive;
+}
+
+void Role::gameOver() {
+	this->isAlive = false;
 }

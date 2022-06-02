@@ -39,13 +39,13 @@
 
 
 using namespace physx;
-
 extern void initPhysics(bool interactive);
 extern void stepPhysics(bool interactive);	
 extern void cleanupPhysics(bool interactive);
 extern void keyPress(unsigned char key, const PxTransform& camera);
 extern void mousePress(int button, int state, int x, int y);
 extern Role* role;
+extern void RayCastByRole();
 
 namespace
 {
@@ -126,6 +126,8 @@ void renderCallback()
 		role->roleJump();
 		role->roleFall();
 	}
+	
+	RayCastByRole();
 	
 
 	PxScene* scene;
