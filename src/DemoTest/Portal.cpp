@@ -341,10 +341,12 @@ void initPhysics(bool interactive)
 	//¾²Ä¦²Á£¬¶¯Ä¦²Á£¬restitution»Ö¸´Ô­×´(µ¯ÐÔ)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
 
-	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
-	groundPlane->setName("Ground");
-	gScene->addActor(*groundPlane);
+	//PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
+	//groundPlane->setName("Ground");
+	//gScene->addActor(*groundPlane);
 
+	extern void createGameScene(const PxTransform & t);
+	createGameScene(PxTransform(PxVec3(-20, 0, 0)));
 
 	role = new Role();
 
