@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\Block\Block.cpp" />
     <ClCompile Include="..\..\src\Common\ClassicMain.cpp" />
     <ClCompile Include="..\..\src\DemoTest\Portal.cpp" />
     <ClCompile Include="..\..\src\DemoTest\PortalRender.cpp" />
@@ -36,6 +37,7 @@
     <ClCompile Include="..\..\src\Utils\mouseUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\Block\Block.h" />
     <ClInclude Include="..\..\src\ImGui\imconfig.h" />
     <ClInclude Include="..\..\src\ImGui\imgui.h" />
     <ClInclude Include="..\..\src\ImGui\imgui_impl_glut.h" />

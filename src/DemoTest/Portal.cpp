@@ -41,7 +41,9 @@
 #include "../Common/PVD.h"
 #include "../Utils/Utils.h"
 #include "../Role/Role.h"
+
 #include<vector>
+#include<string>
 #include <glut.h>
 #include<iostream>
 
@@ -81,6 +83,15 @@ PxControllerManager* cManager = NULL;
 
 // 左键鼠标按下
 bool press = false;
+//用于过滤的属性
+const PxFilterData collisionGroupIgnore(0, 0, 0, 1);  // 碰撞会被忽略的组
+const PxFilterData collisionGroup(1, 0, 0, 0); // 需要碰撞的组
+
+
+
+extern PxVec3 ScenetoWorld(int xCord, int yCord);
+
+
 
 // 鼠标点击时的坐标
 int mouseX, mouseY;
@@ -300,6 +311,7 @@ void createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
 
 			body->userData = body;
 
+			
 			//加入猪队列
 			ballPigList.push_back(body);
 
@@ -312,6 +324,21 @@ void createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
 	}
 	//释放
 	shape->release();
+}
+
+//创建道路方块
+void createRoad(const PxTransform& t,PxReal halfExtent,std::string name) {
+	Block* r = new Block(halfExtent,name);
+	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *gMaterial);
+	shape->setQueryFilterData(collisionGroup);
+	PxRigidDynamic* body = gPhysics->createRigidDynamic(t);
+	body->attachShape(*shape);
+	//更新质量和惯性（数值表示密度）
+	PxRigidBodyExt::updateMassAndInertia(*body, 1.0f);
+	body->setName("Ground");
+	body->userData = r;
+	//把Actor添加到场景中,注释掉这一句之后所有立方体变得不可见且没有碰撞体积
+	gScene->addActor(*body);
 }
 
 //实例化物理
@@ -350,20 +377,95 @@ void initPhysics(bool interactive)
 	cManager->setOverlapRecoveryModule(true);
 	//静摩擦，动摩擦，restitution恢复原状(弹性)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
-
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
-	groundPlane->setName("Ground");
+	
+	groundPlane->setName("over");
 	gScene->addActor(*groundPlane);
 
 
+	createRoad(PxTransform(PxVec3(0, 5, -5)), 5, "0");
+	createRoad(PxTransform(PxVec3(0, 5, 20)),5,"1");
+	createRoad(PxTransform(PxVec3(0, 5, 30)), 5 ,"2");
+	createRoad(PxTransform(PxVec3(0, 5, 40)), 5, "3");
+	createRoad(PxTransform(PxVec3(10, 5, 40)), 5, "4");
+	createRoad(PxTransform(PxVec3(20, 5, 40)), 5, "5");
+	createRoad(PxTransform(PxVec3(20, 5, 30)), 5, "6");
+	createRoad(PxTransform(PxVec3(20, 15, 30)), 5, "6");
 	role = new Role();
 
-	
-	
+	role->fall();
 	//if (不交互)，在render中把交互设成false就有一个默认的球滚过去撞击堆。
 	if(!interactive)
 		//PxSphereGeometry Transform,geometry,velocity（速度）
 		createDynamic(10,PxTransform(PxVec3(0,40,100)), PxVec3(0,-50,-100));
+}
+
+/**
+* @brief 发送射线
+* @param origin 发送射线的坐标 unitDir 发送射线的方向 Road游戏道路基类
+**/
+bool RayCast(PxVec3 origin, PxVec3 unitDir, Block& block)
+{
+
+	PxRaycastHit hitInfo; // 返回的点，法向量信息等都在这里
+	PxReal maxDist = unitDir.normalize(); // 最大射线距离
+
+
+	// 获取点， 法向量，还有UV信息
+	PxHitFlags hitFlags = PxHitFlag::ePOSITION;
+
+
+	//设置射线碰撞的组
+	PxQueryFilterData filterdata = PxQueryFilterData();
+	filterdata.data = collisionGroup; 
+
+	bool isRayHit = PxSceneQueryExt::raycastSingle(
+		*gScene,
+		origin,
+		unitDir,
+		maxDist,
+		hitFlags,
+		hitInfo,
+		filterdata
+	);
+	
+	if (isRayHit) {	
+		//std::cout << hitInfo.actor->getName() << std::endl;
+		PxVec3 pose = hitInfo.actor->getGlobalPose().p;
+		block.setPosition(PxVec3(pose.x, pose.y, pose.z));
+		Block* b = (Block*)hitInfo.actor->userData;
+		block.setName(b->getName());
+		block.setBlockType(b->getBlockType());
+		//std::cout << "hit position x:" << pose.x << " y:" << pose.y << " z:" << pose.z << std::endl;
+	}
+	else {
+	}
+		//std::cout << "rayHit is not hit" << std::endl;
+	return isRayHit;
+}
+
+/**
+* @brief 角色底部发送射线
+**/
+void RayCastByRole() {
+	PxVec3 origin = role->getFootPosition();
+	PxVec3 unitDir = PxVec3(0, -999, 0);
+	if (RayCast(origin, unitDir, role->standingBlock)) {
+		//碰撞到物体
+		//std::cout << "碰到地面" << std::endl;
+		if (role->standingBlock.getBlockType() == BlockType::ground) {
+			//std::cout << role->standingBlock.getName()<<std::endl;
+		}
+	}
+	else {
+		if (role->standingBlock.getBlockType() != BlockType::error) {
+			role->setFootPosition(role->getFootPosition() + role->getSpeed()*5.0f);
+		}
+		role->standingBlock = Block();
+		//std::cout << "未碰到地面" << std::endl;	
+		//role->gameOver();
+		role->fall();
+	}
 }
 
 //（在render中调用）
@@ -401,44 +503,72 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	//PxSphereGeometry Transform,geometry,velocity（速度）
 	case ' ': 
 	{
-		role->tryJump();
+		role->tryJump(false);
 		break;
 	}
-	case 'L':
+	case 'Z':
 	{
-		textX += 1;
+		role->roleCrouch();
 		break;
 	}
-	case 'J':
-	{
-		textX -= 1;
-		break;
-	}
-	case 'I':
-	{
-		textY += 1;
-		break;
-	}
-	case'K':
-	{
-		textY -= 1;
-		break;
-	}
-	
 	default:
 		break;
 	}
 }
 
+void keyRelease(unsigned char key)
+{
+	switch (toupper(key))
+	{
+	case ' ':
+	{
+		role->tryJump(true);
+		break;
+	}
+	case 'Z':
+	{
+		role->roleNoCrouch();
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+//特殊键设置
+void specialKeyPress(GLint key) {
+	switch (key) {
+	default: {
+		return;
+	}
+	}
+}
+
+void specialKeyRelease(GLint key) {
+
+}
+
+//鼠标点击
 void mousePress(int button, int state, int x, int y) {
 	switch (button)
 	{
-	//点击左键
+	//点击右键
 	case 0: {
-		//左键抬起
+		//右键抬起
 		if (state == 1) {
 			if (role->getMovingStatus())return;
-			role->roleMoveByMouse(x, y);
+			//role->roleMoveByMouse(x, y);
+			PxVec3 position = ScenetoWorld(x, y);
+			Block road;
+			if (RayCast(position,PxVec3(0,5,0), road))
+			{			
+				PxVec3 blockPosition = road.getPosition();
+				role->roleMoveByMouse(PxVec3(blockPosition.x,role->getFootPosition().y, blockPosition.z));
+				//role->setFootPosition(PxVec3(road.position.x,role->getFootPosition().y,road.position.z));
+			}
+			else {
+				std::cout << "不可点击";
+			}
 		}
 		break;
 	}

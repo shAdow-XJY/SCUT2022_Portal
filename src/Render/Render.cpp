@@ -29,7 +29,7 @@
 
 #include "Render.h"
 #include<time.h>
-
+#include <iostream>
 using namespace physx;
 
 static float gCylinderData[]={
@@ -242,6 +242,10 @@ void renderGeometry(const PxGeometryHolder& h)
 	}
 }
 
+// settings
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
+
 namespace Snippets
 {
 
@@ -395,13 +399,8 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 
 			if(shadows)/*阴影，，，效果表现上有瑕疵但不知道怎么优化*/
 			{
-				//const PxVec3 shadowDir(0.0f, -0.7071067f, -0.7071067f);
-				const PxVec3 shadowDir(1.0f, 1.0f, 0.0f);
-
-				const PxReal shadowMat[] = { 1,0,0,0,
-					-shadowDir.x / shadowDir.y,0,-shadowDir.z / shadowDir.y,0,
-					0,0,1,0,
-					0,0,0,1 };
+				const PxVec3 shadowDir(0.0f, -0.7071067f, -0.7071067f);
+				const PxReal shadowMat[]={ 1,0,0,0, -shadowDir.x/shadowDir.y,0,-shadowDir.z/shadowDir.y,0, 0,0,1,0, 0,0,0,1 };
 				glPushMatrix();						
 				glMultMatrixf(shadowMat);
 				glMultMatrixf(reinterpret_cast<const float*>(&shapePose));

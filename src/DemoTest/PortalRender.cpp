@@ -39,13 +39,16 @@
 
 
 using namespace physx;
-
 extern void initPhysics(bool interactive);
 extern void stepPhysics(bool interactive);	
 extern void cleanupPhysics(bool interactive);
 extern void keyPress(unsigned char key, const PxTransform& camera);
+extern void keyRelease(unsigned char key);
 extern void mousePress(int button, int state, int x, int y);
+extern void specialKeyPress(GLint key);
+extern void specialKeyRelease(GLint key);
 extern Role* role;
+extern void RayCastByRole();
 
 namespace
 {
@@ -56,26 +59,36 @@ namespace
 		sCamera->handleMotion(x, y);
 	}
 
-	void keyboardCallback(unsigned char key, int x, int y)
-	{
-		if(key==27)
-			exit(0);
+void keyboardDownCallback(unsigned char key, int x, int y)
+{
+	if(key==27)
+		exit(0);
+	if(!sCamera->handleKey(key, x, y))
+		keyPress(key, sCamera->getTransform());
 
-		if(!sCamera->handleKey(key, x, y))
-			keyPress(key, sCamera->getTransform());
+}
+void keyboardUpCallback(unsigned char key, int x, int y)
+{
+	keyRelease(key);
+}
 
-	}
+void specialKeyDownCallback(GLint key, GLint x, GLint y)
+{
+	role->move(key,true);
+	specialKeyPress(key);
+}
 
-	void SpecialKeyCallback(GLint key, GLint x, GLint y)
-	{
-		role->move(key);
-	}
+void specialKeyUpCallback(GLint key, GLint x, GLint y)
+{
+	role->move(key,false);
+	specialKeyRelease(key);
+}
 
-	void mouseCallback(int button, int state, int x, int y)
-	{
-		sCamera->handleMouse(button, state, x, y);
-		mousePress(button, state, x, y);
-	}
+void mouseCallback(int button, int state, int x, int y)
+{
+	sCamera->handleMouse(button, state, x, y);
+	mousePress(button, state, x, y);
+}
 
 	void idleCallback()
 	{
@@ -92,33 +105,43 @@ namespace
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 
-		if (sCamera->isFree())
+	if (sCamera->isFree())
+	{
+		if (role)
 		{
-			//直接写这个键盘移动时跳跃会在一次性完成，过程动画失效
-			if (role)
-			{
-				role->move();
-				role->roleJump();
-				role->roleFall();
-			}
+			role->move();
+			role->roleJump();
+			role->roleFall();
 		}
-		else {
-			if (role)
-			{
-				role->roleJump();
-				role->roleFall();
-			}
+	}
+	else {
+		if (role)
+		{
+			role->roleJump();
+			role->roleFall();
 		}
+	}
+	if (role)
+	{
+		if (role->getMovingStatus() ||sCamera->isFree()) {
+			role->move();
+		}	
+		role->roleJump();
+		role->roleFall();
+	}
 	
-		PxScene* scene;
-		PxGetPhysics().getScenes(&scene,1);
-		PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
-		if(nbActors)
-		{
-			std::vector<PxRigidActor*> actors(nbActors);
-			scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
-			Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
-		}
+	RayCastByRole();
+	
+
+	PxScene* scene;
+	PxGetPhysics().getScenes(&scene,1);
+	PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
+	if(nbActors)
+	{
+		std::vector<PxRigidActor*> actors(nbActors);
+		scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
+		Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
+	}
 
 		Snippets::finishRender();
 	}
@@ -133,7 +156,7 @@ namespace
 
 void renderLoop()
 {
-	sCamera = new Snippets::Camera(PxVec3(0.0f, 50.0f, 0.0f), PxVec3(-0.1f,-0.8f,-0.1f));
+	sCamera = new Snippets::Camera(PxVec3(50.0f, 50.0f, 50.0f), PxVec3(-0.6f, -0.2f, -0.7f));
 
 	Snippets::setupDefaultWindow("PhysX Demo");
 	Snippets::setupDefaultRenderState();
@@ -149,14 +172,15 @@ void renderLoop()
 
 	glutIdleFunc(idleCallback);
 	glutDisplayFunc(renderCallback);
-	glutKeyboardFunc(keyboardCallback);
-	glutSpecialFunc(SpecialKeyCallback);
+	glutKeyboardFunc(keyboardDownCallback);
+	glutKeyboardUpFunc(keyboardUpCallback);
+	glutSpecialFunc(specialKeyDownCallback);
+	glutSpecialUpFunc(specialKeyUpCallback);
 	glutMouseFunc(mouseCallback);
 	glutMotionFunc(motionCallback);
 	motionCallback(0,0);
-
 	atexit(exitCallback);
-
+	
 	initPhysics(true);
 	glutMainLoop();
 
@@ -165,3 +189,25 @@ void renderLoop()
 	ImGui::DestroyContext();
 }
 #endif
+
+LRESULT CALLBACK HostWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_KEYDOWN:
+		if (wParam == VK_LEFT)
+		{
+			std::cout << "...." << std::endl;
+		}
+		break;
+
+		if (wParam == VK_F1)
+		{
+			std::cout << "...." << std::endl;
+		}
+		break;
+	default:
+		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+	return 0;
+}
