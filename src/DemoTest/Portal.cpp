@@ -56,6 +56,7 @@ PxDefaultErrorCallback	gErrorCallback;
 
 PxFoundation*			gFoundation = NULL;
 PxPhysics*				gPhysics	= NULL;
+PxCooking*				gCooking	= NULL;
 
 PxDefaultCpuDispatcher*	gDispatcher = NULL;
 PxScene*				gScene		= NULL;
@@ -352,6 +353,9 @@ void initPhysics(bool interactive)
 	gPvd->connect(*transport,PxPvdInstrumentationFlag::eALL);
 	//创建顶级PxPhysics对象
 	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(),true,gPvd);
+
+	// 创建Cooking对象
+	gCooking = PxCreateCooking(PX_PHYSICS_VERSION, *gFoundation, PxCookingParams(PxTolerancesScale()));
 
 	//?缩放
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());

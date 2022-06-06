@@ -1,85 +1,38 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="..\..\src\Block\Block.cpp" />
     <ClCompile Include="..\..\src\Common\ClassicMain.cpp" />
     <ClCompile Include="..\..\src\DemoTest\Portal.cpp" />
     <ClCompile Include="..\..\src\DemoTest\PortalRender.cpp" />
+    <ClCompile Include="..\..\src\ImGui\imgui.cpp" />
+    <ClCompile Include="..\..\src\ImGui\imgui_demo.cpp" />
+    <ClCompile Include="..\..\src\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="..\..\src\ImGui\imgui_impl_glut.cpp" />
+    <ClCompile Include="..\..\src\ImGui\imgui_impl_opengl2.cpp" />
+    <ClCompile Include="..\..\src\ImGui\imgui_tables.cpp" />
+    <ClCompile Include="..\..\src\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="..\..\src\Render\Camera.cpp" />
     <ClCompile Include="..\..\src\Render\Render.cpp" />
     <ClCompile Include="..\..\src\Role\CCT.cpp" />
-    <ClCompile Include="..\..\src\Role\Role.cpp">
-      <Filter>Role</Filter>
-    <ClCompile Include="..\..\src\ImGui\imgui.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\ImGui\imgui_demo.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\ImGui\imgui_draw.cpp">
-      <Filter>imgui</Filter>
-    <ClCompile Include="..\..\src\Utils\mouseUtils.cpp">
-      <Filter>InputEvent</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\ImGui\imgui_impl_glut.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\ImGui\imgui_impl_opengl2.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\ImGui\imgui_tables.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\ImGui\imgui_widgets.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\Block\Block.cpp">
-      <Filter>Block</Filter>
-    </ClCompile>
+    <ClCompile Include="..\..\src\Role\Role.cpp" />
+    <ClCompile Include="..\..\src\Utils\mouseUtils.cpp" />
+    <ClCompile Include="..\..\src\LoadModel\Model.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\Block\Block.h" />
+    <ClInclude Include="..\..\src\ImGui\imconfig.h" />
+    <ClInclude Include="..\..\src\ImGui\imgui.h" />
+    <ClInclude Include="..\..\src\ImGui\imgui_impl_glut.h" />
+    <ClInclude Include="..\..\src\ImGui\imgui_impl_opengl2.h" />
+    <ClInclude Include="..\..\src\ImGui\imgui_internal.h" />
+    <ClInclude Include="..\..\src\ImGui\imstb_rectpack.h" />
+    <ClInclude Include="..\..\src\ImGui\imstb_textedit.h" />
+    <ClInclude Include="..\..\src\ImGui\imstb_truetype.h" />
     <ClInclude Include="..\..\src\Render\Camera.h" />
     <ClInclude Include="..\..\src\Render\Render.h" />
-    <ClInclude Include="..\..\src\ImGui\imconfig.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\ImGui\imgui.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\ImGui\imgui_impl_glut.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\ImGui\imgui_impl_opengl2.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\ImGui\imgui_internal.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\ImGui\imstb_rectpack.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\ImGui\imstb_textedit.h">
-      <Filter>imgui</Filter>
     <ClInclude Include="..\..\src\Role\CCT.h" />
-    <ClInclude Include="..\..\src\Role\Role.h">
-      <Filter>Role</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\ImGui\imstb_truetype.h">
-      <Filter>imgui</Filter>
-    <ClInclude Include="..\..\src\Block\Block.h">
-      <Filter>Block</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Role">
-      <UniqueIdentifier>{107b6cab-0587-40fb-8714-20433919e16c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="InputEvent">
-      <UniqueIdentifier>{244dbdf3-6f4f-49f3-83af-291d1195b287}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Block">
-      <UniqueIdentifier>{91d725ce-0b21-4591-a2c8-ed266d6943fe}</UniqueIdentifier>
-    <Filter Include="imgui">
-      <UniqueIdentifier>{2f334416-f8d6-437c-9a05-bcd5a53d042e}</UniqueIdentifier>
-    </Filter>
+    <ClInclude Include="..\..\src\Role\Role.h" />
+    <ClInclude Include="..\..\src\LoadModel\Model.h" />
   </ItemGroup>
 </Project>
