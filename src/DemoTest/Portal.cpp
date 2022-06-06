@@ -41,6 +41,7 @@
 #include "../Common/PVD.h"
 #include "../Utils/Utils.h"
 #include "../Role/Role.h"
+#include "../LoadModel/Model.h"
 
 #include<vector>
 #include<string>
@@ -386,6 +387,10 @@ void initPhysics(bool interactive)
 	groundPlane->setName("over");
 	gScene->addActor(*groundPlane);
 
+	// ≤‚ ‘¥˙¬Î
+	Model testModel("D:/sx/PhysX_3.4/SCUT2022_Portal/src/DemoTest/Mouse Server.obj");
+	testModel.createMeshActor(PxVec3(30, 30, 30));
+	// end
 
 	createRoad(PxTransform(PxVec3(0, 5, -5)), 5, "0");
 	createRoad(PxTransform(PxVec3(0, 5, 20)),5,"1");

@@ -43,9 +43,9 @@ PxTriangleMeshDesc Model::processSingleMesh(aiMesh* mesh, const aiScene* scene) 
 	mesh_desc.triangles.count = mesh->mNumFaces;
 
 	vector<PxU32> indices;
-	for (int i = 0; i < mesh->mNumFaces; ++i) {
+	for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
 		aiFace face = mesh->mFaces[i];
-		for (int j = 0; j < face.mNumIndices; ++j) {
+		for (unsigned int j = 0; j < face.mNumIndices; ++j) {
 			indices.push_back(face.mIndices[j]);
 		}
 	}
@@ -66,7 +66,7 @@ PxTriangleMeshDesc Model::processSingleMesh(aiMesh* mesh, const aiScene* scene) 
 }
 
 
-PxRigidActor* Model::createMeshActor(PxVec3& vec) {
+void Model::createMeshActor(const PxVec3& vec) {
 	for (auto mesh : m_triangleMesh) {
 		// 根据mesh描述创建几何体
 		PxTriangleMeshGeometry geom(mesh);
@@ -74,6 +74,14 @@ PxRigidActor* Model::createMeshActor(PxVec3& vec) {
 		PxRigidStatic* TriangleMesh = gPhysics->createRigidStatic(PxTransform(vec));
 
 		// 创建Shape
-		//PxShape* shape = gPhysics->createShape(geom,*)
+		PxShape* shape = gPhysics->createShape(geom, *gMaterial);
+		{
+			shape->setContactOffset(0.02f);
+			shape->setRestOffset(-0.02f);
+		}
+		TriangleMesh->attachShape(*shape);
+		shape->release();
+
+		gScene->addActor(*TriangleMesh);
 	}
 }
