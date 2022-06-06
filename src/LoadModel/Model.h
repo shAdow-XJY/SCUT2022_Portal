@@ -20,7 +20,7 @@ extern PxMaterial* gMaterial;
 class Model {
 public:
 	Model(const char* path);
-	void createMeshActor(const PxVec3& vec);
+	void createMeshActor(const PxTransform& vec);
 private:
 	vector<PxTriangleMeshDesc> m_meshDesc;
 	vector<PxTriangleMesh*> m_triangleMesh;

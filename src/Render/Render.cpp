@@ -301,9 +301,9 @@ void renderImGui() {
 		static float f = 0.0f;
 		static int counter = 0;
 
-		ImGui::Begin("Backstage");                          // Create a window called "Hello, world!" and append into it.
+		ImGui::Begin("Monitoring");                         
 
-		//ImGui::Text("ImGui successfully deployed.");               // Display some text (you can use a format strings too)
+		//ImGui::Text("ImGui successfully deployed.");           
 
 		//ImGui::SameLine();
 		ImGui::Text("clickX = %d", textX);

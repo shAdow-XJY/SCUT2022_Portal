@@ -388,8 +388,8 @@ void initPhysics(bool interactive)
 	gScene->addActor(*groundPlane);
 
 	// ≤‚ ‘¥˙¬Î
-	Model testModel("D:/sx/PhysX_3.4/SCUT2022_Portal/src/DemoTest/Mouse Server.obj");
-	testModel.createMeshActor(PxVec3(30, 30, 30));
+	Model testModel("C:/Users/bwz12/Downloads/nanosuit/nanosuit.obj");
+	testModel.createMeshActor(PxTransform(PxVec3(20, 30, 30)));
 	// end
 
 	createRoad(PxTransform(PxVec3(0, 5, -5)), 5, "0");
