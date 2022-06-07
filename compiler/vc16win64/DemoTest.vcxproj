@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Block\Block.cpp" />
+    <ClCompile Include="..\..\src\Block\Prop.cpp" />
     <ClCompile Include="..\..\src\Common\ClassicMain.cpp" />
     <ClCompile Include="..\..\src\DemoTest\Portal.cpp" />
     <ClCompile Include="..\..\src\DemoTest\PortalRender.cpp" />
@@ -32,12 +33,14 @@
     <ClCompile Include="..\..\src\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="..\..\src\Render\Camera.cpp" />
     <ClCompile Include="..\..\src\Render\Render.cpp" />
+    <ClCompile Include="..\..\src\Role\CCT.cpp" />
     <ClCompile Include="..\..\src\Role\Role.cpp" />
     <ClCompile Include="..\..\src\Scene\gameScene.cpp" />
     <ClCompile Include="..\..\src\Utils\mouseUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Block\Block.h" />
+    <ClInclude Include="..\..\src\Block\Prop.h" />
     <ClInclude Include="..\..\src\ImGui\imconfig.h" />
     <ClInclude Include="..\..\src\ImGui\imgui.h" />
     <ClInclude Include="..\..\src\ImGui\imgui_impl_glut.h" />
@@ -48,6 +51,7 @@
     <ClInclude Include="..\..\src\ImGui\imstb_truetype.h" />
     <ClInclude Include="..\..\src\Render\Camera.h" />
     <ClInclude Include="..\..\src\Render\Render.h" />
+    <ClInclude Include="..\..\src\Role\CCT.h" />
     <ClInclude Include="..\..\src\Role\Role.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -29,6 +29,22 @@ void createBox(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal
 	gScene->addActor(*sceneBox);
 }
 
+//创建道具类，区别只在Block(BlockType::prop)，试验用，可修改
+void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z) {
+	//可以使用多态继承该Block类添加自定义数据
+	Block* floor = new Block(y, "地板" + floorCount,BlockType::prop);
+	PxTransform local(v);
+	PxShape* shape = gPhysics->createShape(PxBoxGeometry(x, y, z), *gMaterial);
+	//碰撞检测的过滤组
+	shape->setQueryFilterData(collisionGroup);
+	//setupFiltering(shape, FilterGroup::ePIG, FilterGroup::eBIRD);
+	PxRigidStatic* sceneBox = gPhysics->createRigidStatic(t.transform(local));
+	sceneBox->attachShape(*shape);
+	sceneBox->userData = floor;
+	sceneBox->setName("Ground");
+	gScene->addActor(*sceneBox);
+}
+
 void createPlane(const PxVec3& point, const PxVec3& normal) {
 	/*PxTransformFromPlaneEquation()将平面方程转换成等价的transform。
 	PxPlaneEquationFromTransform()提供相反的转换。
@@ -53,6 +69,7 @@ void createGameScene(const PxTransform& t) {
 	float c_1_y = boxHeight;  //the position of the center of road_1
 	// create road_1
 	createBox(t, PxVec3(0, c_1_y, 0), r_1_l, boxHeight, r_1_w);
+	createPorp(t, PxVec3(0, c_1_y + 2, 0), r_1_l, boxHeight, r_1_w);
 
 	float r_2_w = 2.0;
 	float r_2_l = 20.0;
@@ -60,6 +77,13 @@ void createGameScene(const PxTransform& t) {
 	float c_2_y = center_y(c_1_y);
 	float c_2_z = r_1_l + r_2_w;
 	createBox(t, PxVec3(c_2_x, c_2_y, c_2_z), r_2_l , boxHeight, r_2_w);
+
+	//创建道具类场景
+	createPorp(t, PxVec3(c_2_x, c_2_y + 0.5, c_2_z), r_2_l, boxHeight, r_2_w);
+	createPorp(t, PxVec3(c_2_x, c_2_y+2.0, c_2_z), r_2_l, boxHeight, r_2_w);
+	createPorp(t, PxVec3(c_2_x, c_2_y + 1.0, c_2_z), r_2_l, boxHeight, r_2_w);
+	createPorp(t, PxVec3(c_2_x, c_2_y + 1.5, c_2_z), r_2_l, boxHeight, r_2_w);
+	createPorp(t, PxVec3(c_2_x, c_2_y + 2.5, c_2_z), r_2_l, boxHeight, r_2_w);
 
 	//stairs
 	float stairsWidth = 2.0;

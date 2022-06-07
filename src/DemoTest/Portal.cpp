@@ -379,11 +379,14 @@ void initPhysics(bool interactive)
 	role->setFootPosition(PxVec3(-100, 20, 0));
 
 	role->fall();
+
+
 	//if (不交互)，在render中把交互设成false就有一个默认的球滚过去撞击堆。
 	if (!interactive)
 		//PxSphereGeometry Transform,geometry,velocity（速度）
 		createDynamic(10, PxTransform(PxVec3(0, 40, 100)), PxVec3(0, -50, -100));
 }
+
 
 /**
 * @brief 发送射线
@@ -422,6 +425,9 @@ bool RayCast(PxVec3 origin, PxVec3 unitDir, Block& block)
 		block.setName(b->getName());
 		block.setBlockType(b->getBlockType());
 		//std::cout << "hit position x:" << pose.x << " y:" << pose.y << " z:" << pose.z << std::endl;
+		if (block.getBlockType() == BlockType::prop) {
+			hitInfo.actor->release();
+		}
 	}
 	else {
 	}
@@ -450,6 +456,27 @@ void RayCastByRole() {
 		//std::cout << "未碰到地面" << std::endl;	
 		//role->gameOver();
 		role->fall();
+	}
+}
+
+/**
+* @brief 角色道具拾取
+**/
+void PickPropByRole() {
+	PxVec3 origin = role->getPosition();
+	PxVec3 forwardDir = PxVec3(5, 0, 5);
+	if (RayCast(origin, forwardDir, role->propBlock)) {
+		if (role->propBlock.getBlockType() == BlockType::prop) {
+			std::cout << "拾取道具成功" << std::endl;
+		}
+		else
+		{
+			std::cout << "不是道具" << std::endl;
+		}
+	}
+	else
+	{
+		std::cout << "射线没有找到目标" << std::endl;
 	}
 }
 
@@ -494,6 +521,11 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	case 'Z':
 	{
 		role->roleCrouch();
+		break;
+	}
+	case 'E':
+	{
+		PickPropByRole();
 		break;
 	}
 	default:

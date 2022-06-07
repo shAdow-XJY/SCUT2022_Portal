@@ -14,7 +14,8 @@ extern float boxHeight;
 enum BlockType
 {
 	error = -1,
-	ground = 1
+	ground = 1,
+	prop = 2
 };
 
 
@@ -30,7 +31,7 @@ private:
 public:
 
 	Block() {};
-	Block(PxReal halfExtent, string name) :halfExtent(halfExtent), name(name), type(BlockType::ground) {};
+	Block(PxReal halfExtent, string name, BlockType type = BlockType::ground) :halfExtent(halfExtent), name(name), type(type) {};
 
 	PxReal getHalfExtent();
 	PxReal getHeight();

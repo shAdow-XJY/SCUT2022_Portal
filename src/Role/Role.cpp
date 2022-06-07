@@ -164,6 +164,15 @@ PxVec3 Role::getFootPosition() {
 }
 
 /**
+* @brief 获取角色controller的中心坐标
+* @Return PxVec3
+**/
+PxVec3 Role::getPosition() {
+	PxExtendedVec3 pos = this->roleController->getPosition();
+	return PxVec3(pos.x, pos.y, pos.z);
+}
+
+/**
 * @brief 设置角色controller的底部坐标
 * @Param position 三维空间坐标点
 **/

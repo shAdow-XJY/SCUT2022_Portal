@@ -48,6 +48,7 @@ public:
 	void gameOver();
 	void setFootPosition(PxVec3 position);
 	PxVec3 getFootPosition();
+	PxVec3 getPosition();
 	void updatePosition();
 	//速度相关
 	PxVec3 getSpeed();
@@ -61,7 +62,7 @@ public:
 	void stopMoving();
 
 	Block standingBlock;
-
+	Block propBlock;
 	void tryJump(bool release);
 	void roleJump();
 	void roleFall();
