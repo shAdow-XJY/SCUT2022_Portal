@@ -392,10 +392,11 @@ void initPhysics(bool interactive)
 * @brief 发送射线
 * @param origin 发送射线的坐标 unitDir 发送射线的方向 Road游戏道路基类
 **/
+PxRaycastHit hitInfo; // 返回的点，法向量信息等都在这里
 bool RayCast(PxVec3 origin, PxVec3 unitDir, Block& block)
 {
 
-	PxRaycastHit hitInfo; // 返回的点，法向量信息等都在这里
+	
 	PxReal maxDist = unitDir.normalize(); // 最大射线距离
 
 
@@ -425,9 +426,6 @@ bool RayCast(PxVec3 origin, PxVec3 unitDir, Block& block)
 		block.setName(b->getName());
 		block.setBlockType(b->getBlockType());
 		//std::cout << "hit position x:" << pose.x << " y:" << pose.y << " z:" << pose.z << std::endl;
-		if (block.getBlockType() == BlockType::prop) {
-			hitInfo.actor->release();
-		}
 	}
 	else {
 	}
@@ -464,9 +462,11 @@ void RayCastByRole() {
 **/
 void PickPropByRole() {
 	PxVec3 origin = role->getPosition();
+	//确定role的前方方向
 	PxVec3 forwardDir = PxVec3(5, 0, 5);
 	if (RayCast(origin, forwardDir, role->propBlock)) {
 		if (role->propBlock.getBlockType() == BlockType::prop) {
+			hitInfo.actor->release();
 			std::cout << "拾取道具成功" << std::endl;
 		}
 		else

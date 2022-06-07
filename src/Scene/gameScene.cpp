@@ -69,7 +69,6 @@ void createGameScene(const PxTransform& t) {
 	float c_1_y = boxHeight;  //the position of the center of road_1
 	// create road_1
 	createBox(t, PxVec3(0, c_1_y, 0), r_1_l, boxHeight, r_1_w);
-	createPorp(t, PxVec3(0, c_1_y + 2, 0), r_1_l, boxHeight, r_1_w);
 
 	float r_2_w = 2.0;
 	float r_2_l = 20.0;
@@ -79,10 +78,7 @@ void createGameScene(const PxTransform& t) {
 	createBox(t, PxVec3(c_2_x, c_2_y, c_2_z), r_2_l , boxHeight, r_2_w);
 
 	//创建道具类场景
-	createPorp(t, PxVec3(c_2_x, c_2_y + 0.5, c_2_z), r_2_l, boxHeight, r_2_w);
-	createPorp(t, PxVec3(c_2_x, c_2_y+2.0, c_2_z), r_2_l, boxHeight, r_2_w);
-	createPorp(t, PxVec3(c_2_x, c_2_y + 1.0, c_2_z), r_2_l, boxHeight, r_2_w);
-	createPorp(t, PxVec3(c_2_x, c_2_y + 1.5, c_2_z), r_2_l, boxHeight, r_2_w);
+	createPorp(t, PxVec3(c_2_x, c_2_y + 2.0, c_2_z), r_2_l, boxHeight, r_2_w);
 	createPorp(t, PxVec3(c_2_x, c_2_y + 2.5, c_2_z), r_2_l, boxHeight, r_2_w);
 
 	//stairs
