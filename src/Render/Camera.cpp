@@ -28,7 +28,7 @@ void Camera::goFront(float speed)
 	mEye.z -= speed;
 }
 
-bool Camera::handleKey(unsigned char key, int x, int y, float speed)
+bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 {
 	PX_UNUSED(x);
 	PX_UNUSED(y);
@@ -45,7 +45,7 @@ bool Camera::handleKey(unsigned char key, int x, int y, float speed)
 			//切换是否为自由视角
 		case 'T': {
 			this->free = !this->free; ;
-			if (!this->free) this->mDir = PxVec3(0, -20, 50).getNormalized(); //朝物体下方看
+			//if (!this->free) this->mDir = dir.getNormalized(); //朝物体下方看
 			break;
 		}
 		default:							

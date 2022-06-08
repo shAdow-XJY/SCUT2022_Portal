@@ -103,31 +103,36 @@ void Role::stopMoving() {
 
 /**
 * @brief 键盘输入控制角色移动
+* @desc	 锁定视角以角色面朝方向为前进方向，自由视角以摄像机朝向为前进方向
 * @Param key输入特殊按键 status按下(T)/弹起(F)
 **/
-void Role::move(GLint key,bool status) {
+void Role::move(GLint key,bool status,bool free) {
 	if (!this->isAlive) {
 		this->setSpeed(PxVec3(0, 0, 0));
 		return;
 	}
 	this->isMoving = false;
 	if (status) {
-		PxVec3 dir = this->speed.getNormalized();
+		PxVec3 dir;
+		if (!free) dir = this->faceDir; //非自由镜头以人物朝向为前进方向
+		else dir = this->dir; //自由镜头以摄像机正前方为前进方向
 		switch (key) {
 		case GLUT_KEY_UP: {
-			dir = PxVec3(0, 0, 1);
+			//dir = PxVec3(0, 0, 1);
 			break;
 		}
 		case GLUT_KEY_DOWN: {
-			dir = PxVec3(0, 0, -1);
+			dir *= -1;
 			break;
 
 		}case GLUT_KEY_LEFT: {
-			dir = PxVec3(1, 0, 0);
+			PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
+			dir = rotate.rotate(dir);
 			break;
 
 		}case GLUT_KEY_RIGHT: {
-			dir = PxVec3(-1, 0, 0);
+			PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
+			dir = rotate.rotate(-dir);
 			break;
 
 		}
@@ -143,7 +148,12 @@ void Role::move(GLint key,bool status) {
 	else
 	{
 		if (!this->isJump && !this->isFall) {
+			this->faceDir = this->speed.getNormalized(); //抬起的时候才更新角色朝向，确保持续移动
+			if (!free) {
+				this->dir = this->faceDir;
+			}
 			this->speed = PxVec3(0, 0, 0);
+			 
 		}
 		else
 		{
@@ -289,11 +299,28 @@ PxVec3 Role::getSpeed() {
 }
 
 /**
+* @brief 自由视角角色前进方向
+**/
+PxVec3 Role::getDir() {
+	return this->dir;
+}
+
+/**
+* @brief 获取角色面朝的方向
+**/
+PxVec3 Role::getFaceDir() {
+	PxVec3 dir = this->speed.getNormalized();
+	if (!this->speed.x || !this->speed.y || !this->speed.z) return this->faceDir;
+	return this->speed.getNormalized();
+}
+
+/**
 * @brief 角色获取速度
 **/
 void Role::setSpeed(PxVec3 speed) {
 	 this->speed = speed;
 }
+
 
 /**
 * @brief 角色是否存活

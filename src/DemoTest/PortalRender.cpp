@@ -74,13 +74,13 @@ void keyboardUpCallback(unsigned char key, int x, int y)
 
 void specialKeyDownCallback(GLint key, GLint x, GLint y)
 {
-	role->move(key,true);
+	role->move(key,true,sCamera->isFree());
 	specialKeyPress(key);
 }
 
 void specialKeyUpCallback(GLint key, GLint x, GLint y)
 {
-	role->move(key,false);
+	role->move(key,false,sCamera->isFree());
 	specialKeyRelease(key);
 }
 
@@ -101,7 +101,10 @@ void mouseCallback(int button, int state, int x, int y)
 
 	
 		if (!sCamera->isFree()) {
-			sCamera->setEye(role->getFootPosition() + PxVec3(0,50,-50));
+			PxVec3 position = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getDir() * -50);
+			sCamera->setEye(position);
+			PxVec3 dir = role->getPosition() - sCamera->getEye();
+			sCamera->setDir(dir.getNormalized());
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 

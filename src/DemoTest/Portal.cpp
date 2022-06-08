@@ -463,7 +463,7 @@ void RayCastByRole() {
 void PickPropByRole() {
 	PxVec3 origin = role->getPosition();
 	//确定role的前方方向
-	PxVec3 forwardDir = PxVec3(5, 0, 5);
+	PxVec3 forwardDir = role->getFaceDir() * 2;
 	if (RayCast(origin, forwardDir, role->propBlock)) {
 		if (role->propBlock.getBlockType() == BlockType::prop) {
 			hitInfo.actor->release();

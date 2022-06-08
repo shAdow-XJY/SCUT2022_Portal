@@ -22,6 +22,10 @@ private:
 	PxF32 roleHeight = 2.0f;
 
 	PxVec3 speed = PxVec3(0, 0, 0);
+	//摄像机朝向
+	PxVec3 dir = PxVec3(0, 0, 1);
+	//人物面朝方向
+	PxVec3 faceDir = PxVec3(0,0,1);
 	PxVec3 nowPostion;	
 	PxVec3 lastPostion;	
 	bool isMoving = false; 
@@ -53,11 +57,16 @@ public:
 	//速度相关
 	PxVec3 getSpeed();
 	void setSpeed(PxVec3 speed);
+
+	//相机朝向
+	PxVec3 getDir();
+	//角色朝向
+	PxVec3 getFaceDir();
 	//角色移动相关
 	void roleMoveByMouse(int x, int y);
 	void roleMoveByMouse(PxVec3 position);
 	void move();
-	void move(GLint key, bool status);
+	void move(GLint key, bool status,bool free);
 	bool getMovingStatus();
 	void stopMoving();
 
