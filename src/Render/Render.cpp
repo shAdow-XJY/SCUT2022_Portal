@@ -180,10 +180,8 @@ void renderGeometry(const PxGeometryHolder& h)
 			const PxU32 triangleCount = mesh.getNbTriangles();
 			const PxU32 has16BitIndices = mesh.getTriangleMeshFlags() & PxTriangleMeshFlag::e16_BIT_INDICES;
 			const void* indexBuffer = mesh.getTriangles();
-			std::cout << "ee:" << indexBuffer << std::endl;
 
 			const PxVec3* vertexBuffer = mesh.getVertices();
-			std::cout << "ef:" << vertexBuffer << std::endl;
 
 			const PxU32* intIndices = reinterpret_cast<const PxU32*>(indexBuffer);
 			const PxU16* shortIndices = reinterpret_cast<const PxU16*>(indexBuffer);

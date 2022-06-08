@@ -25,7 +25,7 @@ void Model::processNode(aiNode* node, const aiScene* scene) {
 		aiNode* currentNode = nodeQueue.front();
 		for (unsigned int i = 0; i < currentNode->mNumMeshes; ++i) {
 			aiMesh* currentMesh = scene->mMeshes[currentNode->mMeshes[i]];
-			this->m_meshDesc.push_back(processSingleMesh(currentMesh, scene));
+			processSingleMesh(currentMesh, scene);
 		}
 		for (unsigned int i = 0; i < currentNode->mNumChildren; ++i) {
 			nodeQueue.push(currentNode->mChildren[i]);
@@ -34,7 +34,7 @@ void Model::processNode(aiNode* node, const aiScene* scene) {
 	}
 }
 
-PxTriangleMeshDesc Model::processSingleMesh(aiMesh* mesh, const aiScene* scene) {
+void Model::processSingleMesh(aiMesh* mesh, const aiScene* scene) {
 	// 对每个node下面的mesh，将其转换到Px的MeshDescription类中
 	PxTriangleMeshDesc mesh_desc;
 	mesh_desc.points.count = mesh->mNumVertices;
@@ -50,24 +50,24 @@ PxTriangleMeshDesc Model::processSingleMesh(aiMesh* mesh, const aiScene* scene) 
 	mesh_desc.points.stride = sizeof(PxVec3);
 	mesh_desc.triangles.count = mesh->mNumFaces;
 
-	/*PxU32* indices = new PxU32[3 * mesh->mNumVertices];
+	PxU32* indices = new PxU32[3 * mesh->mNumVertices];
 	for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
 		aiFace face = mesh->mFaces[i];
 		for (unsigned int j = 0; j < face.mNumIndices; ++j) {
 			indices[i * 3 + j] = face.mIndices[j];
 		}
 	}
-	mesh_desc.triangles.data = indices;*/
+	mesh_desc.triangles.data = indices;
 
-	// vector形式的索引数据对部分模型可能出现三角形错乱的情况
-	vector<PxU32> indices;
-	for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
-		aiFace face = mesh->mFaces[i];
-		for (unsigned int j = 0; j < face.mNumIndices; ++j) {
-			indices.push_back(face.mIndices[j]);
-		}
-	}
-	mesh_desc.triangles.data = &indices[0];
+	//// vector形式的索引数据对部分模型可能出现三角形错乱的情况
+	//vector<PxU32> indices;
+	//for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
+	//	aiFace face = mesh->mFaces[i];
+	//	for (unsigned int j = 0; j < face.mNumIndices; ++j) {
+	//		indices.push_back(face.mIndices[j]);
+	//	}
+	//}
+	//mesh_desc.triangles.data = &indices[0];
 
 	mesh_desc.triangles.stride = 3 * sizeof(PxU32);
 
@@ -76,10 +76,6 @@ PxTriangleMeshDesc Model::processSingleMesh(aiMesh* mesh, const aiScene* scene) 
 	PX_ASSERT(res);
 #endif
 	// 根据MeshDescription生成Mesh
-	/*PxTriangleMesh* triMesh;
-	triMesh = gCooking->createTriangleMesh(mesh_desc, gPhysics->getPhysicsInsertionCallback());
-	m_triangleMesh.push_back(triMesh);*/
-
 	PxDefaultMemoryOutputStream writeBuffer;
 	PxTriangleMeshCookingResult::Enum result;
 	bool status = gCooking->cookTriangleMesh(mesh_desc, writeBuffer, &result);
@@ -89,9 +85,6 @@ PxTriangleMeshDesc Model::processSingleMesh(aiMesh* mesh, const aiScene* scene) 
 	triMesh = gPhysics->createTriangleMesh(readBuffer);
 	m_triangleMesh.push_back(triMesh);
 
-	
-	
-	return mesh_desc;
 }
 
 

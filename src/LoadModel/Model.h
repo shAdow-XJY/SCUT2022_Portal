@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
 #include<queue>
+#include<string>
 #include<assert.h>
 
 #include<assimp/Importer.hpp>
@@ -11,6 +12,7 @@
 
 using namespace physx;
 using std::vector;
+using std::string;
 
 extern PxScene* gScene;
 extern PxCooking*	gCooking;
@@ -22,10 +24,10 @@ public:
 	Model(const char* path);
 	void createMeshActor(const PxTransform& vec);
 private:
-	vector<PxTriangleMeshDesc> m_meshDesc;
 	vector<PxTriangleMesh*> m_triangleMesh;
+
 	void loadModel(const char* path);
 	void processNode(aiNode* node, const aiScene* scene);
-	PxTriangleMeshDesc processSingleMesh(aiMesh* mesh, const aiScene* scene);
+	void processSingleMesh(aiMesh* mesh, const aiScene* scene);
 	
 };
