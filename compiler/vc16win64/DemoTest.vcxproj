@@ -33,7 +33,6 @@
     <ClCompile Include="..\..\src\LoadModel\Model.cpp" />
     <ClCompile Include="..\..\src\Render\Camera.cpp" />
     <ClCompile Include="..\..\src\Render\Render.cpp" />
-    <ClCompile Include="..\..\src\Role\CCT.cpp" />
     <ClCompile Include="..\..\src\Role\Role.cpp" />
     <ClCompile Include="..\..\src\Scene\gameScene.cpp" />
     <ClCompile Include="..\..\src\Utils\mouseUtils.cpp" />
@@ -51,7 +50,6 @@
     <ClInclude Include="..\..\src\LoadModel\Model.h" />
     <ClInclude Include="..\..\src\Render\Camera.h" />
     <ClInclude Include="..\..\src\Render\Render.h" />
-    <ClInclude Include="..\..\src\Role\CCT.h" />
     <ClInclude Include="..\..\src\Role\Role.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

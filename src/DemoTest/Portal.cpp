@@ -448,7 +448,7 @@ bool RayCast(PxVec3 origin, PxVec3 unitDir, Block& block)
 **/
 void RayCastByRole() {
 	PxVec3 origin = role->getFootPosition();
-	PxVec3 unitDir = PxVec3(0, 1, 0);
+	PxVec3 unitDir = PxVec3(0, -1, 0);
 	if (RayCast(origin, unitDir, role->standingBlock)) {
 		//碰撞到物体
 		//std::cout << "碰到地面" << std::endl;
