@@ -177,6 +177,7 @@ void renderGeometry(const PxGeometryHolder& h)
 			const PxTriangleMesh& mesh = *triGeom.triangleMesh;
 			const PxVec3 scale = triGeom.scale.scale;
 
+
 			const PxU32 triangleCount = mesh.getNbTriangles();
 			const PxU32 has16BitIndices = mesh.getTriangleMeshFlags() & PxTriangleMeshFlag::e16_BIT_INDICES;
 			const void* indexBuffer = mesh.getTriangles();
@@ -380,11 +381,11 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 
 			if (shapes[j]->getFlags() & PxShapeFlag::eTRIGGER_SHAPE)
 				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-			
+
 			// render object
-			glPushMatrix();						
+			glPushMatrix();
 			glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
-			if(sleeping)/*是否处于sleeping状态*/
+			if (sleeping)/*是否处于sleeping状态*/
 			{
 				PxVec3 darkColor = color * 0.8f;/*sleeping的情况下颜色*0.8*/
 				glColor4f(darkColor.x, darkColor.y, darkColor.z, 1.0f);
@@ -393,16 +394,16 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 				glColor4f(color.x, color.y, color.z, 1.0f);
 			}
 			renderGeometry(h);
+
 			glPopMatrix();
 
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-
-			if(shadows)/*阴影，，，效果表现上有瑕疵但不知道怎么优化*/
+			if (shadows)/*阴影，，，效果表现上有瑕疵但不知道怎么优化*/
 			{
 				const PxVec3 shadowDir(0.0f, -0.7071067f, -0.7071067f);
-				const PxReal shadowMat[]={ 1,0,0,0, -shadowDir.x/shadowDir.y,0,-shadowDir.z/shadowDir.y,0, 0,0,1,0, 0,0,0,1 };
-				glPushMatrix();						
+				const PxReal shadowMat[] = { 1,0,0,0, -shadowDir.x / shadowDir.y,0,-shadowDir.z / shadowDir.y,0, 0,0,1,0, 0,0,0,1 };
+				glPushMatrix();
 				glMultMatrixf(shadowMat);
 				glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
 				glDisable(GL_LIGHTING);
@@ -410,7 +411,7 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 				renderGeometry(h);
 				glEnable(GL_LIGHTING);
 				glPopMatrix();
-			}
+			}	
 		}
 	}
 }
