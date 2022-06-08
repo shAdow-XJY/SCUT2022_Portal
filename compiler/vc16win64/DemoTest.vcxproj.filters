@@ -10,11 +10,16 @@
     <ClCompile Include="..\..\src\Role\Role.cpp" />
     <ClCompile Include="..\..\src\Utils\mouseUtils.cpp" />
     <ClCompile Include="gameScene.cpp" />
+    <ClCompile Include="..\..\..\..\..\VS\OpenGL\include\glad\glad.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Render\Camera.h" />
     <ClInclude Include="..\..\src\Render\Render.h" />
     <ClInclude Include="..\..\src\Role\CCT.h" />
     <ClInclude Include="..\..\src\Role\Role.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="skybox.fs" />
+    <None Include="skybox.vs" />
   </ItemGroup>
 </Project>

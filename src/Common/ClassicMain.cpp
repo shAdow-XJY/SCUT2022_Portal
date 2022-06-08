@@ -28,7 +28,7 @@
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
 extern int snippetMain(int, const char*const*);
-
+//#include "gameScene.h"
 int main(int argc, char** argv)
 {
 	return snippetMain(argc, argv);

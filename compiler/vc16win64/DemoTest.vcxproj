@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\VS\OpenGL\include\glad\glad.c" />
     <ClCompile Include="..\..\src\Common\ClassicMain.cpp" />
     <ClCompile Include="..\..\src\DemoTest\Portal.cpp" />
     <ClCompile Include="..\..\src\DemoTest\PortalRender.cpp" />
@@ -35,11 +36,15 @@
     <ClInclude Include="..\..\src\Role\CCT.h" />
     <ClInclude Include="..\..\src\Role\Role.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="skybox.fs" />
+    <None Include="skybox.vs" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{809F8893-32BA-4FD4-86B6-F825B7778A82}</ProjectGuid>
     <RootNamespace>Project1</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
     <ProjectName>Portal</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -58,9 +63,10 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
+    <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -68,9 +74,9 @@
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>
     </WholeProgramOptimization>
-    <CharacterSet>
-    </CharacterSet>
-    <UseOfMfc>Static</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -118,11 +124,11 @@
       </SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>./../../../Include;./../../../../PxShared/include;./../../../../PxShared/src/foundation/include;./../../../../PxShared/src/fastxml/include;./../../Graphics/include/win32/GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PreprocessorDefinitions>_DEBUG</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>./../../../Common/lib/vc16win64;./../../lib/vc16win64;./../../../../PxShared/lib/vc16win64;./../../Graphics/lib/win64/glut;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Winmm.lib;OpenGL32.lib;glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>./../../../Common/lib/vc16win64;./../../lib/vc16win64;./../../../../PxShared/lib/vc16win64;./../../Graphics/lib/win64/glut;./../../Graphics/lib/win64/glfw3;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Winmm.lib;OpenGL32.lib;glut32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/LIBPATH:../../../Lib/vc16win64 PhysX3CommonDEBUG_x64.lib PhysX3DEBUG_x64.lib PhysX3CookingDEBUG_x64.lib PhysX3CharacterKinematicDEBUG_x64.lib PhysX3ExtensionsDEBUG.lib PhysX3VehicleDEBUG.lib PxTaskDEBUG_x64.lib PxFoundationDEBUG_x64.lib PsFastXmlDEBUG_x64.lib PxPvdSDKDEBUG_x64.lib /LIBPATH:../../lib/vc16win64 UtilsDEBUG.lib /DEBUG</AdditionalOptions>
     </Link>
     <PostBuildEvent>
@@ -155,15 +161,14 @@
       </SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>./../../../Include;./../../../../PxShared/include;./../../../../PxShared/src/foundation/include;./../../../../PxShared/src/fastxml/include;./../../Graphics/include/win32/GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;WIN32;WIN64;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_WINSOCK_DEPRECATED_NO_WARNINGS;PHYSX_PROFILE_SDK;RENDER_SNIPPET;NDEBUG;PX_SUPPORT_PVD=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Winmm.lib;OpenGL32.lib;glut32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>./../../../Common/lib/vc16win64;./../../lib/vc16win64;./../../../../PxShared/lib/vc16win64;./../../Graphics/lib/win64/glut;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Winmm.lib;OpenGL32.lib;glut32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>./../../../Common/lib/vc16win64;./../../lib/vc16win64;./../../../../PxShared/lib/vc16win64;./../../Graphics/lib/win64/glut;./../../Graphics/lib/win64/glfw3;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/INCREMENTAL:NO /LIBPATH:../../../Lib/vc16win64 PhysX3Common_x64.lib PhysX3_x64.lib PhysX3Cooking_x64.lib PhysX3CharacterKinematic_x64.lib PhysX3Extensions.lib PhysX3Vehicle.lib PxTask_x64.lib PxFoundation_x64.lib PsFastXml_x64.lib PxPvdSDK_x64.lib /LIBPATH:../../lib/vc16win64 Utils.lib</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>

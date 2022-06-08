@@ -41,9 +41,13 @@
 #include "../Common/PVD.h"
 #include "../Utils/Utils.h"
 #include "../Role/Role.h"
+
 #include<vector>
+#include<string>
 #include <glut.h>
+#include <GLFW/glfw3.h>
 #include<iostream>
+
 
 
 using namespace physx;
@@ -421,6 +425,8 @@ void mousePress(int button, int state, int x, int y) {
 //main
 int snippetMain(int, const char*const*)
 {
+
+
 #ifdef RENDER_SNIPPET
 	extern void renderLoop();
 	renderLoop();

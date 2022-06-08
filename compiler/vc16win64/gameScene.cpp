@@ -1,7 +1,18 @@
+#include <iostream>
 #include <ctype.h>
 #include "PxPhysicsAPI.h"
-#include<vector>
+#include <vector>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <Shader.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+
+
+
+using namespace std;
 using namespace physx;
 
 extern PxScene* gScene;
@@ -9,6 +20,100 @@ extern PxMaterial* gMaterial;
 extern PxPhysics* gPhysics;
 float maxJumpHeight = 1.0;
 float stepHeight = 0.8 * maxJumpHeight;
+
+vector<std::string> faces
+{
+		"../Skybox/right.jpg",
+		"../Skybox/left.jpg",
+		"../Skybox/top.jpg",
+		"../Skybox/bottom.jpg",
+		"../Skybox/front.jpg",
+		"../Skybox/back.jpg"
+};
+
+Shader skyboxShader("skybox.vs", "skybox.fs");
+
+float skyboxVertices[] = {
+	// positions          
+	-1.0f,  1.0f, -1.0f,
+	-1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+
+	-1.0f, -1.0f,  1.0f,
+	-1.0f, -1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f,  1.0f,
+	-1.0f, -1.0f,  1.0f,
+
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+
+	-1.0f, -1.0f,  1.0f,
+	-1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f, -1.0f,  1.0f,
+	-1.0f, -1.0f,  1.0f,
+
+	-1.0f,  1.0f, -1.0f,
+	 1.0f,  1.0f, -1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	-1.0f,  1.0f,  1.0f,
+	-1.0f,  1.0f, -1.0f,
+
+	-1.0f, -1.0f, -1.0f,
+	-1.0f, -1.0f,  1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	-1.0f, -1.0f,  1.0f,
+	 1.0f, -1.0f,  1.0f
+};
+
+
+
+unsigned int loadCubemap(vector<std::string> faces) 
+{
+	unsigned int skytexture;
+	glGenTextures(1, &skytexture);
+	glBindTexture(GL_TEXTURE_2D, skytexture);
+
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+			);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+			stbi_image_free(data);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return skytexture;
+}
+
+
+
 
 void createBox(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z) {
 	PxTransform local(v);
@@ -37,6 +142,39 @@ float center_y(float y) {
 }
 
 void createGameScene(const PxTransform& t) {
+
+
+	// glfw: initialize and configure
+// ------------------------------
+	glfwInit();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#ifdef __APPLE__
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+
+	// configure global opengl state
+	// -----------------------------
+	glEnable(GL_DEPTH_TEST);
+
+	//creat SkyBox
+	// skybox VAO
+	unsigned int skyboxVAO, skyboxVBO;
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+	unsigned int cubemapTexture = loadCubemap(faces);
+
+	skyboxShader.use();
+	skyboxShader.setInt("skybox", 0);
+
 	float r_1_l = 4.0;  //road_1_length
 	float r_1_w = 8.0;  //road_1_width
 	float c_1_y = stepHeight;  //the position of the center of road_1
