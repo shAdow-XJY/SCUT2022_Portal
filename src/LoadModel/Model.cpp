@@ -99,6 +99,7 @@ void Model::createMeshActor(const PxTransform& vec) {
 
 		// ´´½¨Shape
 		PxShape* shape = gPhysics->createShape(geom, *gMaterial);
+		//PxShape* shape = gPhysics->createShape(PxCapsuleGeometry(5,5), *gMaterial);
 		{
 			shape->setContactOffset(0.02f);
 			shape->setRestOffset(-0.02f);

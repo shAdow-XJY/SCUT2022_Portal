@@ -25,6 +25,7 @@ public:
 	void createMeshActor(const PxTransform& vec);
 private:
 	vector<PxTriangleMesh*> m_triangleMesh;
+	
 
 	void loadModel(const char* path);
 	void processNode(aiNode* node, const aiScene* scene);
