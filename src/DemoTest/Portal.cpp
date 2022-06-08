@@ -41,6 +41,7 @@
 #include "../Common/PVD.h"
 #include "../Utils/Utils.h"
 #include "../Role/Role.h"
+#include "../LoadModel/Model.h"
 
 #include<vector>
 #include<string>
@@ -56,6 +57,7 @@ PxDefaultErrorCallback	gErrorCallback;
 
 PxFoundation*			gFoundation = NULL;
 PxPhysics*				gPhysics	= NULL;
+PxCooking*				gCooking	= NULL;
 
 PxDefaultCpuDispatcher*	gDispatcher = NULL;
 PxScene*				gScene		= NULL;
@@ -342,6 +344,9 @@ void initPhysics(bool interactive)
 	//创建顶级PxPhysics对象
 	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, gPvd);
 
+	// 创建Cooking对象
+	gCooking = PxCreateCooking(PX_PHYSICS_VERSION, *gFoundation, PxCookingParams(PxTolerancesScale()));
+
 	//?缩放
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
 	//重力
@@ -371,6 +376,11 @@ void initPhysics(bool interactive)
 	groundPlane->setName("over");
 	gScene->addActor(*groundPlane);
 
+	// 测试代码
+	Model testModel("../../models/paimon/paimon.obj");
+	//testModel.createMeshActor((PxTransform(PxVec3(20, 30, 30))).transform(PxTransform(PxQuat(-PxHalfPi,PxVec3(1.0f,0.0f,0.0f)))));
+	testModel.createMeshActor(PxTransform(20, 30, 30));
+	// end
 
 	extern void createGameScene(const PxTransform & t);
 	createGameScene(PxTransform(PxVec3(-100, 0, 0)));
