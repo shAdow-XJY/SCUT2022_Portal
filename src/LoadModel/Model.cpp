@@ -88,12 +88,11 @@ void Model::processSingleMesh(aiMesh* mesh, const aiScene* scene) {
 }
 
 
-void Model::createMeshActor(const PxTransform& vec) {
+void Model::attachMeshes(const PxTransform& vec,PxRigidActor* actor) {
+	// 在指定位置创建Actor
+	//PxRigidStatic* TriangleMesh = gPhysics->createRigidStatic(vec);
 	for (size_t i = 0; i < m_triangleMesh.size();++i) {
 		
-		// 在指定位置创建Actor
-		PxRigidStatic* TriangleMesh = gPhysics->createRigidStatic(vec);
-
 		// 根据mesh描述创建几何体
 		PxTriangleMeshGeometry geom(m_triangleMesh[i]/*,PxMeshScale(PxVec3(0.5f,0.5f,0.5f))*/);
 
@@ -106,7 +105,8 @@ void Model::createMeshActor(const PxTransform& vec) {
 			shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
 		}
 		
-		TriangleMesh->attachShape(*shape);
+		//TriangleMesh->attachShape(*shape);
+		actor->attachShape(*shape);
 		shape->release();
 		/*TriangleMesh->userData = new int;
 		int testid = 8888;
@@ -118,7 +118,7 @@ void Model::createMeshActor(const PxTransform& vec) {
 
 		PxShape* shape = PxRigidActorExt::createExclusiveShape(*TriangleMesh,
 			PxTriangleMeshGeometry(mesh), *material);*/
-
-		gScene->addActor(*TriangleMesh);
+		
 	}
+	//gScene->addActor(*TriangleMesh);
 }

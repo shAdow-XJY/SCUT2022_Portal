@@ -28,6 +28,17 @@ Role::Role() {
 }
 
 /**
+* @brief 将角色与模型绑定
+* @param path 模型文件路径
+**/
+bool Role::attachModel(const char* path) {
+	this->model = new Model(path);
+	this->model->attachMeshes(PxTransform(20, 30, 30), this->role);
+	return true;
+}
+
+
+/**
 * @brief 获取角色是否自动移动
 **/
 bool Role::getMovingStatus() {

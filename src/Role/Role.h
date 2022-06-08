@@ -2,6 +2,7 @@
 #include <iostream>
 #include "PxPhysicsAPI.h"
 #include "../Block/Block.h"
+#include "../LoadModel/Model.h"
 #include <glut.h>
 using namespace physx;
 
@@ -15,6 +16,7 @@ class Role {
 private:
 	PxRigidBody* role;
 	PxController* roleController;
+	Model* model;
 
 	PxF32 roleRadius = 1.0f;
 	PxF32 roleHeight = 2.0f;
@@ -42,6 +44,7 @@ public:
 		this->roleController->release();
 	};
 
+	bool attachModel(const char*);
 	bool getRoleStatus();
 	void gameOver();
 	void setFootPosition(PxVec3 position);

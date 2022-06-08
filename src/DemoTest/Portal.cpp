@@ -41,7 +41,6 @@
 #include "../Common/PVD.h"
 #include "../Utils/Utils.h"
 #include "../Role/Role.h"
-#include "../LoadModel/Model.h"
 
 #include<vector>
 #include<string>
@@ -387,11 +386,11 @@ void initPhysics(bool interactive)
 	groundPlane->setName("over");
 	gScene->addActor(*groundPlane);
 
-	// 测试代码
-	Model testModel("../../models/paimon/paimon.obj");
-	//testModel.createMeshActor((PxTransform(PxVec3(20, 30, 30))).transform(PxTransform(PxQuat(-PxHalfPi,PxVec3(1.0f,0.0f,0.0f)))));
-	testModel.createMeshActor(PxTransform(20, 30, 30));
-	// end
+	//// 测试代码
+	//Model testModel("../../models/paimon/paimon.obj");
+	////testModel.createMeshActor((PxTransform(PxVec3(20, 30, 30))).transform(PxTransform(PxQuat(-PxHalfPi,PxVec3(1.0f,0.0f,0.0f)))));
+	//testModel.createMeshActor(PxTransform(20, 30, 30));
+	//// end
 
 	createRoad(PxTransform(PxVec3(0, 5, -5)), 5, "0");
 	createRoad(PxTransform(PxVec3(0, 5, 20)),5,"1");
@@ -402,7 +401,7 @@ void initPhysics(bool interactive)
 	createRoad(PxTransform(PxVec3(20, 5, 30)), 5, "6");
 	createRoad(PxTransform(PxVec3(20, 15, 30)), 5, "6");
 	role = new Role();
-
+	role->attachModel("../../models/paimon/paimon.obj");
 	role->fall();
 	//if (不交互)，在render中把交互设成false就有一个默认的球滚过去撞击堆。
 	if(!interactive)
