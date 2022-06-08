@@ -31,8 +31,11 @@
     <ClCompile Include="..\..\src\ImGui\imgui_tables.cpp" />
     <ClCompile Include="..\..\src\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="..\..\src\LoadModel\Model.cpp" />
+    <ClCompile Include="..\..\src\Render\BMPLoader.cpp" />
     <ClCompile Include="..\..\src\Render\Camera.cpp" />
     <ClCompile Include="..\..\src\Render\Render.cpp" />
+    <ClCompile Include="..\..\src\Render\Skybox.cpp" />
+    <ClCompile Include="..\..\src\Render\Vector.cpp" />
     <ClCompile Include="..\..\src\Role\Role.cpp" />
     <ClCompile Include="..\..\src\Scene\gameScene.cpp" />
     <ClCompile Include="..\..\src\Utils\mouseUtils.cpp" />
@@ -48,8 +51,11 @@
     <ClInclude Include="..\..\src\ImGui\imstb_textedit.h" />
     <ClInclude Include="..\..\src\ImGui\imstb_truetype.h" />
     <ClInclude Include="..\..\src\LoadModel\Model.h" />
+    <ClInclude Include="..\..\src\Render\BMPLoader.h" />
     <ClInclude Include="..\..\src\Render\Camera.h" />
     <ClInclude Include="..\..\src\Render\Render.h" />
+    <ClInclude Include="..\..\src\Render\Skybox.h" />
+    <ClInclude Include="..\..\src\Render\Vector.h" />
     <ClInclude Include="..\..\src\Role\Role.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -36,6 +36,7 @@
 #include "../Render/Render.h"
 #include "../Render/Camera.h"
 #include "../Role/Role.h"
+#include <Render/Skybox.h>
 
 
 
@@ -50,7 +51,7 @@ extern void specialKeyPress(GLint key);
 extern void specialKeyRelease(GLint key);
 extern Role* role;
 extern void RayCastByRole();
-
+CSkyBox skyBox;
 namespace
 {
 	Snippets::Camera*	sCamera;
@@ -146,6 +147,8 @@ void mouseCallback(int button, int state, int x, int y)
 		scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
 		Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
 	}
+	/** 绘制天空 */
+	skyBox.CreateSkyBox(-2000, -200, -2000, 1.0, 0.5, 1.0);
 
 		Snippets::finishRender();
 	}
@@ -164,6 +167,9 @@ void renderLoop()
 
 	Snippets::setupDefaultWindow("PhysX Demo");
 	Snippets::setupDefaultRenderState();
+
+	/** 初始化天空 */
+	skyBox.Init();
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
