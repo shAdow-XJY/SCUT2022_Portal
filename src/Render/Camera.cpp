@@ -1,5 +1,7 @@
 #include "Camera.h"
+#include "cmath"
 #include <ctype.h>
+#include <iostream>
 #include "foundation/PxMat33.h"
 
 using namespace physx;
@@ -11,6 +13,7 @@ namespace Snippets
 	{
 		mEye = eye;
 		mDir = dir.getNormalized();
+		targetDir = mDir;
 		mMouseX = 0;
 		mMouseY = 0;
 	}
@@ -45,6 +48,7 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 			//切换是否为自由视角
 		case 'T': {
 			this->free = !this->free; ;
+			this->isChangeImmediate = true;
 			//if (!this->free) this->mDir = dir.getNormalized(); //朝物体下方看
 			break;
 		}
@@ -112,6 +116,64 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 	{
 		return mDir;
 	}
+	/**
+	* @brief 每帧更新摄像机
+	* @Param position角色中心位置
+	**/
+	void Camera::updateDir(PxVec3 position) {
+		if (this->isChangeImmediate) {
+			this->targetDir = this->targetDir.getNormalized();
+			this->mDir = this->targetDir;
+			this->isChangeImmediate = false;
+			return;
+		}
+		if (this->free || this->mDir == this->targetDir) {
+			this->isMoving = 0;
+			return;
+		};
+		float dis = std::abs(this->mDir.getNormalized().dot(this->targetDir.getNormalized()));
+		if (dis > 0.99f) {
+			this->mDir = this->targetDir;
+			this->isMoving = 0;
+			return;
+		};
+		const float delta = PxHalfPi / this->rotateSpeed * this->isMoving;
+		PxTransform rotate = PxTransform(position,PxQuat(delta, PxVec3(0, 1, 0)));
+		this->mDir = rotate.rotate(this->mDir);
+		this->mEye = position - this->mDir;
+	}
+	
+	/**
+	* @brief 根据按键计算旋转的方向
+	* @Param key 按键
+	**/
+	void Camera::calDirMoving(GLint key) {
+		if (this->isMoving) return;
+		switch (key) {
+			case GLUT_KEY_UP: {
+				break;
+			}
+			case GLUT_KEY_DOWN: {
+				this->isMoving = 1;
+				//this->rotateSpeed = 400.0f;
+				//this->isChangeImmediate = true;
+				break;
 
+			}case GLUT_KEY_LEFT: {
+				this->isMoving = 1;
+				//this->rotateSpeed = 400.0f;
+				break;
+
+			}case GLUT_KEY_RIGHT: {
+				this->isMoving = -1;
+				//this->rotateSpeed = 400.0f;
+				break;
+
+			}
+			default: {
+				return;
+			}
+		}
+	}
 
 }

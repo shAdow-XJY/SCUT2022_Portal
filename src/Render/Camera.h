@@ -2,6 +2,7 @@
 #define PHYSX_SNIPPET_CAMERA_H
 
 #include "foundation/PxTransform.h"
+#include <glut.h>
 
 namespace Snippets
 {
@@ -21,12 +22,21 @@ namespace Snippets
 		physx::PxVec3		getDir()	const;
 		physx::PxTransform	getTransform() const;
 		bool				isFree();
+		physx::PxVec3		targetDir;
+		int					isMoving = 0;
+		void				updateDir(physx::PxVec3);
+		void				calDirMoving(GLint);
+		float				rotateSpeed = 300.0f;
+		bool				isChangeImmediate = false;
 	private:
 		physx::PxVec3	mEye;	
 		physx::PxVec3	mDir;
+	
 		int				mMouseX;
 		int				mMouseY;
 		bool			free = true; //Ƿƶ
+
+
 	};
 
 

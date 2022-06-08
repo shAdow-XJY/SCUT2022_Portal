@@ -20,7 +20,6 @@ Role::Role() {
 	roleController->setFootPosition(PxExtendedVec3(0, boxHeight + desc.contactOffset +10, 20));
 	roleController->resize(desc.height + desc.radius);
 	roleController->setContactOffset(0.001f);
-
 	this->role = roleController->getActor();
 	this->roleController->setUserData(this);
 	this->nowPostion = this->role->getGlobalPose().p;
@@ -51,7 +50,7 @@ void Role::roleMoveByMouse(int x, int y) {
 * @Param position 三维空间坐标
 **/
 void Role::roleMoveByMouse(PxVec3 position) {
-	if (this->isMoving || this->isJump || this->isFall || !this->isAlive) return;
+	if (this->isMoving || this->isJump || this->isFall || !this->isAlive || !this->canMove) return;
 	this->lastPostion = PxVec3(this->nowPostion.x, this->nowPostion.y, this->nowPostion.z);
 	this->nowPostion = position;
 	this->isMoving = true;
@@ -61,7 +60,7 @@ void Role::roleMoveByMouse(PxVec3 position) {
 * @brief 角色自动移动
 **/
 void Role::move() {
-	if(!this->isMoving || !this->isAlive) return;
+	if(!this->isMoving || !this->isAlive || !this->canMove) return;
 	PxExtendedVec3 position = this->roleController->getFootPosition();
 	float offsetX = this->nowPostion.x - position.x;
 	float offsetZ = this->nowPostion.z - position.z;
@@ -104,14 +103,18 @@ void Role::stopMoving() {
 /**
 * @brief 键盘输入控制角色移动
 * @desc	 锁定视角以角色面朝方向为前进方向，自由视角以摄像机朝向为前进方向
-* @Param key输入特殊按键 status按下(T)/弹起(F)
+* @Param key输入特殊按键 status按下(T)/弹起(F) free相机是否自由移动
 **/
 void Role::move(GLint key,bool status,bool free) {
+	if (!this->canMove) {
+		return;
+	}
 	if (!this->isAlive) {
 		this->setSpeed(PxVec3(0, 0, 0));
 		return;
 	}
 	this->isMoving = false;
+	//按下
 	if (status) {
 		PxVec3 dir;
 		if (!free) dir = this->faceDir; //非自由镜头以人物朝向为前进方向
@@ -141,24 +144,27 @@ void Role::move(GLint key,bool status,bool free) {
 		}
 		}
 		this->speed = dir * 0.12f;
+		this->lastPressDir = dir.getNormalized();
 		if (this->isJump || this->isFall) return;
 		this->roleController->move(this->speed * 4, 0.0001, 1.0f / 120.0f, NULL);
 		this->updatePosition();
 	}
+	//弹起
 	else
 	{
 		if (!this->isJump && !this->isFall) {
-			this->faceDir = this->speed.getNormalized(); //抬起的时候才更新角色朝向，确保持续移动
+			this->faceDir = this->lastPressDir; //获取最后一次移动的面朝方向
 			if (!free) {
-				this->dir = this->faceDir;
+				this->dir = this->faceDir;//抬起的时候才更新角色朝向，确保持续移动
 			}
 			this->speed = PxVec3(0, 0, 0);
-			 
+
 		}
 		else
 		{
 			this->speed = this->speed * 0.5f;
 		}
+		
 		
 	}
 }
@@ -333,4 +339,11 @@ bool Role::getRoleStatus() {
 **/
 void Role::gameOver() {
 	this->isAlive = false;
+}
+
+/**
+* @brief 角色是否存活
+**/
+void Role::changeCanMove(bool flag) {
+	this->canMove = flag;
 }
