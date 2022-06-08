@@ -7,7 +7,7 @@ Model::Model(const char* path) {
 
 void Model::loadModel(const char* path) {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_FlipUVs);
+	const aiScene* scene = importer.ReadFile(path, /*aiProcess_Triangulate | */aiProcess_FlipUVs);
 	if (scene == nullptr || !scene->mRootNode || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) {
 		std::cout << "FAILED to load model: " << path << std::endl;
 		return;
@@ -40,32 +40,34 @@ PxTriangleMeshDesc Model::processSingleMesh(aiMesh* mesh, const aiScene* scene) 
 	mesh_desc.points.count = mesh->mNumVertices;
 	PxVec3* vertices = new PxVec3[mesh->mNumVertices];
 	for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
-		vertices[i].x = mesh->mVertices[i].x;
-		vertices[i].y = mesh->mVertices[i].y;
-		vertices[i].z = mesh->mVertices[i].z;
+		PxVec3 currVertex;
+		currVertex.x = mesh->mVertices[i].x;
+		currVertex.y = mesh->mVertices[i].y;
+		currVertex.z = mesh->mVertices[i].z;
+		vertices[i] = currVertex;
 	}
 	mesh_desc.points.data = vertices;
 	mesh_desc.points.stride = sizeof(PxVec3);
 	mesh_desc.triangles.count = mesh->mNumFaces;
 
-	PxU32* indices = new PxU32[3 * mesh->mNumVertices];
+	/*PxU32* indices = new PxU32[3 * mesh->mNumVertices];
 	for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
 		aiFace face = mesh->mFaces[i];
 		for (unsigned int j = 0; j < face.mNumIndices; ++j) {
 			indices[i * 3 + j] = face.mIndices[j];
 		}
 	}
-	mesh_desc.triangles.data = indices;
+	mesh_desc.triangles.data = indices;*/
 
-	// 用vector似乎不满足MeshDescription的要求
-	/*vector<PxU32> indices;
+	// vector形式的索引数据对部分模型可能出现三角形错乱的情况
+	vector<PxU32> indices;
 	for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
 		aiFace face = mesh->mFaces[i];
 		for (unsigned int j = 0; j < face.mNumIndices; ++j) {
 			indices.push_back(face.mIndices[j]);
 		}
 	}
-	mesh_desc.triangles.data = &indices[0];*/
+	mesh_desc.triangles.data = &indices[0];
 
 	mesh_desc.triangles.stride = 3 * sizeof(PxU32);
 
@@ -88,17 +90,19 @@ PxTriangleMeshDesc Model::processSingleMesh(aiMesh* mesh, const aiScene* scene) 
 	m_triangleMesh.push_back(triMesh);
 
 	
+	
 	return mesh_desc;
 }
 
 
 void Model::createMeshActor(const PxTransform& vec) {
-	for (auto mesh : m_triangleMesh) {
-		//auto mesh = m_triangleMesh[1];
-		// 根据mesh描述创建几何体
-		PxTriangleMeshGeometry geom(mesh);
-		// 在指定位置（？）创建mesh
+	for (size_t i = 0; i < m_triangleMesh.size();++i) {
+		
+		// 在指定位置创建Actor
 		PxRigidStatic* TriangleMesh = gPhysics->createRigidStatic(vec);
+
+		// 根据mesh描述创建几何体
+		PxTriangleMeshGeometry geom(m_triangleMesh[i]/*,PxMeshScale(PxVec3(0.5f,0.5f,0.5f))*/);
 
 		// 创建Shape
 		PxShape* shape = gPhysics->createShape(geom, *gMaterial);
@@ -107,11 +111,19 @@ void Model::createMeshActor(const PxTransform& vec) {
 			shape->setRestOffset(-0.02f);
 			shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
 		}
+		
 		TriangleMesh->attachShape(*shape);
 		shape->release();
-		TriangleMesh->userData = new int;
+		/*TriangleMesh->userData = new int;
 		int testid = 8888;
-		memcpy(TriangleMesh->userData, &testid, sizeof(int));
+		memcpy(TriangleMesh->userData, &testid, sizeof(int));*/
+
+		/*PxRigidDynamic* TriangleMesh = gPhysics->createRigidDynamic(vec);
+		TriangleMesh->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+		PxMaterial* material = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+
+		PxShape* shape = PxRigidActorExt::createExclusiveShape(*TriangleMesh,
+			PxTriangleMeshGeometry(mesh), *material);*/
 
 		gScene->addActor(*TriangleMesh);
 	}

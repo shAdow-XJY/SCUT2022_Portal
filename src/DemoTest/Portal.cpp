@@ -388,8 +388,11 @@ void initPhysics(bool interactive)
 	gScene->addActor(*groundPlane);
 
 	// ≤‚ ‘¥˙¬Î
-	Model testModel("C:/Users/bwz12/Downloads/nanosuit/nanosuit.obj");
-	testModel.createMeshActor(PxTransform(PxVec3(20, 30, 30)));
+	Model testModel("C:/Users/bwz12/Downloads/keqing-fbx-with-textures/source/Keqing/Keqing/Keqing model/Keqing.fbx");
+	//Model testModel("C:/Users/bwz12/Downloads/hololive-gawr-gura/source/Sketchfab_2020_12_03_09_08_48.obj");
+	//Model testModel("C:/Users/bwz12/Downloads/ball.glb");
+	testModel.createMeshActor((PxTransform(PxVec3(20, 30, 30))).transform(PxTransform(PxQuat(-PxHalfPi,PxVec3(1.0f,0.0f,0.0f)))));
+	//testModel.createMeshActor(PxTransform(20, 30, 30));
 	// end
 
 	createRoad(PxTransform(PxVec3(0, 5, -5)), 5, "0");

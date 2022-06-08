@@ -55,7 +55,8 @@ static clock_t lastTime, currTime;
 double rasterTime;
 static bool textShouldRaster = false;
 
-#define MAX_NUM_MESH_VEC3S  1024
+// 此处原先定义为1024， 而TriangleMesh中一个三角形就要占用2个Vec3，复杂模型根本不够用
+#define MAX_NUM_MESH_VEC3S  524288
 static PxVec3 gVertexBuffer[MAX_NUM_MESH_VEC3S];
 extern bool press;
 extern int mouseX;
@@ -179,8 +180,10 @@ void renderGeometry(const PxGeometryHolder& h)
 			const PxU32 triangleCount = mesh.getNbTriangles();
 			const PxU32 has16BitIndices = mesh.getTriangleMeshFlags() & PxTriangleMeshFlag::e16_BIT_INDICES;
 			const void* indexBuffer = mesh.getTriangles();
+			std::cout << "ee:" << indexBuffer << std::endl;
 
 			const PxVec3* vertexBuffer = mesh.getVertices();
+			std::cout << "ef:" << vertexBuffer << std::endl;
 
 			const PxU32* intIndices = reinterpret_cast<const PxU32*>(indexBuffer);
 			const PxU16* shortIndices = reinterpret_cast<const PxU16*>(indexBuffer);
