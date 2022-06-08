@@ -521,8 +521,9 @@ void keyPress(unsigned char key, const PxTransform& camera)
 {
 	switch (toupper(key))
 	{
-	case 'B':	createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 2.0f); break;
-		//PxSphereGeometry Transform,geometry,velocity（速度）
+	case 'B':	createStack(PxTransform(PxVec3(-100, 0, 0)).transform(PxTransform(PxVec3(-30, 10 + 2 * boxHeight, 0))), 10, 2.0f); break;
+	//case 'B':	createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 2.0f); break;
+		//PxSphereGeometry Transform,geometry,velocity（速度）t.transform(PxTransform(PxVec3(-20, 10+2*boxHeight, 0)))
 	case ' ':
 	{
 		role->tryJump(false);
