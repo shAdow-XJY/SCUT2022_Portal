@@ -75,13 +75,15 @@ void keyboardUpCallback(unsigned char key, int x, int y)
 
 void specialKeyDownCallback(GLint key, GLint x, GLint y)
 {
-	role->move(key,true);
+	std::cout << key << endl;
+	role->move(key,true,sCamera->isFree());
 	specialKeyPress(key);
 }
 
 void specialKeyUpCallback(GLint key, GLint x, GLint y)
 {
-	role->move(key,false);
+	role->move(key,false,sCamera->isFree());
+	sCamera->calDirMoving(key);
 	specialKeyRelease(key);
 }
 
@@ -102,7 +104,17 @@ void mouseCallback(int button, int state, int x, int y)
 
 	
 		if (!sCamera->isFree()) {
-			sCamera->setEye(role->getFootPosition() + PxVec3(0,50,-50));
+			PxVec3 position = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getFaceDir() * -50);
+			if (!sCamera->isMoving) {
+				sCamera->setEye(position);
+				role->changeCanMove(true);
+			}
+			else {
+				role->changeCanMove(false);
+			}
+			PxVec3 dir = role->getPosition() - position;
+			sCamera->targetDir = dir;
+			sCamera->updateDir(role->getPosition());
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 
@@ -122,15 +134,6 @@ void mouseCallback(int button, int state, int x, int y)
 			role->roleFall();
 		}
 	}
-	if (role)
-	{
-		if (role->getMovingStatus() ||sCamera->isFree()) {
-			role->move();
-		}	
-		role->roleJump();
-		role->roleFall();
-	}
-	
 	RayCastByRole();
 	
 
