@@ -283,18 +283,19 @@ void setupDefaultRenderState()
 	glClearColor(0.7f, 0.9f, 0.86f, 1.0);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_COLOR_MATERIAL);
-
 	// Setup lighting 光照设置
 	glEnable(GL_LIGHTING);
 	PxReal ambientColor[]	= { 0.0f, 0.1f, 0.2f, 0.0f };
 	PxReal diffuseColor[]	= { 1.0f, 1.0f, 1.0f, 0.0f };		
 	PxReal specularColor[]	= { 0.0f, 0.0f, 0.0f, 0.0f };		
-	PxReal position[]		= { 100.0f, 100.0f, 400.0f, 1.0f };		
+	PxReal position[]		= { 50.0f, 50.0f, 200.0f, 1.0f };		
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientColor);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseColor);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specularColor);
 	glLightfv(GL_LIGHT0, GL_POSITION, position);
 	glEnable(GL_LIGHT0);
+	/** 启用纹理 */
+	glEnable(GL_TEXTURE_2D);
 }
 
 void renderImGui() {

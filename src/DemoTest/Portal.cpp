@@ -82,12 +82,8 @@ const char* PigName = "pig";
 Role* role = NULL;
 PxControllerManager* cManager = NULL;
 
-// 左键鼠标按下
+// 右键鼠标按下
 bool press = false;
-//用于过滤的属性
-const PxFilterData collisionGroupIgnore(0, 0, 0, 1);  // 碰撞会被忽略的组
-const PxFilterData collisionGroup(1, 0, 0, 0); // 需要碰撞的组
-
 
 
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
@@ -313,17 +309,11 @@ void createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
 			body->userData = body;
 
 			
-			//加入猪队列
 			ballPigList.push_back(body);
 
-
-			//把Actor添加到场景中,注释掉这一句之后所有立方体变得不可见且没有碰撞体积
 			gScene->addActor(*body);
-			//gScene->removeActor(*body);
-
 		}
 	}
-	//释放
 	shape->release();
 }
 
@@ -338,11 +328,10 @@ void createRoad(const PxTransform& t,PxReal halfExtent,std::string name) {
 	PxRigidBodyExt::updateMassAndInertia(*body, 1.0f);
 	body->setName("Ground");
 	body->userData = r;
-	//把Actor添加到场景中,注释掉这一句之后所有立方体变得不可见且没有碰撞体积
 	gScene->addActor(*body);
 }
 
-//实例化物理
+///实例化物理
 void initPhysics(bool interactive)
 {
 	//PxFoundation(版本号,内存回调,错误回调)
@@ -350,9 +339,9 @@ void initPhysics(bool interactive)
 	//PVD
 	gPvd = PxCreatePvd(*gFoundation);
 	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate(PVD_HOST, 5425, 10);
-	gPvd->connect(*transport,PxPvdInstrumentationFlag::eALL);
+	gPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
 	//创建顶级PxPhysics对象
-	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(),true,gPvd);
+	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, gPvd);
 
 	// 创建Cooking对象
 	gCooking = PxCreateCooking(PX_PHYSICS_VERSION, *gFoundation, PxCookingParams(PxTolerancesScale()));
@@ -362,8 +351,8 @@ void initPhysics(bool interactive)
 	//重力
 	sceneDesc.gravity = PxVec3(0.0f, -9.8f, 0.0f);
 	gDispatcher = PxDefaultCpuDispatcherCreate(2);
-	sceneDesc.cpuDispatcher	= gDispatcher;
-	sceneDesc.filterShader	= PxDefaultSimulationFilterShader;
+	sceneDesc.cpuDispatcher = gDispatcher;
+	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
 	sceneDesc.filterShader = contactReportFilterShader;
 	sceneDesc.simulationEventCallback = &gContactReportCallback;
 	gScene = gPhysics->createScene(sceneDesc);
@@ -371,7 +360,7 @@ void initPhysics(bool interactive)
 
 
 	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
-	if(pvdClient)
+	if (pvdClient)
 	{
 		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
 		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
@@ -381,8 +370,8 @@ void initPhysics(bool interactive)
 	cManager->setOverlapRecoveryModule(true);
 	//静摩擦，动摩擦，restitution恢复原状(弹性)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
-	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0,1,0,0), *gMaterial);
-	
+	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
+
 	groundPlane->setName("over");
 	gScene->addActor(*groundPlane);
 
@@ -392,31 +381,32 @@ void initPhysics(bool interactive)
 	//testModel.createMeshActor(PxTransform(20, 30, 30));
 	//// end
 
-	createRoad(PxTransform(PxVec3(0, 5, -5)), 5, "0");
-	createRoad(PxTransform(PxVec3(0, 5, 20)),5,"1");
-	createRoad(PxTransform(PxVec3(0, 5, 30)), 5 ,"2");
-	createRoad(PxTransform(PxVec3(0, 5, 40)), 5, "3");
-	createRoad(PxTransform(PxVec3(10, 5, 40)), 5, "4");
-	createRoad(PxTransform(PxVec3(20, 5, 40)), 5, "5");
-	createRoad(PxTransform(PxVec3(20, 5, 30)), 5, "6");
-	createRoad(PxTransform(PxVec3(20, 15, 30)), 5, "6");
+	extern void createGameScene(const PxTransform & t);
+	createGameScene(PxTransform(PxVec3(-100, 0, 0)));
+
 	role = new Role();
+	role->setFootPosition(PxVec3(-100, 20, 0));
+
 	role->attachModel("../../models/paimon/paimon.obj");
 	role->fall();
+
+
 	//if (不交互)，在render中把交互设成false就有一个默认的球滚过去撞击堆。
-	if(!interactive)
+	if (!interactive)
 		//PxSphereGeometry Transform,geometry,velocity（速度）
-		createDynamic(10,PxTransform(PxVec3(0,40,100)), PxVec3(0,-50,-100));
+		createDynamic(10, PxTransform(PxVec3(0, 40, 100)), PxVec3(0, -50, -100));
 }
+
 
 /**
 * @brief 发送射线
 * @param origin 发送射线的坐标 unitDir 发送射线的方向 Road游戏道路基类
 **/
+PxRaycastHit hitInfo; // 返回的点，法向量信息等都在这里
 bool RayCast(PxVec3 origin, PxVec3 unitDir, Block& block)
 {
 
-	PxRaycastHit hitInfo; // 返回的点，法向量信息等都在这里
+	
 	PxReal maxDist = unitDir.normalize(); // 最大射线距离
 
 
@@ -426,7 +416,7 @@ bool RayCast(PxVec3 origin, PxVec3 unitDir, Block& block)
 
 	//设置射线碰撞的组
 	PxQueryFilterData filterdata = PxQueryFilterData();
-	filterdata.data = collisionGroup; 
+	filterdata.data = collisionGroup;
 
 	bool isRayHit = PxSceneQueryExt::raycastSingle(
 		*gScene,
@@ -437,8 +427,8 @@ bool RayCast(PxVec3 origin, PxVec3 unitDir, Block& block)
 		hitInfo,
 		filterdata
 	);
-	
-	if (isRayHit) {	
+
+	if (isRayHit) {
 		//std::cout << hitInfo.actor->getName() << std::endl;
 		PxVec3 pose = hitInfo.actor->getGlobalPose().p;
 		block.setPosition(PxVec3(pose.x, pose.y, pose.z));
@@ -449,7 +439,7 @@ bool RayCast(PxVec3 origin, PxVec3 unitDir, Block& block)
 	}
 	else {
 	}
-		//std::cout << "rayHit is not hit" << std::endl;
+	//std::cout << "rayHit is not hit" << std::endl;
 	return isRayHit;
 }
 
@@ -458,7 +448,7 @@ bool RayCast(PxVec3 origin, PxVec3 unitDir, Block& block)
 **/
 void RayCastByRole() {
 	PxVec3 origin = role->getFootPosition();
-	PxVec3 unitDir = PxVec3(0, -999, 0);
+	PxVec3 unitDir = PxVec3(0, -1, 0);
 	if (RayCast(origin, unitDir, role->standingBlock)) {
 		//碰撞到物体
 		//std::cout << "碰到地面" << std::endl;
@@ -468,7 +458,7 @@ void RayCastByRole() {
 	}
 	else {
 		if (role->standingBlock.getBlockType() != BlockType::error) {
-			role->setFootPosition(role->getFootPosition() + role->getSpeed()*5.0f);
+			role->setFootPosition(role->getFootPosition() + role->getSpeed() * 5.0f);
 		}
 		role->standingBlock = Block();
 		//std::cout << "未碰到地面" << std::endl;	
@@ -477,12 +467,35 @@ void RayCastByRole() {
 	}
 }
 
+/**
+* @brief 角色道具拾取
+**/
+void PickPropByRole() {
+	PxVec3 origin = role->getPosition();
+	//确定role的前方方向
+	PxVec3 forwardDir = role->getFaceDir() * 2;
+	if (RayCast(origin, forwardDir, role->propBlock)) {
+		if (role->propBlock.getBlockType() == BlockType::prop) {
+			hitInfo.actor->release();
+			std::cout << "拾取道具成功" << std::endl;
+		}
+		else
+		{
+			std::cout << "不是道具" << std::endl;
+		}
+	}
+	else
+	{
+		std::cout << "射线没有找到目标" << std::endl;
+	}
+}
+
 //（在render中调用）
 void stepPhysics(bool interactive)
 {
 	PX_UNUSED(interactive);
 	//时间
-	gScene->simulate(1.0f/60.0f);
+	gScene->simulate(1.0f / 60.0f);
 	gScene->fetchResults(true);
 }
 
@@ -493,24 +506,25 @@ void cleanupPhysics(bool interactive)
 	PX_UNUSED(interactive);
 	gScene->release();
 	gDispatcher->release();
-	gPhysics->release();	
+	gPhysics->release();
 	PxPvdTransport* transport = gPvd->getTransport();
 	gPvd->release();
 	transport->release();
-	
+
 	gFoundation->release();
-	
+
 	printf("HelloWorld done.\n");
 }
 
 //按键设置
 void keyPress(unsigned char key, const PxTransform& camera)
 {
-	switch(toupper(key))
+	switch (toupper(key))
 	{
-	case 'B':	createStack(PxTransform(PxVec3(0,0,stackZ-=10.0f)), 10, 2.0f);break;
-	//PxSphereGeometry Transform,geometry,velocity（速度）
-	case ' ': 
+	case 'B':	createStack(PxTransform(PxVec3(-100, 0, 0)).transform(PxTransform(PxVec3(-30, 10 + 2 * boxHeight, 0))), 10, 2.0f); break;
+	//case 'B':	createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 2.0f); break;
+		//PxSphereGeometry Transform,geometry,velocity（速度）t.transform(PxTransform(PxVec3(-20, 10+2*boxHeight, 0)))
+	case ' ':
 	{
 		role->tryJump(false);
 		break;
@@ -518,6 +532,11 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	case 'Z':
 	{
 		role->roleCrouch();
+		break;
+	}
+	case 'E':
+	{
+		PickPropByRole();
 		break;
 	}
 	default:
@@ -561,7 +580,7 @@ void specialKeyRelease(GLint key) {
 void mousePress(int button, int state, int x, int y) {
 	switch (button)
 	{
-	//点击右键
+		//点击右键
 	case 0: {
 		//右键抬起
 		if (state == 1) {
@@ -569,11 +588,11 @@ void mousePress(int button, int state, int x, int y) {
 			//role->roleMoveByMouse(x, y);
 			PxVec3 position = ScenetoWorld(x, y);
 			Block road;
-			if (RayCast(position,PxVec3(0,5,0), road))
-			{			
+			if (RayCast(position, PxVec3(0, 5, 0), road))
+			{
 				PxVec3 blockPosition = road.getPosition();
-				role->roleMoveByMouse(PxVec3(blockPosition.x,role->getFootPosition().y, blockPosition.z));
-				//role->setFootPosition(PxVec3(road.position.x,role->getFootPosition().y,road.position.z));
+				//role->roleMoveByMouse(PxVec3(blockPosition.x, role->getFootPosition().y, blockPosition.z));
+				role->roleMoveByMouse(position);
 			}
 			else {
 				std::cout << "不可点击";
@@ -598,7 +617,7 @@ void mousePress(int button, int state, int x, int y) {
 
 #define RENDER_SNIPPET 1
 //main
-int snippetMain(int, const char*const*)
+int snippetMain(int, const char* const*)
 {
 #ifdef RENDER_SNIPPET
 	extern void renderLoop();
@@ -606,7 +625,7 @@ int snippetMain(int, const char*const*)
 #else
 	static const PxU32 frameCount = 100;
 	initPhysics(false);
-	for(PxU32 i=0; i<frameCount; i++)
+	for (PxU32 i = 0; i < frameCount; i++)
 		stepPhysics(false);
 	cleanupPhysics(false);
 #endif

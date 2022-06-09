@@ -36,6 +36,7 @@
 #include "../Render/Render.h"
 #include "../Render/Camera.h"
 #include "../Role/Role.h"
+#include <Render/Skybox.h>
 
 
 
@@ -50,7 +51,7 @@ extern void specialKeyPress(GLint key);
 extern void specialKeyRelease(GLint key);
 extern Role* role;
 extern void RayCastByRole();
-
+CSkyBox skyBox;
 namespace
 {
 	Snippets::Camera*	sCamera;
@@ -75,13 +76,15 @@ void keyboardUpCallback(unsigned char key, int x, int y)
 
 void specialKeyDownCallback(GLint key, GLint x, GLint y)
 {
-	role->move(key,true);
+	std::cout << key << endl;
+	role->move(key,true,sCamera->isFree());
 	specialKeyPress(key);
 }
 
 void specialKeyUpCallback(GLint key, GLint x, GLint y)
 {
-	role->move(key,false);
+	role->move(key,false,sCamera->isFree());
+	sCamera->calDirMoving(key);
 	specialKeyRelease(key);
 }
 
@@ -102,7 +105,17 @@ void mouseCallback(int button, int state, int x, int y)
 
 	
 		if (!sCamera->isFree()) {
-			sCamera->setEye(role->getFootPosition() + PxVec3(0,50,-50));
+			PxVec3 position = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getFaceDir() * -50);
+			if (!sCamera->isMoving) {
+				sCamera->setEye(position);
+				role->changeCanMove(true);
+			}
+			else {
+				role->changeCanMove(false);
+			}
+			PxVec3 dir = role->getPosition() - position;
+			sCamera->targetDir = dir;
+			sCamera->updateDir(role->getPosition());
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 
@@ -122,15 +135,6 @@ void mouseCallback(int button, int state, int x, int y)
 			role->roleFall();
 		}
 	}
-	if (role)
-	{
-		if (role->getMovingStatus() ||sCamera->isFree()) {
-			role->move();
-		}	
-		role->roleJump();
-		role->roleFall();
-	}
-	
 	RayCastByRole();
 	
 
@@ -143,6 +147,8 @@ void mouseCallback(int button, int state, int x, int y)
 		scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
 		Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
 	}
+	/** 绘制天空 */
+	skyBox.CreateSkyBox(-2000, -200, -2000, 1.0, 0.5, 1.0);
 
 		Snippets::finishRender();
 	}
@@ -161,6 +167,9 @@ void renderLoop()
 
 	Snippets::setupDefaultWindow("PhysX Demo");
 	Snippets::setupDefaultRenderState();
+
+	/** 初始化天空 */
+	skyBox.Init();
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
