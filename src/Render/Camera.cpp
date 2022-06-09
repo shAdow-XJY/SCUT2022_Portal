@@ -118,7 +118,7 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 	}
 	/**
 	* @brief 每帧更新摄像机
-	* @Param position角色中心位置
+	* @param position: 角色中心位置
 	**/
 	void Camera::updateDir(PxVec3 position) {
 		if (this->isChangeImmediate) {
@@ -145,7 +145,7 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 	
 	/**
 	* @brief 根据按键计算旋转的方向
-	* @Param key 按键
+	* @param key: 按键
 	**/
 	void Camera::calDirMoving(GLint key) {
 		if (this->isMoving) return;

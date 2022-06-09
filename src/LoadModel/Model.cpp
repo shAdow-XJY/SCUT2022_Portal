@@ -1,6 +1,11 @@
 #include"Model.h"
 using std::queue;
 
+/*
+* @brief 加载并Cook模型，生成TriangleMesh
+* @param path 模型路径
+*/
+
 Model::Model(const char* path) {
 	loadModel(path);
 }
@@ -87,10 +92,15 @@ void Model::processSingleMesh(aiMesh* mesh, const aiScene* scene) {
 
 }
 
-
-void Model::attachMeshes(const PxTransform& vec,PxRigidActor* actor) {
+/*
+* @brief 为role连接上指定的模型
+* @param trans 模型的局部Pose变换
+* @param actor 要使用该模型的Actor
+*/
+void Model::attachMeshes(const PxTransform& trans,PxRigidActor* actor) {
 	// 在指定位置创建Actor
-	//PxRigidStatic* TriangleMesh = gPhysics->createRigidStatic(vec);
+	//PxRigidDynamic* TriangleMesh = gPhysics->createRigidDynamic(vec);
+	//TriangleMesh->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 	for (size_t i = 0; i < m_triangleMesh.size();++i) {
 		
 		// 根据mesh描述创建几何体
@@ -98,16 +108,18 @@ void Model::attachMeshes(const PxTransform& vec,PxRigidActor* actor) {
 
 		// 创建Shape
 		PxShape* shape = gPhysics->createShape(geom, *gMaterial);
-		//PxShape* shape = gPhysics->createShape(PxCapsuleGeometry(5,5), *gMaterial);
 		{
 			shape->setContactOffset(0.02f);
 			shape->setRestOffset(-0.02f);
 			shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
-			shape->setLocalPose(vec);
+			shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
+			shape->setLocalPose(trans);
 		}
 		
 		//TriangleMesh->attachShape(*shape);
+ 
 		actor->attachShape(*shape);
+
 		shape->release();
 		/*TriangleMesh->userData = new int;
 		int testid = 8888;

@@ -346,6 +346,9 @@ void initPhysics(bool interactive)
 	// 创建Cooking对象
 	gCooking = PxCreateCooking(PX_PHYSICS_VERSION, *gFoundation, PxCookingParams(PxTolerancesScale()));
 
+	// 给PVD注册扩展
+	PxInitExtensions(*gPhysics, gPvd);
+
 	//?缩放
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
 	//重力
@@ -377,9 +380,9 @@ void initPhysics(bool interactive)
 
 	//// 测试代码
 	//Model testModel("../../models/paimon/paimon.obj");
-	////testModel.createMeshActor((PxTransform(PxVec3(20, 30, 30))).transform(PxTransform(PxQuat(-PxHalfPi,PxVec3(1.0f,0.0f,0.0f)))));
+	//testModel.attachMeshes((PxTransform(PxVec3(20, 30, 30))).transform(PxTransform(PxQuat(-PxHalfPi,PxVec3(1.0f,0.0f,0.0f)))));
 	//testModel.createMeshActor(PxTransform(20, 30, 30));
-	//// end
+	// end
 
 	extern void createGameScene(const PxTransform & t);
 	createGameScene(PxTransform(PxVec3(-100, 0, 0)));

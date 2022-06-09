@@ -33,6 +33,9 @@ Role::Role() {
 * @param path 模型文件路径
 **/
 bool Role::attachModel(const char* path) {
+	PxShape* cap;
+	role->getShapes(&cap, 1);
+	role->detachShape(*cap);
 	this->model = new Model(path);
 	this->model->attachMeshes(PxTransform(PxQuat(-PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))), this->role);
 	return true;
@@ -48,7 +51,8 @@ bool Role::getMovingStatus() {
 
 /**
 * @brief 鼠标点击移动获取目标坐标
-* @Param x 鼠标屏幕坐标x y鼠标屏幕坐标y
+* @param x 鼠标屏幕坐标x 
+* @param y 鼠标屏幕坐标y
 **/
 void Role::roleMoveByMouse(int x, int y) {
 	if (this->isMoving || this->isJump || this->isFall || !this->isAlive) return;
@@ -60,7 +64,7 @@ void Role::roleMoveByMouse(int x, int y) {
 
 /**
 * @brief 鼠标点击移动获取目标坐标
-* @Param position 三维空间坐标
+* @param position 三维空间坐标
 **/
 void Role::roleMoveByMouse(PxVec3 position) {
 	if (this->isMoving || this->isJump || this->isFall || !this->isAlive || !this->canMove) return;
@@ -116,7 +120,9 @@ void Role::stopMoving() {
 /**
 * @brief 键盘输入控制角色移动
 * @desc	 锁定视角以角色面朝方向为前进方向，自由视角以摄像机朝向为前进方向
-* @Param key输入特殊按键 status按下(T)/弹起(F) free相机是否自由移动
+* @param key	输入特殊按键 
+* @param status 按下(T)/弹起(F)
+* @param free	相机是否自由移动
 **/
 void Role::move(GLint key,bool status,bool free) {
 	if (!this->canMove) {
@@ -144,11 +150,13 @@ void Role::move(GLint key,bool status,bool free) {
 		}case GLUT_KEY_LEFT: {
 			PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
 			dir = rotate.rotate(dir);
+			role->setGlobalPose(rotate);
 			break;
 
 		}case GLUT_KEY_RIGHT: {
 			PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
 			dir = rotate.rotate(-dir);
+			role->setGlobalPose(rotate);
 			break;
 
 		}
@@ -160,6 +168,7 @@ void Role::move(GLint key,bool status,bool free) {
 		this->lastPressDir = dir.getNormalized();
 		if (this->isJump || this->isFall) return;
 		this->roleController->move(this->speed * 4, 0.0001, 1.0f / 120.0f, NULL);
+		std::cout << speed.x << " " << speed.y << ' ' << speed.z << ' ' << std::endl;
 		this->updatePosition();
 	}
 	//弹起
@@ -185,7 +194,7 @@ void Role::move(GLint key,bool status,bool free) {
 
 /**
 * @brief 获取角色controller的底部坐标
-* @Return PxVec3 
+* @return PxVec3 
 **/
 PxVec3 Role::getFootPosition() {
 	PxExtendedVec3 pos = this->roleController->getFootPosition();
@@ -194,7 +203,7 @@ PxVec3 Role::getFootPosition() {
 
 /**
 * @brief 获取角色controller的中心坐标
-* @Return PxVec3
+* @return PxVec3
 **/
 PxVec3 Role::getPosition() {
 	PxExtendedVec3 pos = this->roleController->getPosition();
@@ -203,7 +212,7 @@ PxVec3 Role::getPosition() {
 
 /**
 * @brief 设置角色controller的底部坐标
-* @Param position 三维空间坐标点
+* @param position 三维空间坐标点
 **/
 void Role::setFootPosition(PxVec3 position) {
 	this->roleController->setFootPosition(PxExtendedVec3(position.x,position.y,position.z));
