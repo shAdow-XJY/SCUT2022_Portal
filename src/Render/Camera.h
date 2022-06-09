@@ -26,7 +26,7 @@ namespace Snippets
 		int					isMoving = 0;
 		void				updateDir(physx::PxVec3);
 		void				calDirMoving(GLint);
-		float				rotateSpeed = 300.0f;
+		float				rotateSpeed = 100.0f;
 		bool				isChangeImmediate = false;
 	private:
 		physx::PxVec3	mEye;	

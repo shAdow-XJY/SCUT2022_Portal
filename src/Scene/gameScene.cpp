@@ -143,8 +143,8 @@ void createGameScene(const PxTransform& t) {
 	createStaticBox(t, PxVec3(c_2_x, c_2_y, c_2_z), r_2_l , boxHeight, r_2_w, defaultPose);
 
 	//创建道具类场景
-	createPorp(t, PxVec3(c_2_x, c_2_y + 2.0, c_2_z), r_2_l, boxHeight, r_2_w);
-	createPorp(t, PxVec3(c_2_x, c_2_y + 2.5, c_2_z), r_2_l, boxHeight, r_2_w);
+	createPorp(t, PxVec3(c_2_x, c_2_y + 2.0, c_2_z), boxHeight, boxHeight, boxHeight);
+	createPorp(t, PxVec3(c_2_x, c_2_y + 2.5, c_2_z), boxHeight, boxHeight, boxHeight);
 
 	//stairs
 	float stairsWidth = 2.0;
