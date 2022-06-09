@@ -103,6 +103,7 @@ void Model::attachMeshes(const PxTransform& vec,PxRigidActor* actor) {
 			shape->setContactOffset(0.02f);
 			shape->setRestOffset(-0.02f);
 			shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+			shape->setLocalPose(vec);
 		}
 		
 		//TriangleMesh->attachShape(*shape);

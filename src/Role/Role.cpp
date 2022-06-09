@@ -12,6 +12,7 @@ Role::Role() {
 	desc.stepOffset = 0.0f;
 	desc.contactOffset = 0.001;
 	desc.upDirection = PxVec3(0.0, 1.0, 0.0);
+	
 
 	RoleHitBehaviorCallback* bCallBack = new RoleHitBehaviorCallback(this);
 	desc.behaviorCallback = bCallBack;
@@ -19,12 +20,13 @@ Role::Role() {
 	roleController = cManager->createController(desc);
 	roleController->setFootPosition(PxExtendedVec3(0, commonBoxHeight + desc.contactOffset +10, 20));
 	roleController->resize(desc.height + desc.radius);
-	roleController->setContactOffset(0.001f);
+	roleController->setContactOffset(0.01f);
 
 	this->role = roleController->getActor();
 	this->roleController->setUserData(this);
 	this->nowPostion = this->role->getGlobalPose().p;
 	this->lastPostion = this->role->getGlobalPose().p;
+	
 }
 
 /**
@@ -33,7 +35,7 @@ Role::Role() {
 **/
 bool Role::attachModel(const char* path) {
 	this->model = new Model(path);
-	this->model->attachMeshes(PxTransform(20, 30, 30), this->role);
+	this->model->attachMeshes(PxTransform(PxQuat(-PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))), this->role);
 	return true;
 }
 
