@@ -44,6 +44,8 @@ private:
 	bool isAlive = true;
 	//重力加速度
 	float midFallSpeed = 0.08;
+
+	bool equiped = false;
 public:
 	Role();
 	~Role() {
@@ -74,7 +76,11 @@ public:
 	void stopMoving();
 
 	Block standingBlock;
+	//道具
 	Block propBlock;
+	void setEquiped(bool equip = true);
+	bool getEquiped();
+	//跳跃
 	void tryJump(bool release);
 	void roleJump();
 	void roleFall();

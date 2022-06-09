@@ -298,6 +298,20 @@ void Role::roleNoCrouch() {
 }
 
 /**
+* @brief 角色获得道具
+**/
+void Role::setEquiped(bool equip) {
+	this->equiped = equip;
+}
+
+/**
+* @brief 获得角色道具状态
+**/
+bool Role::getEquiped() {
+	return this->equiped;
+}
+
+/**
 * @brief 角色设置速度
 **/
 PxVec3 Role::getSpeed() {

@@ -35,16 +35,17 @@ PxRigidStatic* createStaticBox(const PxTransform& t, const PxVec3& v, PxReal x, 
 //创建道具类，区别只在Block(BlockType::prop)，试验用，可修改
 void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z) {
 	//可以使用多态继承该Block类添加自定义数据
-	Block* floor = new Block(y, "地板" + floorCount,BlockType::prop);
+	Block* prop = new Block(y, "地板" + floorCount,BlockType::prop);
 	PxTransform local(v);
+	//cout << v.x << " " << v.y << " " << v.z << endl;
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(x, y, z), *gMaterial);
 	//碰撞检测的过滤组
 	shape->setQueryFilterData(collisionGroup);
 	//setupFiltering(shape, FilterGroup::ePIG, FilterGroup::eBIRD);
 	PxRigidStatic* sceneBox = gPhysics->createRigidStatic(t.transform(local));
 	sceneBox->attachShape(*shape);
-	sceneBox->userData = floor;
-	sceneBox->setName("Ground");
+	sceneBox->userData = prop;
+	sceneBox->setName("Prop");
 	gScene->addActor(*sceneBox);
 }
 
@@ -143,7 +144,6 @@ void createGameScene(const PxTransform& t) {
 	createStaticBox(t, PxVec3(c_2_x, c_2_y, c_2_z), r_2_l , boxHeight, r_2_w, defaultPose);
 
 	//创建道具类场景
-	createPorp(t, PxVec3(c_2_x, c_2_y + 2.0, c_2_z), boxHeight, boxHeight, boxHeight);
 	createPorp(t, PxVec3(c_2_x, c_2_y + 2.5, c_2_z), boxHeight, boxHeight, boxHeight);
 
 	//stairs

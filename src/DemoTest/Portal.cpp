@@ -89,6 +89,8 @@ bool press = false;
 
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
 
+const PxTransform t = PxTransform(PxVec3(-100, 0, 0));
+extern void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z);
 
 
 // 鼠标点击时的坐标
@@ -383,7 +385,8 @@ void initPhysics(bool interactive)
 	// end
 
 	extern void createGameScene(const PxTransform & t);
-	createGameScene(PxTransform(PxVec3(-100, 0, 0)));
+	createGameScene(t);
+	
 
 	role = new Role();
 	role->setFootPosition(PxVec3(-100, 20, 0));
@@ -473,15 +476,42 @@ void RayCastByRole() {
 void PickPropByRole() {
 	PxVec3 origin = role->getPosition();
 	//确定role的前方方向
-	PxVec3 forwardDir = role->getFaceDir() * 2;
+	PxVec3 forwardDir = role->getFaceDir() * 2; 
 	if (RayCast(origin, forwardDir, role->propBlock)) {
 		if (role->propBlock.getBlockType() == BlockType::prop) {
 			hitInfo.actor->release();
+			role->setEquiped(true);
 			std::cout << "拾取道具成功" << std::endl;
 		}
 		else
 		{
 			std::cout << "不是道具" << std::endl;
+		}
+	}
+	else
+	{
+		std::cout << "射线没有找到目标" << std::endl;
+	}
+}
+
+/**
+* @brief 角色道具放置
+**/
+void LayPropByRole() {
+	PxVec3 origin = role->getPosition();
+	//确定role的前方方向
+	PxVec3 forwardDir = PxVec3(role->getFaceDir().x, -3, role->getFaceDir().z);
+	if (RayCast(origin, forwardDir, role->standingBlock)) {
+		if (role->standingBlock.getBlockType() == BlockType::ground) {
+			role->setEquiped(false);
+			//cout << role->getPosition().x << " " << role->getPosition().y << " " << role->getPosition().z << endl;
+			//cout << role->getFaceDir().x << " " << role->getFaceDir().y << " " << role->getFaceDir().z << endl;
+			createPorp(PxTransform(PxVec3(0, 0, 0)), role->getPosition() + role->getFaceDir()*2.5, boxHeight, boxHeight, boxHeight);
+			std::cout << "放置道具成功" << std::endl;
+		}
+		else
+		{
+			std::cout << "不是可放置道具的地方" << std::endl;
 		}
 	}
 	else
@@ -536,7 +566,13 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	}
 	case 'E':
 	{
-		PickPropByRole();
+		if (role->getEquiped()) {
+			LayPropByRole();
+		}
+		else {
+			PickPropByRole();
+		}
+
 		break;
 	}
 	default:
