@@ -262,7 +262,7 @@ PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir)
 **/
 void RayCastByRole() {
 	PxVec3 origin = role->getFootPosition();
-	PxVec3 unitDir = PxVec3(0, -1.0f, 0);
+	PxVec3 unitDir = PxVec3(0, -2.0f, 0);
 	PxRigidActor* actor = NULL;
 	if (actor = RayCast(origin, unitDir)) {
 		//碰撞到物体
@@ -270,12 +270,13 @@ void RayCastByRole() {
 		//cout << role->standingBlock.getName() << endl;
 		Block* block = (Block*) actor->userData ;
 		if (block != NULL) {
+			cout << block->getType() << endl;
 			if (block->getType() == BlockType::road) {
 				//std::cout << role->standingBlock.getName()<<std::endl;
 
 			}
 			else if (block->getType() == BlockType::seesaw) {
-				//cout << "施加重力" << endl;
+				cout << "施加重力" << endl;
 				Seesaw* seesaw = (Seesaw*)block;
 				PxRigidBody* seesawBody = seesaw->getSeesawActor();
 				PxVec3 force = PxVec3(0, -1, 0) * 1000.0f;
