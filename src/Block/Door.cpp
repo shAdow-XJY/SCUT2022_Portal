@@ -6,3 +6,7 @@ void Door::attachDoorActor(PxRigidDynamic* door) {
 PxRigidDynamic* Door::getDoorActor() {
 	return this->door;
 }
+
+bool Door::canOpen() {
+	return this->open;
+}

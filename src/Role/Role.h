@@ -121,9 +121,11 @@ public:
 		string name(actor.getName());
 		if (name == "Door") {
 			Door* door = (Door*)actor.userData;
-			PxRigidBody* doorActor = door->getDoorActor();
-			float scale = 3000.0f;
-			doorActor->addForce(role->getFaceDir() * scale);
+			if (door->canOpen()) {
+				PxRigidBody* doorActor = door->getDoorActor();
+				float scale = 3000.0f;
+				doorActor->addForce(role->getFaceDir() * scale);
+			}
 		}
 		else if (name == "Seesaw") {
 		}

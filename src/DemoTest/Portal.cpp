@@ -276,10 +276,10 @@ void RayCastByRole() {
 
 			}
 			else if (block->getType() == BlockType::seesaw) {
-				cout << "施加重力" << endl;
+				//cout << "施加重力" << endl;
 				Seesaw* seesaw = (Seesaw*)block;
 				PxRigidBody* seesawBody = seesaw->getSeesawActor();
-				PxVec3 force = PxVec3(0, -1, 0) * 1000.0f;
+				PxVec3 force = PxVec3(0, -1, 0) * 3000.0f;
 				PxRigidBodyExt::addForceAtPos(*seesawBody, force, role->getFootPosition());
 				//seesawBody->addForce()
 			}
