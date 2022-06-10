@@ -14,8 +14,8 @@ extern PxPhysics* gPhysics;
 extern int primaryJumpHeight;
 float maxJumpHeight = 3.0;
 float boxHeight = 0.4 * maxJumpHeight;
-float dx = 8.0;  //x_distance x轴方向上可跳跃的间隔长度
-float dz = 8.0;  //z_distance z轴方向上可跳跃的间隔长度
+float dx = 6.0;  //x_distance x轴方向上可跳跃的间隔长度
+float dz = 6.0;  //z_distance z轴方向上可跳跃的间隔长度
 
 //迷宫正门可开属性
 vector<vector<int>> frontDoorCanOpen = {
@@ -110,12 +110,13 @@ void createPlane(const PxVec3& point, const PxVec3& normal) {
 /**
 * @brief 创建道路
 **/
-void createRoad(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose) {	
+PxRigidStatic* createRoad(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose) {
 	PxRigidStatic* roadActor = createStaticBox(t, v, x, y, z, pose);
 	PxVec3 position = roadActor->getGlobalPose().p;
 	Road* road = new Road("路面",position, x, y, z,roadActor);
 	roadActor->userData = road;
 	roadActor->setName("Ground");
+	return roadActor;
 }
 
 float center_y(float y) {
@@ -132,22 +133,27 @@ PxRevoluteJoint* createFrontDoor(const PxTransform& t, PxVec3 v, float scale, Px
 	PxReal z = 1 * scale;
 	//实际-5  旋转角度小：-17.8  -18.56 -18.561815
 	PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(6.5 * scale, -5 * scale, 0),x,y,z, pose);
-	Door* door = new Door("正门",actor0->getGlobalPose().p,x,y,z,actor0, canOpen);
+	/*Door* door = new Door("正门",actor0->getGlobalPose().p,x,y,z,actor0, canOpen);
 	actor0->setName("Door");
-	actor0->userData = door;
+	actor0->userData = door;*/
 	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(0, 0, 0), 6 * scale, 10 * scale, 1 * scale, pose);
 	createStaticBox(pos, PxVec3(23 * scale, 0, 0), 6 * scale, 10 * scale, 1 * scale, pose);
 	PxTransform localFrame0(PxVec3(0, 5 * scale, 0));
 	PxTransform localFrame1(PxVec3(6.5 * scale,0, 0));
 	PxRevoluteJoint* revolute = PxRevoluteJointCreate(*gPhysics, actor0, localFrame0, actor1, localFrame1);
-	if (canOpen) {
+	Door* door = new Door("正门", actor0->getGlobalPose().p, x, y, z, actor0, canOpen, revolute);
+	actor0->setName("Door");
+	actor0->userData = door;
+	PxJointAngularLimitPair limits(-PxPi / 130, 0, 0.01f);
+	revolute->setLimit(limits);
+	/*if (canOpen) {
 		PxJointAngularLimitPair limits(-PxPi / 2, PxPi / 2, 0.01f);
 		revolute->setLimit(limits);
 	}
 	else {
 		PxJointAngularLimitPair limits(-PxPi / 130, 0, 0.01f);
 		revolute->setLimit(limits);
-	}
+	}*/
 	revolute->setRevoluteJointFlag(PxRevoluteJointFlag::eLIMIT_ENABLED, true);
 	revolute->setLocalPose(PxJointActorIndex::Enum::eACTOR1, PxTransform(PxVec3(6.5 * scale, 0, 0), PxQuat(PxHalfPi, PxVec3(0, 0, 1))));
 	return revolute;
@@ -161,14 +167,17 @@ PxRevoluteJoint* createSideDoor(const PxTransform& t, PxVec3 v, float scale, PxT
 	PxReal y = 1 * scale;
 	PxReal z = 5 * scale;
 	PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(0, 0, 11.5 * scale), x, y, z, pose);
-	Door* door = new Door("侧门", actor0->getGlobalPose().p, x, y, z, actor0,canOpen);
+	/*Door* door = new Door("侧门", actor0->getGlobalPose().p, x, y, z, actor0,canOpen);
 	actor0->setName("Door");
-	actor0->userData = door;
+	actor0->userData = door;*/
 	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(0, 0, 0), 1 * scale, 10 * scale, 6 * scale, pose);
 	createStaticBox(pos, PxVec3(0, 0, 23 * scale), 1 * scale, 10 * scale, 6 * scale, pose);
 	PxTransform localFrame0(PxVec3(0, 0, -5 * scale));
 	PxTransform localFrame1(PxVec3(0,0, 6.5 * scale));
 	PxRevoluteJoint* revolute = PxRevoluteJointCreate(*gPhysics, actor0, localFrame0, actor1, localFrame1);
+	Door* door = new Door("侧门", actor0->getGlobalPose().p, x, y, z, actor0, canOpen, revolute);
+	actor0->setName("Door");
+	actor0->userData = door;
 	/*PxJointAngularLimitPair limitPair(-PxPi / 4, PxPi / 4, 0.1f);
 	limitPair.stiffness = 7.0f;
 	limitPair.damping = 100.0f;
@@ -352,7 +361,9 @@ void createGameScene(const PxTransform& t) {
 	float c_3_x = lastSeesaw_x + sx + dx + r_3_l;
 	float c_3_y = seesawpos_y;
 	float c_3_z = seesawpos_z + r_3_w - 5.0;
-	createRoad(t, PxVec3(c_3_x, c_3_y, c_3_z), r_3_l, boxHeight, r_3_w, defaultPose);
+	PxRigidStatic* r_3 = createRoad(t, PxVec3(c_3_x, c_3_y, c_3_z), r_3_l, boxHeight, r_3_w, defaultPose);
+	PxVec3 globalPos = r_3->getGlobalPose().p;
+	std::cout <<"连接路段世界坐标:"<< globalPos.x << "," << globalPos.y << "," << globalPos.z << endl;
 
 	//迷宫边长缩放系数
 	float scale = 0.8;

@@ -207,7 +207,10 @@ void initPhysics(bool interactive)
 	
 
 	role = new Role();
-	role->setFootPosition(PxVec3(-100, 20, -200));
+	//初始位置
+	//role->setFootPosition(PxVec3(-100, 20, -200));
+	//迷宫前位置
+	role->setFootPosition(PxVec3(83, 20, -136));
 
 	role->fall();
 
