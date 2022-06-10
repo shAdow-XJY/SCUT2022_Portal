@@ -11,6 +11,7 @@ extern PxMaterial* gMaterial;
 extern PxPhysics* gPhysics;
 extern PxControllerManager* cManager;
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
+extern PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir);
 
 const int primaryJumpHeight = 6.0f;
 
@@ -18,35 +19,44 @@ class Role {
 private:
 	PxRigidBody* role;
 	PxController* roleController;
-
+	/// <summary>
+	/// 角色属性
+	/// </summary>
 	PxF32 roleRadius = 1.0f;
 	PxF32 roleHeight = 2.0f;
-	//速度方向
+	//人物速度
 	PxVec3 speed = PxVec3(0, 0, 0);
 	//最后一次按下方向键的方向
 	PxVec3 lastPressDir = PxVec3(0, 0, 1);
-	//摄像机朝向
+	//自由相机人物前进方向
 	PxVec3 dir = PxVec3(0, 0, 1);
 	//人物面朝方向
 	PxVec3 faceDir = PxVec3(0,0,1);
-	PxVec3 nowPostion;	
+	//人物当前位置
+	PxVec3 nowPostion;
+	//人物上一次位置
 	PxVec3 lastPostion;	
-	bool isMoving = false;
-	bool canMove = true;
-
-	bool isJump = false;
-	float littleJumpSpeed = 0.06;
-	float bigJumpSpeed = 0.08;
+	//角色重力
+	float mass = 6000.0f;
+	//重力加速度
+	float midFallSpeed = 0.2;
+	//跳跃相关
+	float littleJumpSpeed = 0.15;
+	float bigJumpSpeed = 0.2;
 	float nowJumpHeight = 0.0;
 	float wantJumpHeight = primaryJumpHeight;
 	float maxJumpHeight = 12.0;
 
+	/// <summary>
+	/// 状态量
+	/// </summary>
+	bool isAutoMoving = false;
+	bool canMove = true;
+	bool isJump = false;
 	bool isFall = false;
 	bool isAlive = true;
-	//重力加速度
-	float midFallSpeed = 0.08;
-
 	bool equiped = false;
+
 public:
 	Role();
 	~Role() {
@@ -54,12 +64,15 @@ public:
 		this->roleController->release();
 	};
 
-	bool getRoleStatus();
+	bool getAliveStatus();
 	void gameOver();
+
+	//角色位置信息
 	void setFootPosition(PxVec3 position);
 	PxVec3 getFootPosition();
 	PxVec3 getPosition();
 	void updatePosition();
+
 	//速度相关
 	PxVec3 getSpeed();
 	void setSpeed(PxVec3 speed);
@@ -68,6 +81,7 @@ public:
 	PxVec3 getDir();
 	//角色朝向
 	PxVec3 getFaceDir();
+
 	//角色移动相关
 	void roleMoveByMouse(int x, int y);
 	void roleMoveByMouse(PxVec3 position);
@@ -76,6 +90,7 @@ public:
 	bool getMovingStatus();
 	void stopMoving();
 
+	//人物站立的方块基类
 	Block standingBlock;
 
 	//放置物体
@@ -92,7 +107,15 @@ public:
 	void roleCrouch();
 	void roleNoCrouch();
 
+	//是否可以移动人物
 	void changeCanMove(bool);
+
+	//模拟重力
+	void simulationGravity();
+	//捡起物体
+	void pickUpObj();
+	//放置物体
+	void layDownObj();
 };
 
 class RoleHitCallback :public PxUserControllerHitReport {

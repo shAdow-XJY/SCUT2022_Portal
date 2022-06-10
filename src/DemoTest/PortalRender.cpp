@@ -134,8 +134,7 @@ void mouseCallback(int button, int state, int x, int y)
 			role->roleFall();
 		}
 	}
-	RayCastByRole();
-	
+	role->simulationGravity();
 
 	PxScene* scene;
 	PxGetPhysics().getScenes(&scene,1);

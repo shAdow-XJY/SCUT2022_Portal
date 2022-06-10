@@ -90,7 +90,6 @@ bool press = false;
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
 
 const PxTransform t = PxTransform(PxVec3(-100, 0, 0));
-extern void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z);
 
 
 // 鼠标点击时的坐标
@@ -256,101 +255,9 @@ PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir)
 	return NULL;
 }
 
-/**
-* @brief 角色底部发送射线
-* @desc  用于角色模拟重力和给物体施加重力
-**/
-void RayCastByRole() {
-	PxVec3 origin = role->getFootPosition();
-	PxVec3 unitDir = PxVec3(0, -2.0f, 0);
-	PxRigidActor* actor = NULL;
-	if (actor = RayCast(origin, unitDir)) {
-		//碰撞到物体
-		//std::cout << "碰到地面" << std::endl;
-		//cout << role->standingBlock.getName() << endl;
-		Block* block = (Block*) actor->userData ;
-		if (block != NULL) {
-			cout << block->getType() << endl;
-			if (block->getType() == BlockType::road) {
-				//std::cout << role->standingBlock.getName()<<std::endl;
 
-			}
-			else if (block->getType() == BlockType::seesaw) {
-				//cout << "施加重力" << endl;
-				Seesaw* seesaw = (Seesaw*)block;
-				PxRigidBody* seesawBody = seesaw->getSeesawActor();
-				PxVec3 force = PxVec3(0, -1, 0) * 3000.0f;
-				PxRigidBodyExt::addForceAtPos(*seesawBody, force, role->getFootPosition());
-				//seesawBody->addForce()
-			}
-			role->standingBlock = *block;
-		}
-	}
-	else {
-		if (role->standingBlock.getType() != BlockType::error) {
-			role->setFootPosition(role->getFootPosition() + role->getSpeed() * 5.0f);
-		}
-		role->standingBlock = Block();
-		//std::cout << "未碰到地面" << std::endl;	
-		//role->gameOver();
-		role->fall();
-	}
-}
 
-/**
-* @brief 角色道具拾取
-**/
-void PickPropByRole() {
-	PxVec3 origin = role->getPosition();
-	//确定role的前方方向
-	PxVec3 forwardDir = role->getFaceDir() * 2;
-	PxRigidActor* actor = NULL;
-	if (actor = RayCast(origin, forwardDir)) {
-		Block* block = (Block*)actor->userData;
-		if (block->getType() == BlockType::prop) {
-			actor->release();
-			role->setEquiped(true);
-			std::cout << "拾取道具成功" << std::endl;
-		}
-		else
-		{
-			std::cout << "不是道具" << std::endl;
-		}
-	}
-	else
-	{
-		std::cout << "射线没有找到目标" << std::endl;
-	}
-}
 
-/**
-* @brief 角色道具放置
-**/
-void LayPropByRole() {
-	PxVec3 origin = role->getPosition();
-	//确定role的前方方向
-	PxVec3 forwardDir = PxVec3(role->getFaceDir().x, -3, role->getFaceDir().z) ;
-	PxRigidActor* actor = NULL;
-	if (actor = RayCast(origin, forwardDir)) {
-		Block* block = (Block*)actor->userData;
-		cout << block->getType() << endl;
-		if (block->getType() == BlockType::road) {
-			role->setEquiped(false);
-			//cout << role->getPosition().x << " " << role->getPosition().y << " " << role->getPosition().z << endl;
-			//cout << role->getFaceDir().x << " " << role->getFaceDir().y << " " << role->getFaceDir().z << endl;
-			createPorp(PxTransform(PxVec3(0, 0, 0)), role->getPosition() + role->getFaceDir()*2.5, boxHeight, boxHeight, boxHeight);
-			std::cout << "放置道具成功" << std::endl;
-		}
-		else
-		{
-			std::cout << "不是可放置道具的地方" << std::endl;
-		}
-	}
-	else
-	{
-		std::cout << "射线没有找到目标" << std::endl;
-	}
-}
 
 //（在render中调用）
 void stepPhysics(bool interactive)
@@ -399,10 +306,12 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	case 'E':
 	{
 		if (role->getEquiped()) {
-			LayPropByRole();
+			role->layDownObj();
+
 		}
 		else {
-			PickPropByRole();
+			role->pickUpObj();
+
 		}
 
 		break;
