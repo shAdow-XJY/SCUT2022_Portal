@@ -98,185 +98,6 @@ int mouseX, mouseY;
 int textX = 0, textY = 0;
 
 
-struct FilterGroup
-{
-	enum Enum
-	{
-		eBIRD = (1 << 0),
-		ePIG = (1 << 1),
-		eMINE_LINK = (1 << 2),
-		eCRAB = (1 << 3),
-		eHEIGHTFIELD = (1 << 4),
-	};
-};
-
-
-void setupFiltering(PxShape* shape, PxU32 filterGroup, PxU32 filterMask)
-{
-	PxFilterData filterData;
-	filterData.word0 = filterGroup; // word0 = own ID
-	filterData.word1 = filterMask;	// word1 = ID mask to filter pairs that trigger a contact callback;
-	shape->setSimulationFilterData(filterData);
-}
-
-
-PxFilterFlags contactReportFilterShader(PxFilterObjectAttributes attributes0, PxFilterData filterData0,
-	PxFilterObjectAttributes attributes1, PxFilterData filterData1,
-	PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
-{
-	PX_UNUSED(attributes0);
-	PX_UNUSED(attributes1);
-	PX_UNUSED(filterData0);
-	PX_UNUSED(filterData1);
-	PX_UNUSED(constantBlockSize);
-	PX_UNUSED(constantBlock);
-
-	//
-	// Enable CCD for the pair, request contact reports for initial and CCD contacts.
-	// Additionally, provide information per contact point and provide the actor
-	// pose at the time of contact.
-	//
-
-	pairFlags = PxPairFlag::eCONTACT_DEFAULT
-		| PxPairFlag::eDETECT_CCD_CONTACT
-		| PxPairFlag::eNOTIFY_TOUCH_CCD
-		| PxPairFlag::eNOTIFY_TOUCH_FOUND
-		| PxPairFlag::eNOTIFY_CONTACT_POINTS
-		| PxPairFlag::eCONTACT_EVENT_POSE;
-	return PxFilterFlag::eDEFAULT;
-}
-
-
-
-class ContactReportCallback : public PxSimulationEventCallback
-{
-	void onConstraintBreak(PxConstraintInfo* constraints, PxU32 count) { PX_UNUSED(constraints); PX_UNUSED(count); }
-	void onWake(PxActor** actors, PxU32 count) { PX_UNUSED(actors); PX_UNUSED(count); }
-	void onSleep(PxActor** actors, PxU32 count) { PX_UNUSED(actors); PX_UNUSED(count); }
-	void onTrigger(PxTriggerPair* pairs, PxU32 count) { PX_UNUSED(pairs); PX_UNUSED(count); }
-	void onAdvance(const PxRigidBody*const*, const PxTransform*, const PxU32) {}
-	void onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
-	{
-		//std::vector<PxContactPairPoint> contactPoints;
-
-		//PxTransform spherePose(PxIdentity);
-		//PxU32 nextPairIndex = 0xffffffff;
-
-		//PxContactPairExtraDataIterator iter(pairHeader.extraDataStream, pairHeader.extraDataStreamSize);
-		//bool hasItemSet = iter.nextItemSet();
-		//if (hasItemSet)
-		//	nextPairIndex = iter.contactPairIndex;
-
-		//for (PxU32 i = 0; i < nbPairs; i++)
-		//{
-		//	//
-		//	// Get the pose of the dynamic object at time of impact.
-		//	//
-		//	if (nextPairIndex == i)
-		//	{
-		//		if (pairHeader.actors[0]->is<PxRigidDynamic>())
-		//			spherePose = iter.eventPose->globalPose[0];
-		//		else
-		//			spherePose = iter.eventPose->globalPose[1];
-
-		//		gContactSphereActorPositions.push_back(spherePose.p);
-
-		//		hasItemSet = iter.nextItemSet();
-		//		if (hasItemSet)
-		//			nextPairIndex = iter.contactPairIndex;
-		//	}
-
-		//	//
-		//	// Get the contact points for the pair.
-		//	//
-		//	const PxContactPair& cPair = pairs[i];
-		//	if (cPair.events & (PxPairFlag::eNOTIFY_TOUCH_FOUND | PxPairFlag::eNOTIFY_TOUCH_CCD))
-		//	{
-		//		PxU32 contactCount = cPair.contactCount;
-		//		contactPoints.resize(contactCount);
-		//		cPair.extractContacts(&contactPoints[0], contactCount);
-
-		//		for (PxU32 j = 0; j < contactCount; j++)
-		//		{
-		//			gContactPositions.push_back(contactPoints[j].position);
-		//			gContactImpulses.push_back(contactPoints[j].impulse);
-		//		}
-		//	}
-		//}
-
-		//PxActorFlag
-		for (PxU32 i = 0; i < nbPairs; i++)
-		{
-			const PxContactPair& cp = pairs[i];
-
-			if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND)
-			{
-				if ((pairHeader.actors[0]->getName() == BirdName && pairHeader.actors[1]->getName() == PigName) || (pairHeader.actors[1]->getName() == BirdName && pairHeader.actors[0]->getName() == PigName))
-				{
-					PxActor* otherActor = (pairHeader.actors[0]->getName() == BirdName) ? pairHeader.actors[1] : pairHeader.actors[0];
-					PxRigidDynamic* ballPig1 = (PxRigidDynamic*)(otherActor->userData);
-
-
-					// insert only once
-					if (std::find(ballToDispear.begin(), ballToDispear.end(), ballPig1) == ballToDispear.end())
-						ballToDispear.push_back(ballPig1);
-
-					std::vector<PxRigidDynamic*>::iterator ballIter = std::find(ballPigList.begin(), ballPigList.end(), ballPig1);
-					if (ballIter != ballPigList.end())
-					{
-						//ballPigList.erase(ballIter);
-						//gScene->removeActor(*ballPig1);
-					}
-
-
-
-					break;
-				}
-			}
-		}
-	}
-};
-
-ContactReportCallback gContactReportCallback;
-
-
-
-/*
-PxBase->PxActor->PxRigidActor->PxRigidBody->PxRigidDynamic
-*/
-//创造动态刚体
-PxRigidDynamic* createDynamic( PxReal radius, const PxTransform& t, const PxVec3& velocity=PxVec3(0))
-{
-
-
-	PxShape* shape = gPhysics->createShape(PxSphereGeometry(radius), *gMaterial);
-	setupFiltering(shape, FilterGroup::eBIRD, FilterGroup::ePIG);
-
-
-	//PxPhysics object??transform of the new object ??shape of the new object ??the density of the new object(>0)
-	PxRigidDynamic* dynamic = gPhysics->createRigidDynamic(t);
-	dynamic->attachShape(*shape);
-
-	
-	
-
-	//设置角阻尼系数，还有线性阻尼linearDamping；线性阻尼控制物理形体或约束抵抗平移的量,而角阻尼控制其抵抗旋转的量。如果设置为0，物体会一直旋转/平移
-	dynamic->setAngularDamping(10.0f);
-
-
-	//设置线性速度 
-	dynamic->setLinearVelocity(velocity);
-
-	PxRigidBodyExt::updateMassAndInertia(*dynamic, 1.0f);
-	//加入鸟队列
-	ballBirdList.push_back(dynamic);
-
-	dynamic->setName(BirdName);
-
-	gScene->addActor(*dynamic);
-	return dynamic;
-}
-
 //创建立方体堆
 void createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
 {
@@ -289,7 +110,6 @@ void createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
 	//createShape构建形状;(halfExtent x,y,z)
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *gMaterial);
 	
-	setupFiltering(shape, FilterGroup::ePIG, FilterGroup::eBIRD);
 
 
 	for(PxU32 i=0; i<size;i++)
@@ -318,19 +138,19 @@ void createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
 	shape->release();
 }
 
-//创建道路方块
-void createRoad(const PxTransform& t,PxReal halfExtent,std::string name) {
-	Block* r = new Block(halfExtent,name);
-	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *gMaterial);
-	shape->setQueryFilterData(collisionGroup);
-	PxRigidDynamic* body = gPhysics->createRigidDynamic(t);
-	body->attachShape(*shape);
-	//更新质量和惯性（数值表示密度）
-	PxRigidBodyExt::updateMassAndInertia(*body, 1.0f);
-	body->setName("Ground");
-	body->userData = r;
-	gScene->addActor(*body);
-}
+////创建道路方块
+//void createRoad(const PxTransform& t,PxReal halfExtent,std::string name) {
+//	Block* r = new Block(halfExtent,name);
+//	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *gMaterial);
+//	shape->setQueryFilterData(collisionGroup);
+//	PxRigidDynamic* body = gPhysics->createRigidDynamic(t);
+//	body->attachShape(*shape);
+//	//更新质量和惯性（数值表示密度）
+//	PxRigidBodyExt::updateMassAndInertia(*body, 1.0f);
+//	body->setName("Ground");
+//	body->userData = r;
+//	gScene->addActor(*body);
+//}
 
 ///实例化物理
 void initPhysics(bool interactive)
@@ -354,8 +174,6 @@ void initPhysics(bool interactive)
 	gDispatcher = PxDefaultCpuDispatcherCreate(2);
 	sceneDesc.cpuDispatcher = gDispatcher;
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
-	sceneDesc.filterShader = contactReportFilterShader;
-	sceneDesc.simulationEventCallback = &gContactReportCallback;
 	gScene = gPhysics->createScene(sceneDesc);
 
 
@@ -390,11 +208,6 @@ void initPhysics(bool interactive)
 
 	role->fall();
 
-
-	//if (不交互)，在render中把交互设成false就有一个默认的球滚过去撞击堆。
-	if (!interactive)
-		//PxSphereGeometry Transform,geometry,velocity（速度）
-		createDynamic(10, PxTransform(PxVec3(0, 40, 100)), PxVec3(0, -50, -100));
 }
 
 
@@ -402,13 +215,12 @@ void initPhysics(bool interactive)
 * @brief 发送射线
 * @param origin 发送射线的坐标 unitDir 发送射线的方向 Road游戏道路基类
 **/
-PxRaycastHit hitInfo; // 返回的点，法向量信息等都在这里
-bool RayCast(PxVec3 origin, PxVec3 unitDir, Block& block)
+
+PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir)
 {
 
-	
+	PxRaycastHit hitInfo; // 返回的点，法向量信息等都在这里
 	PxReal maxDist = unitDir.normalize(); // 最大射线距离
-
 
 	// 获取点， 法向量，还有UV信息
 	PxHitFlags hitFlags = PxHitFlag::ePOSITION;
@@ -431,16 +243,14 @@ bool RayCast(PxVec3 origin, PxVec3 unitDir, Block& block)
 	if (isRayHit) {
 		//std::cout << hitInfo.actor->getName() << std::endl;
 		PxVec3 pose = hitInfo.actor->getGlobalPose().p;
-		block.setPosition(PxVec3(pose.x, pose.y, pose.z));
-		Block* b = (Block*)hitInfo.actor->userData;
-		block.setName(b->getName());
-		block.setBlockType(b->getBlockType());
+		return hitInfo.actor;
 		//std::cout << "hit position x:" << pose.x << " y:" << pose.y << " z:" << pose.z << std::endl;
 	}
 	else {
+		return NULL;
 	}
 	//std::cout << "rayHit is not hit" << std::endl;
-	return isRayHit;
+	return NULL;
 }
 
 /**
@@ -448,16 +258,29 @@ bool RayCast(PxVec3 origin, PxVec3 unitDir, Block& block)
 **/
 void RayCastByRole() {
 	PxVec3 origin = role->getFootPosition();
-	PxVec3 unitDir = PxVec3(0, -1, 0);
-	if (RayCast(origin, unitDir, role->standingBlock)) {
+	PxVec3 unitDir = PxVec3(0, -1.0f, 0);
+	PxRigidActor* actor = NULL;
+	if (actor = RayCast(origin, unitDir)) {
 		//碰撞到物体
 		//std::cout << "碰到地面" << std::endl;
-		if (role->standingBlock.getBlockType() == BlockType::ground) {
+		//cout << role->standingBlock.getName() << endl;
+		Block* block = (Block*) actor->userData ;
+		if (block->getType() == BlockType::road) {
 			//std::cout << role->standingBlock.getName()<<std::endl;
+			
 		}
+		else if (block->getType() == BlockType::seesaw) {
+			//cout << "施加重力" << endl;
+			Seesaw* seesaw = (Seesaw*) block;
+			PxRigidBody* seesawBody = seesaw->getSeesawActor();
+			PxVec3 force = PxVec3(0, -1, 0) * 1000.0f;
+			PxRigidBodyExt::addForceAtPos(*seesawBody, force, role->getFootPosition());
+			//seesawBody->addForce()
+		}
+		role->standingBlock = *block;
 	}
 	else {
-		if (role->standingBlock.getBlockType() != BlockType::error) {
+		if (role->standingBlock.getType() != BlockType::error) {
 			role->setFootPosition(role->getFootPosition() + role->getSpeed() * 5.0f);
 		}
 		role->standingBlock = Block();
@@ -474,9 +297,11 @@ void PickPropByRole() {
 	PxVec3 origin = role->getPosition();
 	//确定role的前方方向
 	PxVec3 forwardDir = role->getFaceDir() * 2;
-	if (RayCast(origin, forwardDir, role->propBlock)) {
-		if (role->propBlock.getBlockType() == BlockType::prop) {
-			hitInfo.actor->release();
+	PxRigidActor* actor = NULL;
+	if (actor = RayCast(origin, forwardDir)) {
+		Block* block = (Block*)actor->userData;
+		if (block->getType() == BlockType::prop) {
+			actor->release();
 			std::cout << "拾取道具成功" << std::endl;
 		}
 		else
@@ -584,19 +409,19 @@ void mousePress(int button, int state, int x, int y) {
 	case 0: {
 		//右键抬起
 		if (state == 1) {
-			if (role->getMovingStatus())return;
-			//role->roleMoveByMouse(x, y);
-			PxVec3 position = ScenetoWorld(x, y);
-			Block road;
-			if (RayCast(position, PxVec3(0, 5, 0), road))
-			{
-				PxVec3 blockPosition = road.getPosition();
-				//role->roleMoveByMouse(PxVec3(blockPosition.x, role->getFootPosition().y, blockPosition.z));
-				role->roleMoveByMouse(position);
-			}
-			else {
-				std::cout << "不可点击";
-			}
+			//if (role->getMovingStatus())return;
+			////role->roleMoveByMouse(x, y);
+			//PxVec3 position = ScenetoWorld(x, y);
+			//Block road;
+			//if (RayCast(position, PxVec3(0, 5, 0), road))
+			//{
+			//	PxVec3 blockPosition = road.getPosition();
+			//	//role->roleMoveByMouse(PxVec3(blockPosition.x, role->getFootPosition().y, blockPosition.z));
+			//	role->roleMoveByMouse(position);
+			//}
+			//else {
+			//	std::cout << "不可点击";
+			//}
 		}
 		break;
 	}

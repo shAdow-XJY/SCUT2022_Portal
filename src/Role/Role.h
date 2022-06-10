@@ -1,7 +1,8 @@
 #include <ctype.h>
 #include <iostream>
 #include "PxPhysicsAPI.h"
-#include "../Block/Block.h"
+#include "../Block/Door.h"
+#include "../Block/Seesaw.h"
 #include <glut.h>
 using namespace physx;
 
@@ -74,7 +75,6 @@ public:
 	void stopMoving();
 
 	Block standingBlock;
-	Block propBlock;
 	void tryJump(bool release);
 	void roleJump();
 	void roleFall();
@@ -103,11 +103,20 @@ private:
 public:
 	RoleHitBehaviorCallback(Role* role) :role(role) {};
 	PxControllerBehaviorFlags getBehaviorFlags(const PxShape& shape, const PxActor& actor){	
-		//是否接触到地面
-		if (actor.getName() != "Ground") {
-			this->role->stopMoving();
+		////是否接触到地面
+		//if (actor.getName() != "Ground") {
+		//	this->role->stopMoving();
+		//}
+		string name(actor.getName());
+		if (name == "Door") {
+			Door* door = (Door*)actor.userData;
+			PxRigidBody* doorActor = door->getDoorActor();
+			float scale = 3000.0f;
+			doorActor->addForce(role->getFaceDir() * scale);
 		}
-		if (actor.getName() == "over") {
+		else if (name == "Seesaw") {
+		}
+		if (name == "over") {
 			this->role->gameOver();
 		}
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
@@ -115,7 +124,7 @@ public:
 	PxControllerBehaviorFlags getBehaviorFlags(const PxController& controller) {
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
 	}
-	PxControllerBehaviorFlags  getBehaviorFlags(const PxObstacle& obstacle) {
+	PxControllerBehaviorFlags getBehaviorFlags(const PxObstacle& obstacle) {
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
 	}
 };

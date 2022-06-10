@@ -40,15 +40,16 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 		switch (toupper(key))
 		{
 			if (this->free) {
-		case 'W':	mEye += mDir * 20.0f * speed;		break;
-		case 'S':	mEye -= mDir * 20.0f * speed;		break;
-		case 'A':	mEye -= viewY * 20.0f * speed;		break;
-		case 'D':	mEye += viewY * 20.0f * speed;		break;
+		case 'W':	mEye += mDir * 2.0f * speed;		break;
+		case 'S':	mEye -= mDir * 2.0f * speed;		break;
+		case 'A':	mEye -= viewY * 2.0f * speed;		break;
+		case 'D':	mEye += viewY * 2.0f * speed;		break;
 			}
 			//切换是否为自由视角
 		case 'T': {
 			this->free = !this->free; ;
 			this->isChangeImmediate = true;
+			this->mDir = this->mDir.getNormalized();
 			//if (!this->free) this->mDir = dir.getNormalized(); //朝物体下方看
 			break;
 		}

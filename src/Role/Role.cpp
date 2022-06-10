@@ -8,7 +8,7 @@ Role::Role() {
 	desc.radius = roleRadius;
 	desc.height = roleHeight;
 	desc.material = gMaterial;
-	//desc.climbingMode = PxCapsuleClimbingMode::eCONSTRAINED;
+	desc.climbingMode = PxCapsuleClimbingMode::eLAST;
 	desc.stepOffset = 0.0f;
 	desc.contactOffset = 0.001;
 	desc.upDirection = PxVec3(0.0, 1.0, 0.0);
@@ -237,13 +237,13 @@ void Role::roleJump() {
 		}
 		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, speed, 0.0) + this->speed * 0.3, PxF32(0.001), 1.0f / 60.0f, NULL);
 		nowJumpHeight += speed;
-		std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
-		std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;
+		//std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
+		//std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;
 		if (nowJumpHeight >= wantJumpHeight)
 		{
-			std::cout << "max height" << std::endl;
+			/*std::cout << "max height" << std::endl;
 			std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
-			std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;
+			std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;*/
 
 			nowJumpHeight = 0.0;
 			wantJumpHeight = primaryJumpHeight;
@@ -260,7 +260,11 @@ void Role::roleJump() {
 void Role::roleFall() {
 	if (isFall) {
 		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, -midFallSpeed, 0.0) + this->speed * 0.3, PxF32(0.00001), 1.0f / 60.0f, NULL);		
-		if (flag == PxControllerCollisionFlag::eCOLLISION_DOWN) {
+		if (flag == PxControllerCollisionFlag::eCOLLISION_SIDES) {
+			this->setSpeed(PxVec3(0, 0, 0));
+		}
+		else if (flag == PxControllerCollisionFlag::eCOLLISION_DOWN) {
+			this->setSpeed(PxVec3(0, 0, 0));
 			isFall = false;
 			if (!this->isMoving) {
 				this->updatePosition();
