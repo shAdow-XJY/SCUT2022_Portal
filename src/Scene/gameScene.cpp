@@ -14,7 +14,31 @@ extern PxPhysics* gPhysics;
 extern int primaryJumpHeight;
 float maxJumpHeight = 3.0;
 float boxHeight = 0.4 * maxJumpHeight;
+float dx = 8.0;  //x_distance x轴方向上可跳跃的间隔长度
+float dz = 8.0;  //z_distance z轴方向上可跳跃的间隔长度
 
+//迷宫正门可开属性
+vector<vector<int>> frontDoorCanOpen = {
+	{0,1,0,1,1,0,1,1,0},
+	{0,0,0,1,1,0,1,0,0},
+	{1,1,0,1,1,1,1,1,0},
+	{0,0,1,0,0,1,1,1,0},
+	{0,1,1,0,0,0,1,1,0},
+	{0,0,1,0,0,0,0,1,0},
+	{0,1,0,0,0,1,0,0,0},
+	{0,1,0,1,0,1,0,1,1}
+};
+//迷宫侧门可开属性
+vector<vector<int>> sideDoorCanOpen = {
+	{0,1,0,0,0,1,1,1,0},
+	{0,1,1,1,0,0,1,0,0},
+	{0,0,1,0,1,0,1,1,0},
+	{0,0,0,1,1,1,1,1,0},
+	{0,1,0,0,1,1,1,1,0},
+	{0,1,0,0,0,1,1,0,0},
+	{0,0,1,0,0,0,1,1,0},
+	{0,0,0,1,0,1,0,0,0}
+};      
 
 PxRigidStatic* createStaticBox(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose) {
 	PxTransform local(v);
@@ -107,7 +131,7 @@ PxRevoluteJoint* createFrontDoor(const PxTransform& t, PxVec3 v, float scale, Px
 	PxReal y = 5 * scale;
 	PxReal z = 1 * scale;
 	//实际-5  旋转角度小：-17.8  -18.56 -18.561815
-	PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(6.5 * scale, -18.56 * scale, 0),x,y,z, pose);
+	PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(6.5 * scale, -5 * scale, 0),x,y,z, pose);
 	Door* door = new Door("正门",actor0->getGlobalPose().p,x,y,z,actor0, canOpen);
 	actor0->setName("Door");
 	actor0->userData = door;
@@ -162,6 +186,50 @@ PxRevoluteJoint* createSideDoor(const PxTransform& t, PxVec3 v, float scale, PxT
 	return revolute;
 }
 
+//创建迷宫关卡
+void createMaze(const PxTransform& t, PxVec3 v, float scale, PxTransform& pose) {
+	//迷宫左下角坐标
+	float x = v.x + 4 * 37 * scale;
+	float z = v.z - 4 * 37 * scale;
+
+	//迷宫门的坐标
+	float door_x;
+	float door_y = v.y + boxHeight + 0.5 + 10 * scale;
+	float door_z;
+
+	//正门逻辑
+	//从左到右
+	for (int i = 0; i < 8; i++) {
+		door_x = x - i * 37 * scale - 30 * scale;
+		//从下到上
+		for (int j = 0; j < 9; j++) {
+			door_z = z + j * 37 * scale;
+			if (frontDoorCanOpen[i][j]) {
+				createFrontDoor(t, PxVec3(door_x, door_y, door_z), scale, pose, true);
+			}
+			else {
+				createFrontDoor(t, PxVec3(door_x, door_y, door_z), scale, pose, false);
+			}
+		}
+	}
+
+	//侧门逻辑
+	//从下到上
+	for (int i = 0; i < 8; i++) {
+		door_z = z + i * 37 * scale + 7 * scale;
+		//从左到右
+		for (int j = 0; j < 9; j++) {
+			door_x = x - j * 37 * scale;
+			if (sideDoorCanOpen[i][j]) {
+				createSideDoor(t, PxVec3(door_x, door_y, door_z), scale, pose, true);
+			}
+			else {
+				createSideDoor(t, PxVec3(door_x, door_y, door_z), scale, pose, false);
+			}
+		}
+	}
+}
+
 //t为场景构建的原点 v为该跷板中心相对场景原点的位置 x、y、z为长板的长高宽
 //跷板 PxVec3 v的第二个参数应该为 底下所有盒子的高+ y
 PxRevoluteJoint* createSeesaw(const PxTransform& t,PxVec3 v,float x, float y, float z, PxTransform& pose) {
@@ -179,29 +247,72 @@ PxRevoluteJoint* createSeesaw(const PxTransform& t,PxVec3 v,float x, float y, fl
 	return revolute;
 }
 
+//创建跷跷板关卡 v为跷板0的中心点 sx、sy、sz为跷板的半长
+float createSeesawLevel(const PxTransform& t, PxVec3 v,float sx, float sy, float sz, PxTransform& pose) {
+	//第一块跷板0
+	float x0 = v.x;
+	float y0 = v.y;
+	float z0 = v.z;
+	createSeesaw(t, v, sx, sy, sz, pose);
+
+	//第二块跷板1
+	float x1 = x0 + 2*sx + dx;
+	float z1 = z0 + sz + dz / 2;
+	createSeesaw(t, PxVec3(x1, y0, z1), sx, sy, sz, pose);
+	
+	float x2 = x1;
+	float z2 = z0 - sz - dz / 2;
+	createSeesaw(t, PxVec3(x2, y0, z2), sx, sy, sz, pose);
+
+	float x3 = x0 + 4 * sx + 2 * dx;
+	float z3 = z0;
+	createSeesaw(t, PxVec3(x3, y0, z3), sx, sy, sz, pose);
+
+	float x4 = x3;
+	float z4 = z0 + 2 * sz + dz;
+	createSeesaw(t, PxVec3(x4, y0, z4), sx, sy, sz, pose);
+
+	float x5 = x3;
+	float z5 = z0 - 2 * sz - dz;
+	createSeesaw(t, PxVec3(x5, y0, z5), sx, sy, sz, pose);
+
+	float x6 = x1 + 4 * sx + 2 * dx;
+	float z6 = z1;
+	createSeesaw(t, PxVec3(x6, y0, z6), sx, sy, sz, pose);
+
+	float x7 = x6;
+	float z7 = z2;
+	createSeesaw(t, PxVec3(x7, y0, z7), sx, sy, sz, pose);
+	
+	float x8 = x3 + 4 * sx + 2 * dx;
+	float z8 = z0;
+	createSeesaw(t, PxVec3(x8, y0, z8), sx, sy, sz, pose);
+
+	return x8;
+ }
 
 void createGameScene(const PxTransform& t) {
-	PxTransform defaultPose(PxQuat(0, PxVec3(0, 1, 0)));
+	PxTransform defaultPose(PxQuat(0, PxVec3(0, 1, 0)));  //刚体默认pose
 
-	float r_1_l = 100.0;  //road_1_length 4
-	float r_1_w = 100.0;  //road_1_width 8
+	float r_1_l = 4.0;  //road_1_length 4 100
+	float r_1_w = 15.0;  //road_1_width 8 100
 	float c_1_y = boxHeight;  //the position of the center of road_1
 	// create road_1
 	createRoad(t, PxVec3(0, c_1_y, 0), r_1_l, boxHeight, r_1_w, defaultPose);
 
-	float r_2_w = 2.0;
+	float r_2_w = 4.0;
 	float r_2_l = 20.0;
 	float c_2_x = r_2_l - r_1_l;
 	float c_2_y = center_y(c_1_y);
-	float c_2_z = r_1_l + r_2_w;
+	float c_2_z = r_1_w + r_2_w;
 	createRoad(t, PxVec3(c_2_x, c_2_y, c_2_z), r_2_l , boxHeight, r_2_w, defaultPose);
 
 	//创建道具类场景
 	createPorp(t, PxVec3(c_2_x, c_2_y + 2.5, c_2_z), boxHeight, boxHeight, boxHeight);
 
 	//stairs
-	float stairsWidth = 2.0;
-	float stairsLength = 1.0;
+	float stairsWidth = 4.0;
+	float stairsLength = 2.0;
 	float center_x = stairsLength + r_2_l + c_2_x;
 	float centerHeight = center_y(c_2_y);
 	float center_z = c_2_z;
@@ -211,13 +322,63 @@ void createGameScene(const PxTransform& t) {
 		center_x += 2 * stairsLength;
 	}
 	
-	PxTransform pose1(PxQuat(-PxHalfPi/3, PxVec3(1, 0, 0)));
-	//跷板 PxVec3 v的第二个参数应该为 底下所有盒子的高+ 最好大于z的数
-	createSeesaw(t, PxVec3(-30, 15 + 2 * boxHeight, -10), 5, 1, 15, pose1);
-	createFrontDoor(t, PxVec3(-20, 8.5 + 2 * boxHeight, 10), 0.8, defaultPose, true);
-	createSideDoor(t, PxVec3(-20 + 30 * 0.8, 8.5 + 2 * boxHeight, 10 + 7 * 0.8), 0.8, defaultPose, false);
-	createFrontDoor(t, PxVec3(-20, 8.5 + 2 * boxHeight, 10+37*0.8), 0.8, defaultPose, false);
-	createSideDoor(t, PxVec3(-20-7*0.8, 8.5 + 2 * boxHeight, 10+7*0.8), 0.8, defaultPose, true);
+	//最后一节台阶的中心点（center_x-2*stairsLength,centerHeight-2*boxHeight,center_z）
+	//悬空路段
+	float roadblock_length = 3.0;
+	float roadblock_width = 4.0;
+	float rb_x = center_x - 2 * stairsLength + dx + roadblock_length;
+	float rb_y = centerHeight - 2 * boxHeight;
+	float rb_z = center_z;
+	for (int i = 0; i < 3; i++) {
+		createRoad(t, PxVec3(rb_x, rb_y, rb_z), roadblock_length, boxHeight, roadblock_width, defaultPose);
+		rb_x = rb_x + 2 * roadblock_length + dx;
+	}
+
+	//最后一块悬空路段的中心点（rb_x-2 * roadblock_length - dx, rb_y, rb_z）
+	//第一块跷板的坐标
+	float seesawpos_x = rb_x - roadblock_length + 0.5 * dx;
+	float seesawpos_y = rb_y;
+	float seesawpos_z = rb_z;
+	float sx = 5.0;
+	float sy = 1.0;
+	float sz = 15.0;
+	PxVec3 seesawpos_v(seesawpos_x, seesawpos_y, seesawpos_z);
+	float lastSeesaw_x = createSeesawLevel(t, seesawpos_v, sx, sy, sz, defaultPose);
+	//最后一块跷板的中心点（lastSeesaw_x,seesawpos_y, seesawpos_z）
+
+	//连接跷板关卡与迷宫关卡的路段
+	float r_3_l = 5.0;
+	float r_3_w = 50.0;
+	float c_3_x = lastSeesaw_x + sx + dx + r_3_l;
+	float c_3_y = seesawpos_y;
+	float c_3_z = seesawpos_z + r_3_w - 5.0;
+	createRoad(t, PxVec3(c_3_x, c_3_y, c_3_z), r_3_l, boxHeight, r_3_w, defaultPose);
+
+	//迷宫边长缩放系数
+	float scale = 0.8;
+	//迷宫小正方形边长37*scale
+	float sideLength = 37.0 * scale;
+	//迷宫中心点坐标
+	float mazePos_x = c_3_x - 1.5 * sideLength;
+	float mazePos_y = c_3_y;
+	float mazePos_z = c_3_z + r_3_w + 4 * sideLength;
+	PxVec3 maze_v(mazePos_x, mazePos_y, mazePos_z);
+	//迷宫地板边长
+	float mazeLength = 4 * sideLength+1;
+	//创建迷宫地板
+	createRoad(t, maze_v, mazeLength, boxHeight, mazeLength, defaultPose);
+	createMaze(t, maze_v, scale, defaultPose);
+
+
+
+
+	//PxTransform pose1(PxQuat(-PxHalfPi/3, PxVec3(1, 0, 0)));
+	////跷板 PxVec3 v的第二个参数应该为 底下所有盒子的高+ 最好大于z的数
+	//createSeesaw(t, PxVec3(-30, 15 + 2 * boxHeight, -10), 5, 1, 15, pose1);
+	//createFrontDoor(t, PxVec3(-20, 8.5 + 2 * boxHeight, 10), 0.8, defaultPose, true);
+	//createSideDoor(t, PxVec3(-20 + 30 * 0.8, 8.5 + 2 * boxHeight, 10 + 7 * 0.8), 0.8, defaultPose, false);
+	//createFrontDoor(t, PxVec3(-20, 8.5 + 2 * boxHeight, 10+37*0.8), 0.8, defaultPose, false);
+	//createSideDoor(t, PxVec3(-20-7*0.8, 8.5 + 2 * boxHeight, 10+7*0.8), 0.8, defaultPose, true);
 
 	createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
 }
