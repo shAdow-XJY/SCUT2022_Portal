@@ -76,7 +76,6 @@ void keyboardUpCallback(unsigned char key, int x, int y)
 
 void specialKeyDownCallback(GLint key, GLint x, GLint y)
 {
-	std::cout << key << endl;
 	role->move(key,true,sCamera->isFree());
 	specialKeyPress(key);
 }
