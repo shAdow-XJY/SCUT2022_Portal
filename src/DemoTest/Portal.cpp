@@ -207,7 +207,7 @@ void initPhysics(bool interactive)
 	
 
 	role = new Role();
-	role->setFootPosition(PxVec3(-100, 0, -200));
+	role->setFootPosition(PxVec3(-100, 20, -200));
 
 	role->fall();
 
