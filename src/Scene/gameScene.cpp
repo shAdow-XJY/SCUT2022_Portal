@@ -126,6 +126,30 @@ void createSeesaw(const PxTransform& t,PxVec3 v,float x, float y, float z, PxTra
 }
 
 
+//Create fluid
+void CreateFluid(const PxTransform& t, PxVec3 v,PxVec3 s)
+{
+	PxTransform pos(t.transform(PxTransform(v)));
+	PxVec3 w(20,20,100);
+	// set immutable properties.
+	PxU32 maxParticles = 2048;
+	bool perParticleRestOffset = false;
+	// create particle system in PhysX SDK
+	PxParticleSystem* ps = gPhysics->createParticleSystem(maxParticles, perParticleRestOffset);
+	PxParticleCreationData particleCreationData;
+	particleCreationData.numParticles = 1024;
+	particleCreationData.indexBuffer = PxStrideIterator<const PxU32>();
+	particleCreationData.positionBuffer = PxStrideIterator<const PxVec3>();
+	particleCreationData.velocityBuffer = PxStrideIterator<const PxVec3>(&s, 0);
+
+	// create particles in *PxParticleSystem* ps
+	bool success = ps->createParticles(particleCreationData);
+	if (ps) {
+		gScene->addActor(*ps);
+	}
+}
+
+
 void createGameScene(const PxTransform& t) {
 	PxTransform defaultPose(PxQuat(0, PxVec3(0, 1, 0)));
 
@@ -171,6 +195,8 @@ void createGameScene(const PxTransform& t) {
 	//第二个参数应该为PxVec3 v(v_x, 底下所有盒子的高+10*scale+0.5，v_z)
 	createDoor(t, PxVec3(-20, 8.5 + 2 * boxHeight, 10), 0.8, defaultPose);
 	createDoor(t, PxVec3(-50, 15.5 + 2 * boxHeight, 20), 1.5, defaultPose);
+
+	CreateFluid(t, PxVec3(-30, 50, 50),PxVec3(0,1,1));
 
 	createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
 	//createPlane(PxVec3(0, 100, 0), PxVec3(0, 1, 0));
