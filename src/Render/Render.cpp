@@ -57,6 +57,7 @@ static bool textShouldRaster = false;
 
 // 此处原先定义为1024， 而TriangleMesh中一个三角形就要占用2个Vec3，复杂模型根本不够用
 #define MAX_NUM_MESH_VEC3S  524288
+
 static PxVec3 gVertexBuffer[MAX_NUM_MESH_VEC3S];
 extern bool press;
 extern int mouseX;
@@ -383,20 +384,22 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 			if (shapes[j]->getFlags() & PxShapeFlag::eTRIGGER_SHAPE)
 				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
-			// render object
-			glPushMatrix();
-			glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
-			if (sleeping)/*是否处于sleeping状态*/
-			{
-				PxVec3 darkColor = color * 0.8f;/*sleeping的情况下颜色*0.8*/
-				glColor4f(darkColor.x, darkColor.y, darkColor.z, 1.0f);
-			}
-			else {
-				glColor4f(color.x, color.y, color.z, 1.0f);
-			}
-			renderGeometry(h);
+			if (shapes[j]->getFlags() & PxShapeFlag::eVISUALIZATION) {
+				// render object
+				glPushMatrix();
+				glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
+				if (sleeping)/*是否处于sleeping状态*/
+				{
+					PxVec3 darkColor = color * 0.8f;/*sleeping的情况下颜色*0.8*/
+					glColor4f(darkColor.x, darkColor.y, darkColor.z, 1.0f);
+				}
+				else {
+					glColor4f(color.x, color.y, color.z, 1.0f);
+				}
+				renderGeometry(h);
 
-			glPopMatrix();
+				glPopMatrix();
+			}
 
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

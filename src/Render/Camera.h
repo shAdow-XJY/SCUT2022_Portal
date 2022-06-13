@@ -3,6 +3,7 @@
 
 #include "foundation/PxTransform.h"
 #include <glut.h>
+#include<time.h>
 
 namespace Snippets
 {
@@ -26,7 +27,7 @@ namespace Snippets
 		int					isMoving = 0;
 		void				updateDir(physx::PxVec3);
 		void				calDirMoving(GLint);
-		float				rotateSpeed = 300.0f;
+		float				rotateSpeed = 150.0f;
 		bool				isChangeImmediate = false;
 	private:
 		physx::PxVec3	mEye;	
@@ -35,7 +36,14 @@ namespace Snippets
 		int				mMouseX;
 		int				mMouseY;
 		bool			free = true; //Ƿƶ
+		clock_t lastClock = 0, currClock = 0;
 
+		float getTimeFromLastFrame() {
+			currClock = clock();
+			float ret = static_cast<float>((currClock - lastClock) / CLOCKS_PER_SEC);
+			lastClock = currClock;
+			return ret;
+		}
 
 	};
 

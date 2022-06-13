@@ -52,7 +52,7 @@ extern void specialKeyRelease(GLint key);
 extern Role* role;
 extern void RayCastByRole();
 CSkyBox skyBox;
-namespace
+namespace 
 {
 	Snippets::Camera*	sCamera;
 

@@ -2,6 +2,8 @@
 #include "cmath"
 #include <iostream>
 
+#define MAX_NUM_ACTOR_SHAPES 128
+
 
 Role::Role() {
 	PxCapsuleControllerDesc desc;
@@ -35,9 +37,12 @@ Role::Role() {
 bool Role::attachModel(const char* path) {
 	PxShape* cap;
 	role->getShapes(&cap, 1);
-	role->detachShape(*cap);
+	// 设为false就能只作为碰撞体而不渲染出来
+	cap->setFlag(PxShapeFlag::eVISUALIZATION, false);
 	this->model = new Model(path);
-	this->model->attachMeshes(PxTransform(PxQuat(-PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))), this->role);
+	this->model->attachMeshes(PxTransform(PxQuat(-PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))).transform(PxTransform(PxVec3(0.0f,-0.4f,0.0f))), this->role);
+	this->role->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+	
 	return true;
 }
 
@@ -150,12 +155,34 @@ void Role::move(GLint key,bool status,bool free) {
 		}case GLUT_KEY_LEFT: {
 			PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
 			dir = rotate.rotate(dir);
+			PxTransform currfront = role->getGlobalPose();
+
+			//PxU32 NbShapes = role->getNbShapes();
+			//PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
+			//role->getShapes(shapes, NbShapes);
+			//for (PxU32 i = 0; i < NbShapes; i++) {
+			//	role->detachShape(*shapes[i]);
+			//	//shapes[i]->setLocalPose(PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0))));
+			//}
+			//model->attachMeshes(PxTransform(PxQuat(-PxHalfPi, PxVec3(0, 1, 0))),role);
+
 			role->setGlobalPose(rotate);
+
+			cout << "LEFT!" << endl;
 			break;
 
 		}case GLUT_KEY_RIGHT: {
 			PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
 			dir = rotate.rotate(-dir);
+
+			//PxU32 NbShapes = role->getNbShapes();
+			//PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
+			//role->getShapes(shapes, NbShapes);
+			//for (PxU32 i = 0; i < NbShapes; i++) {
+			//	role->detachShape(*shapes[i]);
+			//	//shapes[i]->setLocalPose(PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0))));
+			//}
+			//model->attachMeshes(PxTransform(PxQuat(-PxHalfPi, PxVec3(0, 1, 0))), role);
 			role->setGlobalPose(rotate);
 			break;
 
@@ -186,8 +213,6 @@ void Role::move(GLint key,bool status,bool free) {
 		{
 			this->speed = this->speed * 0.5f;
 		}
-		
-		
 	}
 }
 

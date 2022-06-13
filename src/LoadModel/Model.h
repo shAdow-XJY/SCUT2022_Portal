@@ -23,9 +23,10 @@ class Model {
 public:
 	Model(const char* path);
 	void attachMeshes(const PxTransform& trans, PxRigidActor* actor);
+	void transformModel(const PxTransform& trans);
 private:
 	vector<PxTriangleMesh*> m_triangleMesh;
-	
+	vector<PxShape*> m_shapes;
 	void loadModel(const char* path);
 	void processNode(aiNode* node, const aiScene* scene);
 	void processSingleMesh(aiMesh* mesh, const aiScene* scene);

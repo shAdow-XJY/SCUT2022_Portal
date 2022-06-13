@@ -104,7 +104,7 @@ void Model::attachMeshes(const PxTransform& trans,PxRigidActor* actor) {
 	for (size_t i = 0; i < m_triangleMesh.size();++i) {
 		
 		// 根据mesh描述创建几何体
-		PxTriangleMeshGeometry geom(m_triangleMesh[i]/*,PxMeshScale(PxVec3(0.5f,0.5f,0.5f))*/);
+		PxTriangleMeshGeometry geom(m_triangleMesh[i],PxMeshScale(PxVec3(2.0f,2.0f,2.0f)));
 
 		// 创建Shape
 		PxShape* shape = gPhysics->createShape(geom, *gMaterial);
@@ -114,13 +114,14 @@ void Model::attachMeshes(const PxTransform& trans,PxRigidActor* actor) {
 			shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
 			shape->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, false);
 			shape->setLocalPose(trans);
+			m_shapes.push_back(shape);
 		}
 		
 		//TriangleMesh->attachShape(*shape);
  
 		actor->attachShape(*shape);
 
-		shape->release();
+		//shape->release();
 		/*TriangleMesh->userData = new int;
 		int testid = 8888;
 		memcpy(TriangleMesh->userData, &testid, sizeof(int));*/
@@ -135,3 +136,4 @@ void Model::attachMeshes(const PxTransform& trans,PxRigidActor* actor) {
 	}
 	//gScene->addActor(*TriangleMesh);
 }
+

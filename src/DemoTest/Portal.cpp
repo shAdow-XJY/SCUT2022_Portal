@@ -390,7 +390,8 @@ void initPhysics(bool interactive)
 	role = new Role();
 	role->setFootPosition(PxVec3(-100, 20, 0));
 
-	role->attachModel("../../models/paimon/paimon.obj");
+	//role->attachModel("../../models/paimon/paimon.obj");
+	role->attachModel("../../models/human.obj");
 	role->fall();
 
 

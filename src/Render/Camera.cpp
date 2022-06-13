@@ -36,24 +36,25 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 	PX_UNUSED(x);
 	PX_UNUSED(y);
 
-		PxVec3 viewY = mDir.cross(PxVec3(0, 1, 0)).getNormalized();
-		switch (toupper(key))
-		{
-			if (this->free) {
-		case 'W':	mEye += mDir * 20.0f * speed;		break;
-		case 'S':	mEye -= mDir * 20.0f * speed;		break;
-		case 'A':	mEye -= viewY * 20.0f * speed;		break;
-		case 'D':	mEye += viewY * 20.0f * speed;		break;
-			}
-			//切换是否为自由视角
-		case 'T': {
-			this->free = !this->free; ;
-			this->isChangeImmediate = true;
-			//if (!this->free) this->mDir = dir.getNormalized(); //朝物体下方看
-			break;
+	PxVec3 viewY = mDir.cross(PxVec3(0, 1, 0)).getNormalized();
+	switch (toupper(key))
+	{
+		if (this->free) {
+	case 'W':	mEye += mDir * 2.0f * speed * getTimeFromLastFrame();		break;
+	case 'S':	mEye -= mDir * 2.0f * speed * getTimeFromLastFrame();		break;
+	case 'A':	mEye -= viewY * 2.0f * speed * getTimeFromLastFrame();		break;
+	case 'D':	mEye += viewY * 2.0f * speed * getTimeFromLastFrame();		break;
 		}
-		default:							
-			return false;
+	
+		//切换是否为自由视角
+	case 'T': {
+		this->free = !this->free; ;
+		this->isChangeImmediate = true;
+		//if (!this->free) this->mDir = dir.getNormalized(); //朝物体下方看
+		break;
+	}
+	default:							
+		return false;
 	}
 	return true;
 }
@@ -137,7 +138,7 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 			this->isMoving = 0;
 			return;
 		};
-		const float delta = PxHalfPi / this->rotateSpeed * this->isMoving;
+		const float delta = PxHalfPi / this->rotateSpeed * this->isMoving * getTimeFromLastFrame();
 		PxTransform rotate = PxTransform(position,PxQuat(delta, PxVec3(0, 1, 0)));
 		this->mDir = rotate.rotate(this->mDir);
 		this->mEye = position - this->mDir;
