@@ -123,76 +123,81 @@ float center_y(float y) {
 	return y + 2 * boxHeight;
 }
 
+
 //t为场景构建的原点 v为该门中心点相对场景原点的位置 scale为门的缩放系数
 //第二个参数应该为PxVec3 v(v_x, 底下所有盒子的高+10*scale，v_z)
 //轴心在中点
-PxRevoluteJoint* createFrontDoor(const PxTransform& t, PxVec3 v, float scale, PxTransform& pose,bool canOpen = true) {
+void createFrontDoor(const PxTransform& t, PxVec3 v, float scale, PxTransform& pose,bool canOpen = true) {
 	PxTransform pos(t.transform(PxTransform(v)));//-17.8  -18.56 -18.561815
 	PxReal x = 10 * scale;
 	PxReal y = 5 * scale;
 	PxReal z = 1 * scale;
 	//实际-5  旋转角度小：-17.8  -18.56 -18.561815
-	PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(6.5 * scale, -5 * scale, 0),x,y,z, pose);
-	/*Door* door = new Door("正门",actor0->getGlobalPose().p,x,y,z,actor0, canOpen);
-	actor0->setName("Door");
-	actor0->userData = door;*/
 	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(0, 0, 0), 6 * scale, 10 * scale, 1 * scale, pose);
 	createStaticBox(pos, PxVec3(23 * scale, 0, 0), 6 * scale, 10 * scale, 1 * scale, pose);
-	PxTransform localFrame0(PxVec3(0, 5 * scale, 0));
-	PxTransform localFrame1(PxVec3(6.5 * scale,0, 0));
-	PxRevoluteJoint* revolute = PxRevoluteJointCreate(*gPhysics, actor0, localFrame0, actor1, localFrame1);
-	Door* door = new Door("正门", actor0->getGlobalPose().p, x, y, z, actor0, canOpen, revolute);
-	actor0->setName("Door");
-	actor0->userData = door;
-	PxJointAngularLimitPair limits(-PxPi / 130, 0, 0.01f);
-	revolute->setLimit(limits);
-	/*if (canOpen) {
-		PxJointAngularLimitPair limits(-PxPi / 2, PxPi / 2, 0.01f);
-		revolute->setLimit(limits);
-	}
-	else {
+	if (canOpen) {
+		PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(6.5 * scale, -5 * scale, 0), x, y, z, pose);
+		/*Door* door = new Door("正门",actor0->getGlobalPose().p,x,y,z,actor0, canOpen);
+		actor0->setName("Door");
+		actor0->userData = door;*/
+		PxTransform localFrame0(PxVec3(0, 5 * scale, 0));
+		PxTransform localFrame1(PxVec3(6.5 * scale, 0, 0));
+		PxRevoluteJoint* revolute = PxRevoluteJointCreate(*gPhysics, actor0, localFrame0, actor1, localFrame1);
+		Door* door = new Door("正门", actor0->getGlobalPose().p, x, y, z, actor0, canOpen, revolute);
+		actor0->setName("Door");
+		actor0->userData = door;
 		PxJointAngularLimitPair limits(-PxPi / 130, 0, 0.01f);
 		revolute->setLimit(limits);
-	}*/
-	revolute->setRevoluteJointFlag(PxRevoluteJointFlag::eLIMIT_ENABLED, true);
-	revolute->setLocalPose(PxJointActorIndex::Enum::eACTOR1, PxTransform(PxVec3(6.5 * scale, 0, 0), PxQuat(PxHalfPi, PxVec3(0, 0, 1))));
-	return revolute;
+		/*if (canOpen) {
+			PxJointAngularLimitPair limits(-PxPi / 2, PxPi / 2, 0.01f);
+			revolute->setLimit(limits);
+		}
+		else {
+			PxJointAngularLimitPair limits(-PxPi / 130, 0, 0.01f);
+			revolute->setLimit(limits);
+		}*/
+		revolute->setRevoluteJointFlag(PxRevoluteJointFlag::eLIMIT_ENABLED, true);
+		revolute->setLocalPose(PxJointActorIndex::Enum::eACTOR1, PxTransform(PxVec3(6.5 * scale, 0, 0), PxQuat(PxHalfPi, PxVec3(0, 0, 1))));
+		//return revolute;
+	}
+	else {
+		createStaticBox(pos, PxVec3(11.5 * scale, 0, 0), y, x, z, pose);
+	}
 }
 
 
 // joint在中点
-PxRevoluteJoint* createSideDoor(const PxTransform& t, PxVec3 v, float scale, PxTransform& pose, bool canOpen = true) {
+void createSideDoor(const PxTransform& t, PxVec3 v, float scale, PxTransform& pose, bool canOpen = true) {
 	PxTransform pos(t.transform(PxTransform(v)));
 	PxReal x = 10 * scale;
 	PxReal y = 1 * scale;
 	PxReal z = 5 * scale;
-	PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(0, 0, 11.5 * scale), x, y, z, pose);
-	/*Door* door = new Door("侧门", actor0->getGlobalPose().p, x, y, z, actor0,canOpen);
-	actor0->setName("Door");
-	actor0->userData = door;*/
 	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(0, 0, 0), 1 * scale, 10 * scale, 6 * scale, pose);
 	createStaticBox(pos, PxVec3(0, 0, 23 * scale), 1 * scale, 10 * scale, 6 * scale, pose);
-	PxTransform localFrame0(PxVec3(0, 0, -5 * scale));
-	PxTransform localFrame1(PxVec3(0,0, 6.5 * scale));
-	PxRevoluteJoint* revolute = PxRevoluteJointCreate(*gPhysics, actor0, localFrame0, actor1, localFrame1);
-	Door* door = new Door("侧门", actor0->getGlobalPose().p, x, y, z, actor0, canOpen, revolute);
-	actor0->setName("Door");
-	actor0->userData = door;
-	/*PxJointAngularLimitPair limitPair(-PxPi / 4, PxPi / 4, 0.1f);
-	limitPair.stiffness = 7.0f;
-	limitPair.damping = 100.0f;
-	revolute->setLimit(limitPair);*/
 	if (canOpen) {
+		PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(0, 0, 11.5 * scale), x, y, z, pose);
+		/*Door* door = new Door("侧门", actor0->getGlobalPose().p, x, y, z, actor0,canOpen);
+		actor0->setName("Door");
+		actor0->userData = door;*/
+		PxTransform localFrame0(PxVec3(0, 0, -5 * scale));
+		PxTransform localFrame1(PxVec3(0, 0, 6.5 * scale));
+		PxRevoluteJoint* revolute = PxRevoluteJointCreate(*gPhysics, actor0, localFrame0, actor1, localFrame1);
+		Door* door = new Door("侧门", actor0->getGlobalPose().p, x, y, z, actor0, canOpen, revolute);
+		actor0->setName("Door");
+		actor0->userData = door;
+		/*PxJointAngularLimitPair limitPair(-PxPi / 4, PxPi / 4, 0.1f);
+		limitPair.stiffness = 7.0f;
+		limitPair.damping = 100.0f;
+		revolute->setLimit(limitPair);*/
 		PxJointAngularLimitPair limits(-PxPi / 2, PxPi / 2, 0.01f);
 		revolute->setLimit(limits);
+		revolute->setRevoluteJointFlag(PxRevoluteJointFlag::eLIMIT_ENABLED, true);
+		revolute->setLocalPose(PxJointActorIndex::Enum::eACTOR1, PxTransform(PxVec3(0, 0, 6.5 * scale), PxQuat(PxHalfPi, PxVec3(0, 0, 1))));
+		//return revolute;
 	}
 	else {
-		PxJointAngularLimitPair limits(-PxPi / 130, 0, 0.01f);
-		revolute->setLimit(limits);
+		createStaticBox(pos, PxVec3(0, 0, 11.5 * scale), y, x, z, pose);
 	}
-	revolute->setRevoluteJointFlag(PxRevoluteJointFlag::eLIMIT_ENABLED, true);
-	revolute->setLocalPose(PxJointActorIndex::Enum::eACTOR1, PxTransform(PxVec3(0, 0, 6.5 * scale), PxQuat(PxHalfPi, PxVec3(0, 0, 1))));
-	return revolute;
 }
 
 //创建迷宫关卡
@@ -256,6 +261,7 @@ PxRevoluteJoint* createSeesaw(const PxTransform& t,PxVec3 v,float x, float y, fl
 	return revolute;
 }
 
+
 //创建跷跷板关卡 v为跷板0的中心点 sx、sy、sz为跷板的半长
 float createSeesawLevel(const PxTransform& t, PxVec3 v,float sx, float sy, float sz, PxTransform& pose) {
 	//第一块跷板0
@@ -301,6 +307,7 @@ float createSeesawLevel(const PxTransform& t, PxVec3 v,float sx, float sy, float
  }
 
 void createGameScene(const PxTransform& t) {
+	time_t startTime = time(NULL);
 	PxTransform defaultPose(PxQuat(0, PxVec3(0, 1, 0)));  //刚体默认pose
 
 	float r_1_l = 4.0;  //road_1_length 4 100
@@ -379,7 +386,6 @@ void createGameScene(const PxTransform& t) {
 	//创建迷宫地板
 	createRoad(t, maze_v, mazeLength, boxHeight, mazeLength, defaultPose);
 	createMaze(t, maze_v, scale, defaultPose);
-
 
 
 
