@@ -46,6 +46,7 @@
 #include<string>
 #include <glut.h>
 #include<iostream>
+#include<time.h>
 
 
 
@@ -97,6 +98,7 @@ int mouseX, mouseY;
 
 // 提示字符的位置（测试用）
 int textX = 0, textY = 0;
+
 
 
 //创建立方体堆

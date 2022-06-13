@@ -269,7 +269,7 @@ void Role::tryJump(bool release) {
 		}
 	}
 }
-
+extern clock_t deltaClock;
 /**
 * @brief ½ÇÉ«ÌøÔ¾
 **/
@@ -287,7 +287,8 @@ void Role::roleJump() {
 		if (canForward && canMove) {
 			jumpSpeed += this->speed * 0.3;
 		}
-		PxControllerCollisionFlags flag = roleController->move(jumpSpeed, PxF32(0.001), 1.0f / 60.0f, NULL);
+		
+		PxControllerCollisionFlags flag = roleController->move(jumpSpeed, PxF32(0.001), deltaClock, NULL);
 		nowJumpHeight += speed;
 		//std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
 		//std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;
@@ -315,7 +316,7 @@ void Role::roleFall() {
 		if (canForward && canMove) {
 			fallSpeed += this->speed * 0.3;
 		}
-		PxControllerCollisionFlags flag = roleController->move(fallSpeed, PxF32(0.00001), 1.0f / 60.0f, NULL);
+		PxControllerCollisionFlags flag = roleController->move(fallSpeed, PxF32(0.00001), deltaClock, NULL);
 		if (flag == PxControllerCollisionFlag::eCOLLISION_SIDES) {
 			this->setSpeed(PxVec3(0, 0, 0));
 		}

@@ -51,12 +51,17 @@ extern void specialKeyPress(GLint key);
 extern void specialKeyRelease(GLint key);
 extern Role* role;
 extern void RayCastByRole();
+extern void calculateElapsedClocksFromLastFrame();
+
 CSkyBox skyBox;
+
 
 bool beginGame = true;
 namespace
 {
 	Snippets::Camera*	sCamera;
+
+	
 
 	void motionCallback(int x, int y)
 	{
@@ -125,37 +130,38 @@ void mouseCallback(int button, int state, int x, int y)
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 
-	if (sCamera->isFree())
-	{
-		if (role)
+		if (sCamera->isFree())
 		{
-			role->move();
-			role->roleJump();
-			role->roleFall();
+			if (role)
+			{
+				role->move();
+				role->roleJump();
+				role->roleFall();
+			}
 		}
-	}
-	else {
-		if (role)
-		{
-			role->roleJump();
-			role->roleFall();
+		else {
+			if (role)
+			{
+				role->roleJump();
+				role->roleFall();
+			}
 		}
-	}
-	role->simulationGravity();
+		role->simulationGravity();
 
-	PxScene* scene;
-	PxGetPhysics().getScenes(&scene,1);
-	PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
-	if(nbActors)
-	{
-		std::vector<PxRigidActor*> actors(nbActors);
-		scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
-		Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
-	}
-	/** 绘制天空 */
-	skyBox.CreateSkyBox(-2000, -200, -2000, 1.0, 0.5, 1.0);
+		PxScene* scene;
+		PxGetPhysics().getScenes(&scene,1);
+		PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
+		if(nbActors)
+		{
+			std::vector<PxRigidActor*> actors(nbActors);
+			scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
+			Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
+		}
+		/** 绘制天空 */
+		skyBox.CreateSkyBox(-2000, -200, -2000, 1.0, 0.5, 1.0);
 
 		Snippets::finishRender();
+		calculateElapsedClocksFromLastFrame();
 	}
 
 	void exitCallback(void)
@@ -163,6 +169,7 @@ void mouseCallback(int button, int state, int x, int y)
 		delete sCamera;
 		cleanupPhysics(true);
 	}
+
 }
 
 

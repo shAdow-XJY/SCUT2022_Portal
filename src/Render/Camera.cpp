@@ -5,6 +5,7 @@
 #include "foundation/PxMat33.h"
 
 using namespace physx;
+extern clock_t deltaClock;
 
 namespace Snippets
 {
@@ -40,10 +41,10 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 	switch (toupper(key))
 	{
 		if (this->free) {
-	case 'W':	mEye += mDir * 2.0f * speed * getTimeFromLastFrame();		break;
-	case 'S':	mEye -= mDir * 2.0f * speed * getTimeFromLastFrame();		break;
-	case 'A':	mEye -= viewY * 2.0f * speed * getTimeFromLastFrame();		break;
-	case 'D':	mEye += viewY * 2.0f * speed * getTimeFromLastFrame();		break;
+	case 'W':	mEye += mDir * 2.0f * speed * deltaClock;		break;
+	case 'S':	mEye -= mDir * 2.0f * speed * deltaClock;		break;
+	case 'A':	mEye -= viewY * 2.0f * speed * deltaClock;		break;
+	case 'D':	mEye += viewY * 2.0f * speed * deltaClock;		break;
 		}
 	
 		//切换是否为自由视角
@@ -139,7 +140,7 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 			this->isMoving = 0;
 			return;
 		};
-		const float delta = PxHalfPi / this->rotateSpeed * this->isMoving * getTimeFromLastFrame();
+		const float delta = (PxHalfPi / (this->rotateSpeed * this->isMoving)) * deltaClock;
 		PxTransform rotate = PxTransform(position,PxQuat(delta, PxVec3(0, 1, 0)));
 		this->mDir = rotate.rotate(this->mDir);
 		this->mEye = position - this->mDir;

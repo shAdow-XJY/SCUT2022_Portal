@@ -1,5 +1,6 @@
 ﻿#include "PxPhysicsAPI.h"
 #include "../Render/Render.h"
+#include <time.h>
 using namespace physx;
 
 /**
@@ -30,4 +31,15 @@ PxVec3 ScenetoWorld(int xCord, int yCord) {
 	gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
 	return PxVec3(posX, posY, posZ);
+}
+
+clock_t currClock = 0, lastClock = 0;
+clock_t deltaClock;
+
+void calculateElapsedClocksFromLastFrame() {
+	//更新deltaTime给需要速度的地方使用
+	currClock = clock();
+	//deltaTime = static_cast<double>((currClock - lastClock) / CLOCKS_PER_SEC);
+	deltaClock = currClock - lastClock;
+	lastClock = currClock;
 }

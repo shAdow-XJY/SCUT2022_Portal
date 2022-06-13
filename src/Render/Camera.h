@@ -5,6 +5,7 @@
 #include <glut.h>
 #include<time.h>
 
+
 namespace Snippets
 {
 	class Camera
@@ -27,7 +28,7 @@ namespace Snippets
 		int					isMoving = 0; //旋转方向 1逆时针 -1顺时针 0不旋转
 		void				updateDir(physx::PxVec3);
 		void				calDirMoving(GLint);
-		float				rotateSpeed = 100.0f; //旋转速度
+		float				rotateSpeed = 80.0f; //旋转速度
 		bool				isChangeImmediate = false; //是否立即改变视角
 	private:
 		physx::PxVec3	mEye;	
@@ -36,15 +37,6 @@ namespace Snippets
 		int				mMouseX;
 		int				mMouseY;
 		bool			free = true; //Ƿƶ
-		clock_t lastClock = 0, currClock = 0;
-
-		float getTimeFromLastFrame() {
-			currClock = clock();
-			float ret = static_cast<float>((currClock - lastClock) / CLOCKS_PER_SEC);
-			lastClock = currClock;
-			return ret;
-		}
-
 	};
 
 
