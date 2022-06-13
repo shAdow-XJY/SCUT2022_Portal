@@ -428,7 +428,8 @@ void Role::simulationGravity() {
 * @brief 角色道具拾取
 **/
 void Role::pickUpObj() {
-	PxVec3 origin = this->getPosition();
+	//cout << this->faceDir.x<<" " << this->faceDir.y <<" "<< this->faceDir.z<<" " << endl;
+	PxVec3 origin = this->getPosition() - PxVec3(0,0.2f,0);
 	//确定role的前方方向
 	PxVec3 forwardDir = this->getFaceDir() * 2;
 	PxRigidActor* actor = NULL;
@@ -456,11 +457,10 @@ void Role::pickUpObj() {
 void Role::layDownObj() {
 	PxVec3 origin = this->getPosition();
 	//确定role的前方方向
-	PxVec3 forwardDir = PxVec3(this->getFaceDir().x, -3, this->getFaceDir().z);
+	PxVec3 forwardDir = PxVec3(this->getFaceDir().x * 1.5f, -3, this->getFaceDir().z * 1.5f);
 	PxRigidActor* actor = NULL;
 	if (actor = RayCast(origin, forwardDir)) {
 		Block* block = (Block*)actor->userData;
-		cout << block->getType() << endl;
 		if (block->getType() == BlockType::road) {
 			this->equiped = false;
 			extern void createPorp(const PxTransform & t, const PxVec3 & v, PxReal x, PxReal y, PxReal z);

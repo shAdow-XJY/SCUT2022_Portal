@@ -13,7 +13,7 @@ extern PxControllerManager* cManager;
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
 extern PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir);
 
-const int primaryJumpHeight = 6.0f;
+const int primaryJumpHeight = 8.0f;
 
 class Role {
 private:
@@ -37,7 +37,7 @@ private:
 	//人物上一次位置
 	PxVec3 lastPostion;	
 	//角色重力
-	float mass = 6000.0f;
+	float mass = 2000.0f;
 	//重力加速度
 	float midFallSpeed = 0.1;
 	//跳跃相关
@@ -45,7 +45,7 @@ private:
 	float bigJumpSpeed = 0.1;
 	float nowJumpHeight = 0.0;
 	float wantJumpHeight = primaryJumpHeight;
-	float maxJumpHeight = 12.0;
+	float maxJumpHeight = 14.0;
 
 	/// <summary>
 	/// 状态量

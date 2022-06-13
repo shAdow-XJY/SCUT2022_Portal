@@ -62,8 +62,9 @@ void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxRea
 	//碰撞检测的过滤组
 	shape->setQueryFilterData(collisionGroup);
 	//setupFiltering(shape, FilterGroup::ePIG, FilterGroup::eBIRD);
-	PxRigidStatic* sceneBox = gPhysics->createRigidStatic(t.transform(local));
-	Block* block = new Block("方块", sceneBox->getGlobalPose().p, x, y, z);
+	PxRigidDynamic* sceneBox = gPhysics->createRigidDynamic(t.transform(local));
+	PxRigidBodyExt::updateMassAndInertia(*sceneBox, 1.0f);
+	Block* block = new Block("道具", sceneBox->getGlobalPose().p, x, y, z);
 	block->setType(BlockType::prop);
 	sceneBox->attachShape(*shape);
 	sceneBox->userData = block;

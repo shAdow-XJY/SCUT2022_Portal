@@ -52,6 +52,8 @@ extern void specialKeyRelease(GLint key);
 extern Role* role;
 extern void RayCastByRole();
 CSkyBox skyBox;
+
+bool beginGame = true;
 namespace
 {
 	Snippets::Camera*	sCamera;
@@ -103,7 +105,11 @@ void mouseCallback(int button, int state, int x, int y)
 		stepPhysics(true);
 
 	
-		if (!sCamera->isFree()) {
+		if (!sCamera->isFree() || beginGame) {
+			if (beginGame) {
+				sCamera->isChangeImmediate = true;
+				beginGame = false;
+			}
 			PxVec3 position = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getFaceDir() * -50);
 			if (!sCamera->isMoving) {
 				sCamera->setEye(position);
@@ -115,6 +121,7 @@ void mouseCallback(int button, int state, int x, int y)
 			PxVec3 dir = role->getPosition() - position;
 			sCamera->targetDir = dir;
 			sCamera->updateDir(role->getPosition());
+			
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 
