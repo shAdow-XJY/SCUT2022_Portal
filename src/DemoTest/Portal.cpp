@@ -89,7 +89,8 @@ bool press = false;
 
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
 
-const PxTransform t = PxTransform(PxVec3(-100, 0, 0));
+const PxTransform t = PxTransform(PxVec3(-100, 0, -200));
+extern void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z);
 
 
 // 鼠标点击时的坐标
@@ -206,7 +207,10 @@ void initPhysics(bool interactive)
 	
 
 	role = new Role();
-	role->setFootPosition(PxVec3(-100, 20, 0));
+	//初始位置
+	//role->setFootPosition(PxVec3(-100, 20, -200));
+	//迷宫前位置
+	role->setFootPosition(PxVec3(83, 20, -136));
 
 	role->fall();
 

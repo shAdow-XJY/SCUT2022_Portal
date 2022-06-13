@@ -10,3 +10,7 @@ PxRigidDynamic* Door::getDoorActor() {
 bool Door::canOpen() {
 	return this->open;
 }
+
+PxRevoluteJoint* Door::getJoint() {
+	return this->joint;
+}
