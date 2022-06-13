@@ -72,7 +72,7 @@ extern std::map<string, unsigned int> textureMap;
 CBMPLoader* TextureLoader;
 unsigned int textureID;
 
-static void drawBox(GLfloat x, GLfloat y, GLfloat z)
+static void drawBox(GLfloat x, GLfloat y, GLfloat z,bool shadow)
 {
 	static GLfloat n[6][3] =
 	{
@@ -108,8 +108,13 @@ static void drawBox(GLfloat x, GLfloat y, GLfloat z)
 	for (i = 5; i >= 0; i--) {
 		/** 开始绘制 */
 		glPushMatrix();
-		//glTranslatef(-x, -y, -z);
-		glColor4f(1, 1, 1, 1);
+		if (shadow) {
+			glColor4f(0.1f, 0.2f, 0.3f, 1.0f);
+		}
+		else
+		{
+			glColor4f(1, 1, 1, 1);
+		}
 
 		/** 绘制背面 */
 		glBindTexture(GL_TEXTURE_2D, textureID);
@@ -130,12 +135,13 @@ static void drawBox(GLfloat x, GLfloat y, GLfloat z)
 }
 
 
-void renderGeometry(const PxGeometryHolder& h, int type)
+void renderGeometry(const PxGeometryHolder& h, int type,bool shadow)
 {
 	switch(h.getType())
 	{
 	case PxGeometryType::eBOX:			
 		{
+		
 		switch (type)
 		{
 		case 0: {
@@ -155,7 +161,7 @@ void renderGeometry(const PxGeometryHolder& h, int type)
 			break;
 		}
 		}
-			drawBox(h.box().halfExtents.x*2, h.box().halfExtents.y*2, h.box().halfExtents.z*2);
+			drawBox(h.box().halfExtents.x*2, h.box().halfExtents.y*2, h.box().halfExtents.z*2,shadow);
 		}
 		break;
 	case PxGeometryType::eSPHERE:		
@@ -168,7 +174,7 @@ void renderGeometry(const PxGeometryHolder& h, int type)
 
 			const PxF32 radius = h.capsule().radius;
 			const PxF32 halfHeight = h.capsule().halfHeight;
-
+			glColor4f(0.0f, 1.0f, 0.0f, 0.0f);
 			//Sphere
 			glPushMatrix();
 			glTranslatef(halfHeight, 0.0f, 0.0f);
@@ -465,12 +471,6 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 		{
 			const PxMat44 shapePose(PxShapeExt::getGlobalPose(*shapes[j], *actors[i]));
 			PxGeometryHolder h = shapes[j]->getGeometry();
-			//shapes[j]->getGeometry().box();
-			/*std::cout << "shapes[j]->getActor()->getGlobalPose();" << std::endl;
-			std::cout << shapes[j]->getActor()->getGlobalPose().p.x << std::endl;
-			std::cout << shapes[j]->getActor()->getGlobalPose().p.y << std::endl;
-			std::cout << shapes[j]->getActor()->getGlobalPose().p.z << std::endl;*/
-			//shapePose.getPosition();
 
 			if (shapes[j]->getFlags() & PxShapeFlag::eTRIGGER_SHAPE)
 				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -486,14 +486,8 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 			else {
 				glColor4f(color.x, color.y, color.z, 1.0f);
 			}
-			//shapes[j]->getGeometry().heightField();
-			/*std::cout << "shapes[j]->getGeometry().heightField()" << shapes[j]->getGeometry().heightField().columnScale << " "
-				<< shapes[j]->getGeometry().heightField().heightScale << " "
-				<< shapes[j]->getGeometry().heightField().rowScale << std::endl;*/
-			//shape = (RenderClass*)shapes[j]->userData.name;
 			
 			int type = 0;
-			
 			try {
 				if (actors[i]->getName()) {
 					string str = actors[i]->getName();
@@ -520,7 +514,7 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 				std::cout << str << std::endl;
 			}
 
-			renderGeometry(h, type);
+			renderGeometry(h, type,false);
 			
 			glPopMatrix();
 
@@ -535,7 +529,7 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 				glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
 				glDisable(GL_LIGHTING);
 				glColor4f(0.1f, 0.2f, 0.3f, 1.0f);
-				//renderGeometry(h, shapes[j]->getLocalPose());
+				renderGeometry(h, type,true);
 				glEnable(GL_LIGHTING);
 				glPopMatrix();
 			}	
