@@ -236,7 +236,11 @@ void Role::roleJump() {
 		{
 			speed = littleJumpSpeed;
 		}
-		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, speed, 0.0) + this->speed * 0.3, PxF32(0.001), 1.0f / 60.0f, NULL);
+		PxVec3 jumpSpeed = PxVec3(0.0, speed, 0.0);
+		if (canForward && canMove) {
+			jumpSpeed += this->speed * 0.3;
+		}
+		PxControllerCollisionFlags flag = roleController->move(jumpSpeed, PxF32(0.001), 1.0f / 60.0f, NULL);
 		nowJumpHeight += speed;
 		//std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
 		//std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;
@@ -260,7 +264,11 @@ void Role::roleJump() {
 **/
 void Role::roleFall() {
 	if (isFall) {
-		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, -midFallSpeed, 0.0) + this->speed * 0.3, PxF32(0.00001), 1.0f / 60.0f, NULL);		
+		PxVec3 fallSpeed = PxVec3(0.0, -midFallSpeed, 0.0);
+		if (canForward && canMove) {
+			fallSpeed += this->speed * 0.3;
+		}
+		PxControllerCollisionFlags flag = roleController->move(fallSpeed, PxF32(0.00001), 1.0f / 60.0f, NULL);
 		if (flag == PxControllerCollisionFlag::eCOLLISION_SIDES) {
 			this->setSpeed(PxVec3(0, 0, 0));
 		}
@@ -361,10 +369,14 @@ void Role::gameOver() {
 }
 
 /**
-* @brief 角色是否存活
+* @brief 角色是否可以移动
 **/
 void Role::changeCanMove(bool flag) {
 	this->canMove = flag;
+}
+
+void Role::changeForward(bool flag) {
+	this->canForward = flag;
 }
 
 
@@ -374,12 +386,13 @@ void Role::changeCanMove(bool flag) {
 **/
 void Role::simulationGravity() {
 	PxVec3 origin = this->getFootPosition();
-	PxVec3 unitDir = PxVec3(0, -0.5f, 0);
+	PxVec3 unitDir = PxVec3(0, -1.0f, 0);
 	PxRigidActor* actor = NULL;
 	if (actor = RayCast(origin, unitDir)) {
 		//碰撞到物体
 		//std::cout << "碰到地面" << std::endl;
 		//cout << role->standingBlock.getName() << endl;
+		this->standingOnBlock = true;
 		Block* block = (Block*)actor->userData;
 		if (block != NULL) {
 			//cout << block->getType() << endl;
@@ -388,7 +401,7 @@ void Role::simulationGravity() {
 
 			}
 			else if (block->getType() == BlockType::seesaw) {
-				//cout << "施加重力" << endl;
+				cout << "施加重力" << endl;
 				Seesaw* seesaw = (Seesaw*)block;
 				PxRigidBody* seesawBody = seesaw->getSeesawActor();
 				PxVec3 force = PxVec3(0, -1, 0) * this->mass;
@@ -403,6 +416,7 @@ void Role::simulationGravity() {
 			this->setFootPosition(this->getFootPosition() + this->getSpeed() * 5.0f); //边缘滑动
 		}
 		this->standingBlock = Block();
+		this->standingOnBlock = false;
 		//std::cout << "未碰到地面" << std::endl;	
 		//role->gameOver();
 		this->fall();

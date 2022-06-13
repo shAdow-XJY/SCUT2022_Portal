@@ -39,10 +39,10 @@ private:
 	//角色重力
 	float mass = 6000.0f;
 	//重力加速度
-	float midFallSpeed = 0.2;
+	float midFallSpeed = 0.1;
 	//跳跃相关
-	float littleJumpSpeed = 0.15;
-	float bigJumpSpeed = 0.2;
+	float littleJumpSpeed = 0.08;
+	float bigJumpSpeed = 0.1;
 	float nowJumpHeight = 0.0;
 	float wantJumpHeight = primaryJumpHeight;
 	float maxJumpHeight = 12.0;
@@ -56,6 +56,9 @@ private:
 	bool isFall = false;
 	bool isAlive = true;
 	bool equiped = false;
+	//本次跳跃是否能够向前
+	bool canForward = true;
+	bool standingOnBlock = true;
 
 public:
 	Role();
@@ -102,6 +105,7 @@ public:
 	void roleJump();
 	void roleFall();
 	void fall();
+	void changeForward(bool);
 
 	//下蹲
 	void roleCrouch();
@@ -116,6 +120,7 @@ public:
 	void pickUpObj();
 	//放置物体
 	void layDownObj();
+
 };
 
 class RoleHitCallback :public PxUserControllerHitReport {
@@ -152,7 +157,7 @@ public:
 		}
 		else if (name == "Seesaw") {
 		}
-		if (name == "over") {
+		else if (name == "over") {
 			this->role->gameOver();
 		}
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
