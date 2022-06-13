@@ -36,7 +36,7 @@
 #include "../Render/Render.h"
 #include "../Render/Camera.h"
 #include "../Role/Role.h"
-#include <Render/Skybox.h>
+#include <Render/RenderBox.h>
 
 
 
@@ -51,7 +51,7 @@ extern void specialKeyPress(GLint key);
 extern void specialKeyRelease(GLint key);
 extern Role* role;
 extern void RayCastByRole();
-CSkyBox skyBox;
+RenderBox skyBox;
 namespace
 {
 	Snippets::Camera*	sCamera;
@@ -93,30 +93,29 @@ void mouseCallback(int button, int state, int x, int y)
 	mousePress(button, state, x, y);
 }
 
-	void idleCallback()
-	{
-		glutPostRedisplay();
-	}
+void idleCallback()
+{
+	glutPostRedisplay();
+}
 
-	void renderCallback()
-	{
-		stepPhysics(true);
+void renderCallback()
+{
+	stepPhysics(true);
 
-	
-		if (!sCamera->isFree()) {
-			PxVec3 position = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getFaceDir() * -50);
-			if (!sCamera->isMoving) {
-				sCamera->setEye(position);
-				role->changeCanMove(true);
-			}
-			else {
-				role->changeCanMove(false);
-			}
-			PxVec3 dir = role->getPosition() - position;
-			sCamera->targetDir = dir;
-			sCamera->updateDir(role->getPosition());
+	if (!sCamera->isFree()) {
+		PxVec3 position = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getFaceDir() * -50);
+		if (!sCamera->isMoving) {
+			sCamera->setEye(position);
+			role->changeCanMove(true);
 		}
-		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
+		else {
+			role->changeCanMove(false);
+		}
+		PxVec3 dir = role->getPosition() - position;
+		sCamera->targetDir = dir;
+		sCamera->updateDir(role->getPosition());
+	}
+	Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 
 	if (sCamera->isFree())
 	{
@@ -148,16 +147,16 @@ void mouseCallback(int button, int state, int x, int y)
 	/** 绘制天空 */
 	skyBox.CreateSkyBox(-2000, -200, -2000, 1.0, 0.5, 1.0);
 
-		Snippets::finishRender();
-	}
-
-	void exitCallback(void)
-	{
-		delete sCamera;
-		cleanupPhysics(true);
-	}
+	Snippets::finishRender();
 }
 
+void exitCallback(void)
+{
+	delete sCamera;
+	cleanupPhysics(true);
+}
+
+}
 
 void renderLoop()
 {
@@ -167,7 +166,7 @@ void renderLoop()
 	Snippets::setupDefaultRenderState();
 
 	/** 初始化天空 */
-	skyBox.Init();
+	skyBox.Init(true);
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -196,6 +195,8 @@ void renderLoop()
 	ImGui_ImplGLUT_Shutdown();
 	ImGui::DestroyContext();
 }
+
+
 #endif
 
 LRESULT CALLBACK HostWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)

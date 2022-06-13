@@ -5,6 +5,9 @@
 #include "../Block/Seesaw.h"
 #include<vector>
 #include<iostream>
+#include <glut.h>
+#include <Render/BMPLoader.h>
+#include <map>
 
 using namespace physx;
 
@@ -16,7 +19,17 @@ float maxJumpHeight = 3.0;
 float boxHeight = 0.4 * maxJumpHeight;
 
 
-PxRigidStatic* createStaticBox(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose) {
+//可选材质：["door"]\["wall"]\[]
+//extern std::map<string, CBMPLoader*> textureMap;
+//extern CBMPLoader* TextureLoader;
+
+
+
+//RenderBox renderbox;
+// type : 0:Ground
+//        1:Wall
+//        2:Door
+PxRigidStatic* createStaticBox(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose,int type) {
 	PxTransform local(v);
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(x, y, z), *gMaterial);
 	//碰撞检测的过滤组
@@ -24,11 +37,29 @@ PxRigidStatic* createStaticBox(const PxTransform& t, const PxVec3& v, PxReal x, 
 	shape->setLocalPose(pose);
 	PxRigidStatic* sceneBox = gPhysics->createRigidStatic(t.transform(local));
 	sceneBox->attachShape(*shape);
-	sceneBox->setName("block");
+	//sceneBox->setName("block");
+	switch (type)
+	{
+	case 0: {
+		sceneBox->setName("Ground");
+		cout << sceneBox->getName() << endl;
+		break;
+	}
+	case 1: {
+		sceneBox->setName("Wall");
+		break;
+	}
+	case 2: {
+		sceneBox->setName("Door");
+		break;
+	}
+	default:
+		sceneBox->setName("Ground");
+		break;
+	}
 	gScene->addActor(*sceneBox);
 	return sceneBox;
 }
-
 
 //创建道具类，区别只在Block(BlockType::prop)，试验用，可修改
 void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z) {
@@ -37,6 +68,7 @@ void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxRea
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(x, y, z), *gMaterial);
 	//碰撞检测的过滤组
 	shape->setQueryFilterData(collisionGroup);
+
 	//setupFiltering(shape, FilterGroup::ePIG, FilterGroup::eBIRD);
 	PxRigidStatic* sceneBox = gPhysics->createRigidStatic(t.transform(local));
 	Block* block = new Block("方块", sceneBox->getGlobalPose().p, x, y, z);
@@ -48,7 +80,7 @@ void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxRea
 }
 
 
-PxRigidDynamic* createDynamicBox(bool kinematic, const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose, const PxVec3& velocity = PxVec3(0)) {
+PxRigidDynamic* createDynamicBox(bool kinematic, const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose, int type,const PxVec3& velocity = PxVec3(0)) {
 	PxTransform local(v);
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(x, y, z), *gMaterial);
 	shape->setQueryFilterData(collisionGroup);
@@ -57,7 +89,24 @@ PxRigidDynamic* createDynamicBox(bool kinematic, const PxTransform& t, const PxV
 	sceneBox->attachShape(*shape);
 	sceneBox->setAngularDamping(10.0f);
 	sceneBox->setLinearVelocity(velocity);
-	sceneBox->setName("");
+	switch (type)
+	{
+	case 0: {
+		sceneBox->setName("Ground");
+		break;
+	}
+	case 1: {
+		sceneBox->setName("Wall");
+		break;
+	}
+	case 2: {
+		sceneBox->setName("Door");
+		break;
+	}
+	default:
+		sceneBox->setName("Ground");
+		break;
+	}
 	PxRigidBodyExt::updateMassAndInertia(*sceneBox, 1.0f);
 	if (kinematic) {
 		sceneBox->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
@@ -73,12 +122,14 @@ void createPlane(const PxVec3& point, const PxVec3& normal) {
 	PxPlaneEquationFromTransform()提供相反的转换。
 	PxPlaneGeometry没有attribute，因为形状的位置完全定义了平面的碰撞体积。
 	PxPlaneGeometry的shape只能为静态actor创建。*/
+
 	PxPlane p(point, normal);
 	PxShape* planeShape = gPhysics->createShape(PxPlaneGeometry(), *gMaterial);	
 	PxRigidStatic* plane = gPhysics->createRigidStatic(PxTransformFromPlaneEquation(p));
 	plane->attachShape(*planeShape);
-	plane->setName("over"); //over表示角色接触就死亡
+	plane->setName("Over"); //over表示角色接触就死亡
 	gScene->addActor(*plane);
+
 	
 }
 
@@ -87,11 +138,15 @@ void createPlane(const PxVec3& point, const PxVec3& normal) {
 * @brief 创建道路
 **/
 void createRoad(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose) {	
-	PxRigidStatic* roadActor = createStaticBox(t, v, x, y, z, pose);
+	PxRigidStatic* roadActor = createStaticBox(t, v, x, y, z, pose,0);
+	//std::cout << "v::" <<  v.x << " " << v.y << " " << v.z << endl;
 	PxVec3 position = roadActor->getGlobalPose().p;
 	Road* road = new Road("路面",position, x, y, z,roadActor);
 	roadActor->userData = road;
 	roadActor->setName("Ground");
+	/*std::cout << "posi::" <<  position.x << " " << position.y << " " << position.z << endl;
+	renderbox.CreateRenderBox(position.x, position.y, position.z, x, y, z);*/
+
 }
 
 float center_y(float y) {
@@ -103,16 +158,18 @@ float center_y(float y) {
 //轴心在中点
 PxRevoluteJoint* createFrontDoor(const PxTransform& t, PxVec3 v, float scale, PxTransform& pose,bool canOpen = true) {
 	PxTransform pos(t.transform(PxTransform(v)));//-17.8  -18.56 -18.561815
+
 	PxReal x = 10 * scale;
 	PxReal y = 5 * scale;
 	PxReal z = 1 * scale;
 	//实际-5  旋转角度小：-17.8  -18.56 -18.561815
-	PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(6.5 * scale, -18.56 * scale, 0),x,y,z, pose);
+	PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(6.5 * scale, -18.56 * scale, 0),x,y,z, pose,2);
 	Door* door = new Door("正门",actor0->getGlobalPose().p,x,y,z,actor0, canOpen);
 	actor0->setName("Door");
 	actor0->userData = door;
-	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(0, 0, 0), 6 * scale, 10 * scale, 1 * scale, pose);
-	createStaticBox(pos, PxVec3(23 * scale, 0, 0), 6 * scale, 10 * scale, 1 * scale, pose);
+
+	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(0, 0, 0), 6 * scale, 10 * scale, 1 * scale, pose,1);
+	createStaticBox(pos, PxVec3(23 * scale, 0, 0), 6 * scale, 10 * scale, 1 * scale, pose,1);
 	PxTransform localFrame0(PxVec3(0, 5 * scale, 0));
 	PxTransform localFrame1(PxVec3(6.5 * scale,0, 0));
 	PxRevoluteJoint* revolute = PxRevoluteJointCreate(*gPhysics, actor0, localFrame0, actor1, localFrame1);
@@ -126,6 +183,8 @@ PxRevoluteJoint* createFrontDoor(const PxTransform& t, PxVec3 v, float scale, Px
 	}
 	revolute->setRevoluteJointFlag(PxRevoluteJointFlag::eLIMIT_ENABLED, true);
 	revolute->setLocalPose(PxJointActorIndex::Enum::eACTOR1, PxTransform(PxVec3(6.5 * scale, 0, 0), PxQuat(PxHalfPi, PxVec3(0, 0, 1))));
+
+
 	return revolute;
 }
 
@@ -136,12 +195,13 @@ PxRevoluteJoint* createSideDoor(const PxTransform& t, PxVec3 v, float scale, PxT
 	PxReal x = 10 * scale;
 	PxReal y = 1 * scale;
 	PxReal z = 5 * scale;
-	PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(0, 0, 11.5 * scale), x, y, z, pose);
+	PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(0, 0, 11.5 * scale), x, y, z, pose,2);
 	Door* door = new Door("侧门", actor0->getGlobalPose().p, x, y, z, actor0,canOpen);
 	actor0->setName("Door");
 	actor0->userData = door;
-	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(0, 0, 0), 1 * scale, 10 * scale, 6 * scale, pose);
-	createStaticBox(pos, PxVec3(0, 0, 23 * scale), 1 * scale, 10 * scale, 6 * scale, pose);
+
+	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(0, 0, 0), 1 * scale, 10 * scale, 6 * scale, pose,1);
+	createStaticBox(pos, PxVec3(0, 0, 23 * scale), 1 * scale, 10 * scale, 6 * scale, pose,1);
 	PxTransform localFrame0(PxVec3(0, 0, -5 * scale));
 	PxTransform localFrame1(PxVec3(0,0, 6.5 * scale));
 	PxRevoluteJoint* revolute = PxRevoluteJointCreate(*gPhysics, actor0, localFrame0, actor1, localFrame1);
@@ -159,6 +219,8 @@ PxRevoluteJoint* createSideDoor(const PxTransform& t, PxVec3 v, float scale, PxT
 	}
 	revolute->setRevoluteJointFlag(PxRevoluteJointFlag::eLIMIT_ENABLED, true);
 	revolute->setLocalPose(PxJointActorIndex::Enum::eACTOR1, PxTransform(PxVec3(0, 0, 6.5 * scale), PxQuat(PxHalfPi, PxVec3(0, 0, 1))));
+
+
 	return revolute;
 }
 
@@ -166,12 +228,12 @@ PxRevoluteJoint* createSideDoor(const PxTransform& t, PxVec3 v, float scale, PxT
 //跷板 PxVec3 v的第二个参数应该为 底下所有盒子的高+ y
 PxRevoluteJoint* createSeesaw(const PxTransform& t,PxVec3 v,float x, float y, float z, PxTransform& pose) {
 	PxTransform pos(t.transform(PxTransform(v)));
-	PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(0, 0, 0), x, y, z, pose);	
+	PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(0, 0, 0), x, y, z, pose,2);	
 	Seesaw* seesaw = new Seesaw("翘板",actor0->getGlobalPose().p,x,y,z,actor0);
 	actor0->setName("Seesaw");
 	actor0->userData = seesaw;
-	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(-(x+y+0.5), 0, 0), y, y, y, pose);
-	createStaticBox(pos, PxVec3(x+y+0.5, 0, 0), y, y, y, pose);
+	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(-(x+y+0.5), 0, 0), y, y, y, pose,1);
+	createStaticBox(pos, PxVec3(x+y+0.5, 0, 0), y, y, y, pose,1);
 	PxTransform localFrame0(PxVec3(0, 0, 0));
 	PxTransform localFrame1(PxVec3(x+y+0.5, 0, 0));
 	PxRevoluteJoint* revolute = PxRevoluteJointCreate(*gPhysics, actor0, localFrame0, actor1, localFrame1);
@@ -214,6 +276,9 @@ void createGameScene(const PxTransform& t) {
 	PxTransform pose1(PxQuat(-PxHalfPi/3, PxVec3(1, 0, 0)));
 	//跷板 PxVec3 v的第二个参数应该为 底下所有盒子的高+ 最好大于z的数
 	createSeesaw(t, PxVec3(-30, 15 + 2 * boxHeight, -10), 5, 1, 15, pose1);
+
+	//选择门的材质ID
+	
 	createFrontDoor(t, PxVec3(-20, 8.5 + 2 * boxHeight, 10), 0.8, defaultPose, true);
 	createSideDoor(t, PxVec3(-20 + 30 * 0.8, 8.5 + 2 * boxHeight, 10 + 7 * 0.8), 0.8, defaultPose, false);
 	createFrontDoor(t, PxVec3(-20, 8.5 + 2 * boxHeight, 10+37*0.8), 0.8, defaultPose, false);

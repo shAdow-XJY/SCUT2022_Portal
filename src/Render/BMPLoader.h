@@ -13,7 +13,8 @@ public:
     CBMPLoader();
     ~CBMPLoader();
 
-    bool LoadBitmap(char* filename); /**< 装载一个bmp文件 */
+    bool LoadBitmap(const char* filename); /**< 装载一个bmp文件 */
+    unsigned int generateID(const char* file);
     void FreeImage();                /**< 释放图像数据 */
 
     unsigned int ID;                 /**< 生成纹理的ID号 */

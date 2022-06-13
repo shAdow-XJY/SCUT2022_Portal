@@ -30,6 +30,10 @@
 #include "Render.h"
 #include<time.h>
 #include <iostream>
+#include "BMPLoader.h"
+#include <string>
+#include <map>
+using namespace std;
 using namespace physx;
 
 static float gCylinderData[]={
@@ -63,14 +67,95 @@ extern int mouseX;
 extern int mouseY;
 extern int textX, textY;
 
-void renderGeometry(const PxGeometryHolder& h)
+
+extern std::map<string, unsigned int> textureMap;
+CBMPLoader* TextureLoader;
+unsigned int textureID;
+
+static void drawBox(GLfloat x, GLfloat y, GLfloat z)
+{
+	static GLfloat n[6][3] =
+	{
+	  {-1.0, 0.0, 0.0},
+	  {0.0, 1.0, 0.0},
+	  {1.0, 0.0, 0.0},
+	  {0.0, -1.0, 0.0},
+	  {0.0, 0.0, 1.0},
+	  {0.0, 0.0, -1.0}
+	};
+	static GLint faces[6][4] =
+	{
+	  {0, 1, 2, 3},
+	  {3, 2, 6, 7},
+	  {7, 6, 5, 4},
+	  {4, 5, 1, 0},
+	  {5, 6, 2, 1},
+	  {7, 4, 0, 3}
+	};
+	GLfloat v[8][3];
+	GLint i;
+
+	v[0][0] = v[1][0] = v[2][0] = v[3][0] = -x / 2;
+	v[4][0] = v[5][0] = v[6][0] = v[7][0] = x / 2;
+	v[0][1] = v[1][1] = v[4][1] = v[5][1] = -y / 2;
+	v[2][1] = v[3][1] = v[6][1] = v[7][1] = y / 2;
+	v[0][2] = v[3][2] = v[4][2] = v[7][2] = -z / 2;
+	v[1][2] = v[2][2] = v[5][2] = v[6][2] = z / 2;
+	/** 启用纹理 */
+	glEnable(GL_TEXTURE_2D);
+
+
+	for (i = 5; i >= 0; i--) {
+		/** 开始绘制 */
+		glPushMatrix();
+		//glTranslatef(-x, -y, -z);
+		glColor4f(1, 1, 1, 1);
+
+		/** 绘制背面 */
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		//std::cout << TextureLoader->ID << std::endl;
+		glBegin(GL_QUADS);
+		glNormal3fv(&n[i][0]);
+		/** 指定纹理坐标和顶点坐标 */
+		glTexCoord2f(1.0f, 0.0f); glVertex3fv(&v[faces[i][0]][0]);
+		glTexCoord2f(1.0f, 1.0f); glVertex3fv(&v[faces[i][1]][0]);
+		glTexCoord2f(0.0f, 1.0f); glVertex3fv(&v[faces[i][2]][0]);
+		glTexCoord2f(0.0f, 0.0f); glVertex3fv(&v[faces[i][3]][0]);
+		
+		
+		glEnd();
+	}
+	glPopMatrix();                 /** 绘制结束 */
+	glFlush();
+}
+
+
+void renderGeometry(const PxGeometryHolder& h, int type)
 {
 	switch(h.getType())
 	{
 	case PxGeometryType::eBOX:			
 		{
-			glScalef(h.box().halfExtents.x, h.box().halfExtents.y, h.box().halfExtents.z);
-			glutSolidCube(2.0);
+		switch (type)
+		{
+		case 0: {
+			textureID = textureMap["road"];
+			break;
+		}
+		case 1: {
+			textureID = textureMap["wall"];
+			break;
+		}
+		case 2: {
+			textureID = textureMap["door"];
+			break;
+		}
+		default:{
+			textureID = textureMap["road"];
+			break;
+		}
+		}
+			drawBox(h.box().halfExtents.x*2, h.box().halfExtents.y*2, h.box().halfExtents.z*2);
 		}
 		break;
 	case PxGeometryType::eSPHERE:		
@@ -296,6 +381,7 @@ void setupDefaultRenderState()
 	glEnable(GL_LIGHT0);
 	/** 启用纹理 */
 	glEnable(GL_TEXTURE_2D);
+	
 }
 
 void renderImGui() {
@@ -379,6 +465,12 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 		{
 			const PxMat44 shapePose(PxShapeExt::getGlobalPose(*shapes[j], *actors[i]));
 			PxGeometryHolder h = shapes[j]->getGeometry();
+			//shapes[j]->getGeometry().box();
+			/*std::cout << "shapes[j]->getActor()->getGlobalPose();" << std::endl;
+			std::cout << shapes[j]->getActor()->getGlobalPose().p.x << std::endl;
+			std::cout << shapes[j]->getActor()->getGlobalPose().p.y << std::endl;
+			std::cout << shapes[j]->getActor()->getGlobalPose().p.z << std::endl;*/
+			//shapePose.getPosition();
 
 			if (shapes[j]->getFlags() & PxShapeFlag::eTRIGGER_SHAPE)
 				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -394,8 +486,42 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 			else {
 				glColor4f(color.x, color.y, color.z, 1.0f);
 			}
-			renderGeometry(h);
+			//shapes[j]->getGeometry().heightField();
+			/*std::cout << "shapes[j]->getGeometry().heightField()" << shapes[j]->getGeometry().heightField().columnScale << " "
+				<< shapes[j]->getGeometry().heightField().heightScale << " "
+				<< shapes[j]->getGeometry().heightField().rowScale << std::endl;*/
+			//shape = (RenderClass*)shapes[j]->userData.name;
+			
+			int type = 0;
+			
+			try {
+				if (actors[i]->getName()) {
+					string str = actors[i]->getName();
+					cout << str << endl;
+					if (str._Equal("Over"))
+					{
+						type = 0;
+					}
+					else if (str._Equal("Ground"))
+					{
+						type = 0;
+					}
+					else if (str._Equal("Wall"))
+					{
+						type = 2;
+					}
+					else if (str._Equal("Door"))
+					{
+						type = 3;
+					}
+				}
+			}
+			catch (char* str) {
+				std::cout << str << std::endl;
+			}
 
+			renderGeometry(h, type);
+			
 			glPopMatrix();
 
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -409,7 +535,7 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 				glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
 				glDisable(GL_LIGHTING);
 				glColor4f(0.1f, 0.2f, 0.3f, 1.0f);
-				renderGeometry(h);
+				//renderGeometry(h, shapes[j]->getLocalPose());
 				glEnable(GL_LIGHTING);
 				glPopMatrix();
 			}	

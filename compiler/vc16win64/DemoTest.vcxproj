@@ -36,7 +36,7 @@
     <ClCompile Include="..\..\src\Render\BMPLoader.cpp" />
     <ClCompile Include="..\..\src\Render\Camera.cpp" />
     <ClCompile Include="..\..\src\Render\Render.cpp" />
-    <ClCompile Include="..\..\src\Render\Skybox.cpp" />
+    <ClCompile Include="..\..\src\Render\RenderBox.cpp" />
     <ClCompile Include="..\..\src\Render\Vector.cpp" />
     <ClCompile Include="..\..\src\Role\Role.cpp" />
     <ClCompile Include="..\..\src\Scene\gameScene.cpp" />
@@ -59,7 +59,7 @@
     <ClInclude Include="..\..\src\Render\BMPLoader.h" />
     <ClInclude Include="..\..\src\Render\Camera.h" />
     <ClInclude Include="..\..\src\Render\Render.h" />
-    <ClInclude Include="..\..\src\Render\Skybox.h" />
+    <ClInclude Include="..\..\src\Render\RenderBox.h" />
     <ClInclude Include="..\..\src\Render\Vector.h" />
     <ClInclude Include="..\..\src\Role\Role.h" />
   </ItemGroup>
