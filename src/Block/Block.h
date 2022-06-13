@@ -1,3 +1,4 @@
+#pragma once
 #include <ctype.h>
 #include <string>
 #include "PxPhysicsAPI.h"
@@ -14,35 +15,72 @@ extern float boxHeight;
 enum BlockType
 {
 	error = -1,
-	ground = 1,
-	prop = 2
+	block = 0, //普通方块
+	road = 1, //道路
+	prop = 2,
+	door = 3, //门
+	seesaw =4
 };
 
 
 //方块基类，后续可拓展实现
 class Block {
-private:
-	PxReal halfExtent = 0;
-	//高度层数
-	PxReal height = 2 * boxHeight;
-	PxVec3 position = PxVec3(0, 0, 0);
+protected:
+	PxVec3 position;
+	PxReal halfX = 0;
+	PxReal halfY = 0;
+	PxReal halfZ = 0;
 	BlockType type = BlockType::error;
 	string name = "";
 public:
-
 	Block() {};
-	Block(PxReal halfExtent, string name, BlockType type = BlockType::ground) :halfExtent(halfExtent), name(name), type(type) {};
+	Block(string name, PxVec3 position, PxReal halfX, PxReal halfY, PxReal halfZ, BlockType type = BlockType::block)
+	:name(name),position(position), halfX(halfX), halfY(halfY), halfZ(halfZ), type(type) {}
 
-	PxReal getHalfExtent();
-	PxReal getHeight();
-	PxVec3 getPosition();
-	BlockType getBlockType();
-	string getName();
 
-	void setHalfExtent(PxReal);
-	void setHeight(PxReal);
-	void setPosition(PxVec3);
-	void setBlockType(BlockType);
-	void setName(string);
+	PxVec3 getPosition() {
+		return this->position;
+	}
 
+	PxReal getHalfX(){
+		return this->halfX;
+	}
+	PxReal getHalfY() {
+		return this->halfY;
+	}
+	PxReal getHalfZ() {
+		return this->halfZ;
+	}
+
+	BlockType getType() {
+		return this->type;
+	}
+
+	string getName() {
+		return this->name;
+	}
+
+	void setPosition(PxVec3 position) {
+		this->position = position;
+	}
+
+	void setHalfX(PxReal halfX) {
+		this->halfX = halfX;
+	}
+
+	void setHalfY(PxReal halfY) {
+		this->halfY = halfY;
+	}
+
+	void setHalfZ(PxReal halfZ) {
+		this->halfZ = halfZ;
+	}
+
+	void setType(BlockType type) {
+		this->type = type;
+	}
+
+	void setName(string name) {
+		this->name = name;
+	}
 };

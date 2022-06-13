@@ -10,7 +10,7 @@ Role::Role() {
 	desc.radius = roleRadius;
 	desc.height = roleHeight;
 	desc.material = gMaterial;
-	//desc.climbingMode = PxCapsuleClimbingMode::eCONSTRAINED;
+	desc.climbingMode = PxCapsuleClimbingMode::eLAST;
 	desc.stepOffset = 0.0f;
 	desc.contactOffset = 0.001;
 	desc.upDirection = PxVec3(0.0, 1.0, 0.0);
@@ -51,7 +51,7 @@ bool Role::attachModel(const char* path) {
 * @brief 获取角色是否自动移动
 **/
 bool Role::getMovingStatus() {
-	return this->isMoving;
+	return this->isAutoMoving;
 }
 
 /**
@@ -60,11 +60,11 @@ bool Role::getMovingStatus() {
 * @param y 鼠标屏幕坐标y
 **/
 void Role::roleMoveByMouse(int x, int y) {
-	if (this->isMoving || this->isJump || this->isFall || !this->isAlive) return;
+	if (this->isAutoMoving || this->isJump || this->isFall || !this->isAlive) return;
 	PxVec3 nowPosition = ScenetoWorld(x, y);
 	this->lastPostion = PxVec3(this->nowPostion.x,this->nowPostion.y,this->nowPostion.z);
 	this->nowPostion = nowPosition;
-	this->isMoving = true;
+	this->isAutoMoving = true;
 }
 
 /**
@@ -72,27 +72,27 @@ void Role::roleMoveByMouse(int x, int y) {
 * @param position 三维空间坐标
 **/
 void Role::roleMoveByMouse(PxVec3 position) {
-	if (this->isMoving || this->isJump || this->isFall || !this->isAlive || !this->canMove) return;
+	if (this->isAutoMoving || this->isJump || this->isFall || !this->isAlive || !this->canMove) return;
 	this->lastPostion = PxVec3(this->nowPostion.x, this->nowPostion.y, this->nowPostion.z);
 	this->nowPostion = position;
-	this->isMoving = true;
+	this->isAutoMoving = true;
 }
 
 /**
 * @brief 角色自动移动
 **/
 void Role::move() {
-	if(!this->isMoving || !this->isAlive || !this->canMove) return;
+	if(!this->isAutoMoving || !this->isAlive || !this->canMove) return;
 	PxExtendedVec3 position = this->roleController->getFootPosition();
 	float offsetX = this->nowPostion.x - position.x;
 	float offsetZ = this->nowPostion.z - position.z;
 	if (abs(offsetX) <= 0.01f && abs(offsetZ) <= 0.01f) {
 		this->roleController->setFootPosition(PxExtendedVec3(this->nowPostion.x, this->nowPostion.y, this->nowPostion.z));
-		this->isMoving = false;
+		this->isAutoMoving = false;
 		return;
 	}
 
-	this->isMoving = true;
+	this->isAutoMoving = true;
 	float speed = 0.05f;
 	if (abs(offsetX) > 0.05f) {
 		speed = offsetX > 0 ? speed : -speed;
@@ -109,7 +109,7 @@ void Role::move() {
 	}
 	else
 	{
-		this->isMoving = false;
+		this->isAutoMoving = false;
 		this->roleController->setFootPosition(PxExtendedVec3(this->nowPostion.x, this->nowPostion.y, this->nowPostion.z));
 	}
 }
@@ -118,7 +118,7 @@ void Role::move() {
 * @brief 角色停止自动移动
 **/
 void Role::stopMoving() {
-	this->isMoving = false;
+	this->isAutoMoving = false;
 	this->nowPostion = PxVec3(this->roleController->getFootPosition().x, this->roleController->getFootPosition().y, this->roleController->getFootPosition().z);
 }
 
@@ -137,8 +137,8 @@ void Role::move(GLint key,bool status,bool free) {
 		this->setSpeed(PxVec3(0, 0, 0));
 		return;
 	}
-	this->isMoving = false;
-	//按下
+	this->isAutoMoving = false; //停止自动移动
+	//移动按键按下
 	if (status) {
 		PxVec3 dir;
 		if (!free) dir = this->faceDir; //非自由镜头以人物朝向为前进方向
@@ -198,7 +198,7 @@ void Role::move(GLint key,bool status,bool free) {
 		std::cout << speed.x << " " << speed.y << ' ' << speed.z << ' ' << std::endl;
 		this->updatePosition();
 	}
-	//弹起
+	//移动按键弹起
 	else
 	{
 		if (!this->isJump && !this->isFall) {
@@ -206,11 +206,12 @@ void Role::move(GLint key,bool status,bool free) {
 			if (!free) {
 				this->dir = this->faceDir;//抬起的时候才更新角色朝向，确保持续移动
 			}
-			this->speed = PxVec3(0, 0, 0);
+			this->speed = PxVec3(0, 0, 0); //重置速度
 
 		}
 		else
 		{
+			//空中存在移动惯性
 			this->speed = this->speed * 0.5f;
 		}
 	}
@@ -259,7 +260,7 @@ void Role::tryJump(bool release) {
 	if (!this->isAlive) return;
 	if (!isJump && !isFall) {
 		if (!release) {
-			std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
+			//std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
 			wantJumpHeight = wantJumpHeight <= maxJumpHeight ? (wantJumpHeight + bigJumpSpeed*5) : maxJumpHeight;
 		}
 		else
@@ -282,15 +283,19 @@ void Role::roleJump() {
 		{
 			speed = littleJumpSpeed;
 		}
-		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, speed, 0.0) + this->speed * 0.3, PxF32(0.001), 1.0f / 60.0f, NULL);
+		PxVec3 jumpSpeed = PxVec3(0.0, speed, 0.0);
+		if (canForward && canMove) {
+			jumpSpeed += this->speed * 0.3;
+		}
+		PxControllerCollisionFlags flag = roleController->move(jumpSpeed, PxF32(0.001), 1.0f / 60.0f, NULL);
 		nowJumpHeight += speed;
-		std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
-		std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;
+		//std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
+		//std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;
 		if (nowJumpHeight >= wantJumpHeight)
 		{
-			std::cout << "max height" << std::endl;
+			/*std::cout << "max height" << std::endl;
 			std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
-			std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;
+			std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;*/
 
 			nowJumpHeight = 0.0;
 			wantJumpHeight = primaryJumpHeight;
@@ -306,10 +311,18 @@ void Role::roleJump() {
 **/
 void Role::roleFall() {
 	if (isFall) {
-		PxControllerCollisionFlags flag = roleController->move(PxVec3(0.0, -midFallSpeed, 0.0) + this->speed * 0.3, PxF32(0.00001), 1.0f / 60.0f, NULL);		
-		if (flag == PxControllerCollisionFlag::eCOLLISION_DOWN) {
+		PxVec3 fallSpeed = PxVec3(0.0, -midFallSpeed, 0.0);
+		if (canForward && canMove) {
+			fallSpeed += this->speed * 0.3;
+		}
+		PxControllerCollisionFlags flag = roleController->move(fallSpeed, PxF32(0.00001), 1.0f / 60.0f, NULL);
+		if (flag == PxControllerCollisionFlag::eCOLLISION_SIDES) {
+			this->setSpeed(PxVec3(0, 0, 0));
+		}
+		else if (flag == PxControllerCollisionFlag::eCOLLISION_DOWN) {
+			this->setSpeed(PxVec3(0, 0, 0));
 			isFall = false;
-			if (!this->isMoving) {
+			if (!this->isAutoMoving) {
 				this->updatePosition();
 			};
 		}
@@ -342,6 +355,20 @@ void Role::fall() {
 **/
 void Role::roleNoCrouch() {
 	this->roleController->resize(roleHeight+roleRadius);
+}
+
+/**
+* @brief 角色获得道具
+**/
+void Role::setEquiped(bool equip) {
+	this->equiped = equip;
+}
+
+/**
+* @brief 获得角色道具状态
+**/
+bool Role::getEquiped() {
+	return this->equiped;
 }
 
 /**
@@ -378,7 +405,7 @@ void Role::setSpeed(PxVec3 speed) {
 /**
 * @brief 角色是否存活
 **/
-bool Role::getRoleStatus() {
+bool Role::getAliveStatus() {
 	return this->isAlive;
 }
 /**
@@ -389,8 +416,113 @@ void Role::gameOver() {
 }
 
 /**
-* @brief 角色是否存活
+* @brief 角色是否可以移动
 **/
 void Role::changeCanMove(bool flag) {
 	this->canMove = flag;
+}
+
+void Role::changeForward(bool flag) {
+	this->canForward = flag;
+}
+
+
+/**
+* @brief 角色底部发送射线
+* @desc  用于角色模拟重力和给物体施加重力
+**/
+void Role::simulationGravity() {
+	PxVec3 origin = this->getFootPosition();
+	PxVec3 unitDir = PxVec3(0, -1.0f, 0);
+	PxRigidActor* actor = NULL;
+	if (actor = RayCast(origin, unitDir)) {
+		//碰撞到物体
+		//std::cout << "碰到地面" << std::endl;
+		//cout << role->standingBlock.getName() << endl;
+		this->standingOnBlock = true;
+		Block* block = (Block*)actor->userData;
+		if (block != NULL) {
+			//cout << block->getType() << endl;
+			if (block->getType() == BlockType::road) {
+				//std::cout << role->standingBlock.getName()<<std::endl;
+
+			}
+			else if (block->getType() == BlockType::seesaw) {
+				cout << "施加重力" << endl;
+				Seesaw* seesaw = (Seesaw*)block;
+				PxRigidBody* seesawBody = seesaw->getSeesawActor();
+				PxVec3 force = PxVec3(0, -1, 0) * this->mass;
+				PxRigidBodyExt::addForceAtPos(*seesawBody, force, this->getFootPosition());
+				//seesawBody->addForce()
+			}
+			this->standingBlock = *block;
+		}
+	}
+	else {
+		if (this->standingBlock.getType() != BlockType::error) {
+			this->setFootPosition(this->getFootPosition() + this->getSpeed() * 5.0f); //边缘滑动
+		}
+		this->standingBlock = Block();
+		this->standingOnBlock = false;
+		//std::cout << "未碰到地面" << std::endl;	
+		//role->gameOver();
+		this->fall();
+	}
+}
+
+
+/**
+* @brief 角色道具拾取
+**/
+void Role::pickUpObj() {
+	//cout << this->faceDir.x<<" " << this->faceDir.y <<" "<< this->faceDir.z<<" " << endl;
+	PxVec3 origin = this->getPosition() - PxVec3(0,0.2f,0);
+	//确定role的前方方向
+	PxVec3 forwardDir = this->getFaceDir() * 2;
+	PxRigidActor* actor = NULL;
+	if (actor = RayCast(origin, forwardDir)) {
+		Block* block = (Block*)actor->userData;
+		if (block->getType() == BlockType::prop) {
+			actor->release();
+			this->equiped = true;
+			std::cout << "拾取道具成功" << std::endl;
+		}
+		else
+		{
+			std::cout << "不是道具" << std::endl;
+		}
+	}
+	else
+	{
+		std::cout << "射线没有找到目标" << std::endl;
+	}
+}
+
+/**
+* @brief 角色道具放置
+**/
+void Role::layDownObj() {
+	PxVec3 origin = this->getPosition();
+	//确定role的前方方向
+	PxVec3 forwardDir = PxVec3(this->getFaceDir().x * 1.5f, -3, this->getFaceDir().z * 1.5f);
+	PxRigidActor* actor = NULL;
+	if (actor = RayCast(origin, forwardDir)) {
+		Block* block = (Block*)actor->userData;
+		if (block->getType() == BlockType::road) {
+			this->equiped = false;
+			extern void createPorp(const PxTransform & t, const PxVec3 & v, PxReal x, PxReal y, PxReal z);
+			//cout << role->getPosition().x << " " << role->getPosition().y << " " << role->getPosition().z << endl;
+			//cout << role->getFaceDir().x << " " << role->getFaceDir().y << " " << role->getFaceDir().z << endl;
+			createPorp(PxTransform(PxVec3(0, 0, 0)), this->getPosition() + this->getFaceDir() * 2.5, boxHeight, boxHeight, boxHeight);
+			std::cout << "放置道具成功" << std::endl;
+		}
+		else
+		{
+			std::cout << "不是可放置道具的地方" << std::endl;
+		}
+	}
+	else
+	{
+		std::cout << "射线没有找到目标" << std::endl;
+	}
 }

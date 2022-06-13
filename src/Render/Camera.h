@@ -23,12 +23,12 @@ namespace Snippets
 		physx::PxVec3		getDir()	const;
 		physx::PxTransform	getTransform() const;
 		bool				isFree();
-		physx::PxVec3		targetDir;
-		int					isMoving = 0;
+		physx::PxVec3		targetDir; //旋转目标
+		int					isMoving = 0; //旋转方向 1逆时针 -1顺时针 0不旋转
 		void				updateDir(physx::PxVec3);
 		void				calDirMoving(GLint);
-		float				rotateSpeed = 150.0f;
-		bool				isChangeImmediate = false;
+		float				rotateSpeed = 100.0f; //旋转速度
+		bool				isChangeImmediate = false; //是否立即改变视角
 	private:
 		physx::PxVec3	mEye;	
 		physx::PxVec3	mDir;

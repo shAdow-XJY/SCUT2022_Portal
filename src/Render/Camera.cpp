@@ -50,6 +50,7 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 	case 'T': {
 		this->free = !this->free; ;
 		this->isChangeImmediate = true;
+		this->mDir = this->mDir.getNormalized();
 		//if (!this->free) this->mDir = dir.getNormalized(); //朝物体下方看
 		break;
 	}
@@ -156,18 +157,15 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 			}
 			case GLUT_KEY_DOWN: {
 				this->isMoving = 1;
-				//this->rotateSpeed = 400.0f;
 				//this->isChangeImmediate = true;
 				break;
 
 			}case GLUT_KEY_LEFT: {
 				this->isMoving = 1;
-				//this->rotateSpeed = 400.0f;
 				break;
 
 			}case GLUT_KEY_RIGHT: {
 				this->isMoving = -1;
-				//this->rotateSpeed = 400.0f;
 				break;
 
 			}
