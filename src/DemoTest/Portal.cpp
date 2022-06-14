@@ -209,22 +209,23 @@ void initPhysics(bool interactive)
 	//testModel.attachMeshes((PxTransform(PxVec3(20, 30, 30))).transform(PxTransform(PxQuat(-PxHalfPi,PxVec3(1.0f,0.0f,0.0f)))));
 	//testModel.createMeshActor(PxTransform(20, 30, 30));
 	// end
-	std::string textture[] = { "door","wall","road" };
-	for (auto name : textture) {
+	std::string texture[] = { "Door","Wall","Road","SeesawBox","Seesaw"};
+	for (auto name : texture) {
+		string baseUrl = "../../texture/";
 		CBMPLoader* BMPLoader = new CBMPLoader();
-		unsigned int id = BMPLoader->generateID((name + ".bmp").c_str());
+		unsigned int id = BMPLoader->generateID((baseUrl + name + ".bmp").c_str());
 		textureMap.insert(std::pair<string, unsigned int>(name, id));
 		std::cout << id << std::endl;
 	}
-
+	textureMap.insert(std::pair<string, unsigned int>("Block", 0));
 	extern void createGameScene(const PxTransform & t);
 	createGameScene(t);
 
 	role = new Role();
 	//初始位置
-	role->setFootPosition(PxVec3(-100, 20, -210));
+	//role->setFootPosition(PxVec3(-100, 20, -210));
 	//迷宫前位置
-	//role->setFootPosition(PxVec3(83, 20, -136));
+	role->setFootPosition(PxVec3(83, 20, -136));
 
 	//role->attachModel("../../models/paimon/paimon.obj");
 	role->attachModel("../../models/human.obj");

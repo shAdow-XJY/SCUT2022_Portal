@@ -40,8 +40,8 @@ public:
 private:
 
     CBMPLoader  m_texture[6];   /**< 天空盒/渲染盒 纹理 */
-    const char* skyBmpName[6] = { "back","front","bottom","top","left","right" };
-    const char* boxBmpName[6] = { "back","front","bottom","top","left","right" };
+    const char* skyBmpName[6] = { "../../texture/back","../../texture/front","../../texture/bottom","../../texture/top","../../texture/left","../../texture/right" };
+    const char* boxBmpName[6] = { "../../texture/back","../../texture/front","../../texture/bottom","../../texture/top","../../texture/left","../../texture/right" };
 };
 
 

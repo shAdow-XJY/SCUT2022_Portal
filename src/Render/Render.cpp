@@ -137,32 +137,14 @@ static void drawBox(GLfloat x, GLfloat y, GLfloat z,bool shadow)
 }
 
 
-void renderGeometry(const PxGeometryHolder& h, BlockType TextureType,bool shadow)
+void renderGeometry(const PxGeometryHolder& h, string name,bool shadow)
 {
 	switch(h.getType())
 	{
 	case PxGeometryType::eBOX:			
 		{
-		
-		switch (TextureType)
-		{
-		case BlockType::road: {
-			textureID = textureMap["road"];
-			break;
-		}
-		case BlockType::wall: {
-			textureID = textureMap["wall"];
-			break;
-		}
-		case BlockType::door: {
-			textureID = textureMap["door"];
-			break;
-		}
-		default:{
-			textureID = textureMap["road"];
-			break;
-		}
-		}
+	
+			textureID = textureMap[name];
 			drawBox(h.box().halfExtents.x*2, h.box().halfExtents.y*2, h.box().halfExtents.z*2,shadow);
 		}
 		break;
@@ -488,34 +470,14 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 				else {
 					glColor4f(color.x, color.y, color.z, 1.0f);
 				}
-				BlockType TextureType = BlockType::block;
-				int type = 0;
-				try {
-					if (actors[i]->getName()) {
-						string str = actors[i]->getName();
-						cout << str << endl;
-						if (str._Equal("Ground"))
-						{
-							TextureType = BlockType::road;
-							type = 0;
-						}
-						else if (str._Equal("Wall"))
-						{
-							TextureType = BlockType::wall;
-							type = 2;
-						}
-						else if (str._Equal("Door"))
-						{
-							TextureType = BlockType::door;
-							type = 3;
-						}
-					}
+				if (actors[i]->getName()) {
+					string name = string(actors[i]->getName());
+					renderGeometry(h, name, false);
 				}
-				catch (char* str) {
-					std::cout << str << std::endl;
-				}
-
-				renderGeometry(h, TextureType, false);
+				else
+				{
+					renderGeometry(h, "Block", false);
+				}			
 
 				glPopMatrix();
 			}
@@ -530,7 +492,7 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 				glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
 				glDisable(GL_LIGHTING);
 				glColor4f(0.1f, 0.2f, 0.3f, 1.0f);
-				renderGeometry(h, BlockType::error,true);
+				renderGeometry(h, "Block",true);
 				glEnable(GL_LIGHTING);
 				glPopMatrix();
 			}	
