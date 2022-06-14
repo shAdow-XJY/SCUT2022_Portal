@@ -126,26 +126,40 @@ void createSeesaw(const PxTransform& t,PxVec3 v,float x, float y, float z, PxTra
 }
 
 
+
+
 //Create fluid
-void CreateFluid(const PxTransform& t, PxVec3 v,PxVec3 s)
+void CreateFluid(const PxTransform& t,PxVec3 v,PxVec3 s, PxReal restitution, PxReal viscosity,PxReal stiffness, PxReal dynamicFriction, PxReal particleDistance)
 {
 	PxTransform pos(t.transform(PxTransform(v)));
-	PxVec3 w(20,20,100);
+	PxVec3 ps = pos.p;
 	// set immutable properties.
 	PxU32 maxParticles = 2048;
 	bool perParticleRestOffset = false;
 	// create particle system in PhysX SDK
-	PxParticleSystem* ps = gPhysics->createParticleSystem(maxParticles, perParticleRestOffset);
+	PxParticleFluid* fluid = gPhysics->createParticleFluid(maxParticles, perParticleRestOffset);
+
 	PxParticleCreationData particleCreationData;
 	particleCreationData.numParticles = 1024;
 	particleCreationData.indexBuffer = PxStrideIterator<const PxU32>();
-	particleCreationData.positionBuffer = PxStrideIterator<const PxVec3>();
+	particleCreationData.positionBuffer = PxStrideIterator<const PxVec3>(&ps);
 	particleCreationData.velocityBuffer = PxStrideIterator<const PxVec3>(&s, 0);
+	fluid->setGridSize(5.0f);
+	fluid->setMaxMotionDistance(0.3f);
+	fluid->setRestOffset(particleDistance * 0.3f);
+	fluid->setContactOffset(particleDistance * 0.3f * 2);
+	fluid->setDamping(0.0f);
+	fluid->setRestitution(restitution);
+	fluid->setDynamicFriction(dynamicFriction);
+	fluid->setRestParticleDistance(particleDistance);
+	fluid->setViscosity(viscosity);
+	fluid->setStiffness(stiffness);
+	fluid->setParticleReadDataFlag(PxParticleReadDataFlag::eVELOCITY_BUFFER, true);
 
-	// create particles in *PxParticleSystem* ps
-	bool success = ps->createParticles(particleCreationData);
-	if (ps) {
-		gScene->addActor(*ps);
+	// create particles in *PxParticleFluid* fluid
+	bool success = fluid->createParticles(particleCreationData);
+	if (fluid) {
+		gScene->addActor(*fluid);
 	}
 }
 
@@ -196,7 +210,7 @@ void createGameScene(const PxTransform& t) {
 	createDoor(t, PxVec3(-20, 8.5 + 2 * boxHeight, 10), 0.8, defaultPose);
 	createDoor(t, PxVec3(-50, 15.5 + 2 * boxHeight, 20), 1.5, defaultPose);
 
-	CreateFluid(t, PxVec3(-30, 50, 50),PxVec3(0,1,1));
+	CreateFluid(t, PxVec3(-30, 100, 50),PxVec3(0,0,1), 0.3f, 60.0f, 45.0f, 0.001f, 0.8f);
 
 	createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
 	//createPlane(PxVec3(0, 100, 0), PxVec3(0, 1, 0));
