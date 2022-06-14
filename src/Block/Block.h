@@ -19,7 +19,8 @@ enum BlockType
 	road = 1, //╣юб╥
 	prop = 2,
 	door = 3, //це
-	seesaw =4
+	seesaw =4,
+	wall = 5
 };
 
 

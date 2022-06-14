@@ -36,7 +36,7 @@
 #include "../Render/Render.h"
 #include "../Render/Camera.h"
 #include "../Role/Role.h"
-#include <Render/Skybox.h>
+#include <Render/RenderBox.h>
 
 
 
@@ -53,10 +53,11 @@ extern Role* role;
 extern void RayCastByRole();
 extern void calculateElapsedClocksFromLastFrame();
 
-CSkyBox skyBox;
+
 
 
 bool beginGame = true;
+RenderBox skyBox;
 namespace
 {
 	Snippets::Camera*	sCamera;
@@ -100,14 +101,14 @@ void mouseCallback(int button, int state, int x, int y)
 	mousePress(button, state, x, y);
 }
 
-	void idleCallback()
-	{
-		glutPostRedisplay();
-	}
+void idleCallback()
+{
+	glutPostRedisplay();
+}
 
-	void renderCallback()
-	{
-		stepPhysics(true);
+void renderCallback()
+{
+	stepPhysics(true);
 
 	
 		if (!sCamera->isFree() || beginGame) {
@@ -172,7 +173,6 @@ void mouseCallback(int button, int state, int x, int y)
 
 }
 
-
 void renderLoop()
 {
 	sCamera = new Snippets::Camera(PxVec3(50.0f, 50.0f, 50.0f), PxVec3(-0.6f, -0.2f, -0.7f));
@@ -181,7 +181,7 @@ void renderLoop()
 	Snippets::setupDefaultRenderState();
 
 	/** ³õÊ¼»¯Ìì¿Õ */
-	skyBox.Init();
+	skyBox.Init(true);
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -210,6 +210,8 @@ void renderLoop()
 	ImGui_ImplGLUT_Shutdown();
 	ImGui::DestroyContext();
 }
+
+
 #endif
 
 LRESULT CALLBACK HostWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)

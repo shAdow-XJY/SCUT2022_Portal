@@ -1,12 +1,12 @@
-#include "SkyBox.h"
+#include "RenderBox.h"
 #include <glut.h>
 #include <iostream>
 
-CSkyBox::CSkyBox()
+RenderBox::RenderBox()
 {
 }
 
-CSkyBox::~CSkyBox()
+RenderBox::~RenderBox()
 {
     /** 删除纹理对象及其占用的内存 */
     for (int i = 0; i < 6; i++)
@@ -17,11 +17,29 @@ CSkyBox::~CSkyBox()
 
 }
 
-/** 天空盒初始化 */
-bool CSkyBox::Init()
+/** 材质贴图初始化 */
+bool RenderBox::Init(bool skybox)
 {
     char filename[128];                                         /**< 用来保存文件名 */
-    const char* bmpName[] = { "back","front","bottom","top","left","right" };
+    const char* bmpName[6];
+    if (skybox) {
+        bmpName[0] = this->skyBmpName[0];
+        bmpName[1] = this->skyBmpName[1];
+        bmpName[2] = this->skyBmpName[2];
+        bmpName[3] = this->skyBmpName[3];
+        bmpName[4] = this->skyBmpName[4];
+        bmpName[5] = this->skyBmpName[5];
+    }
+    else
+    {
+        bmpName[0] = this->boxBmpName[0];
+        bmpName[1] = this->boxBmpName[1];
+        bmpName[2] = this->boxBmpName[2];
+        bmpName[3] = this->boxBmpName[3];
+        bmpName[4] = this->boxBmpName[4];
+        bmpName[5] = this->boxBmpName[5];
+    }
+    //const char* bmpName[] = { "back","front","bottom","top","left","right" };
     for (int i = 0; i < 6; i++)
     {
         sprintf(filename, "%s", bmpName[i]);
@@ -55,7 +73,7 @@ bool CSkyBox::Init()
 }
 
 /** 构造天空盒 */
-void  CSkyBox::CreateSkyBox(float x, float y, float z,
+void  RenderBox::CreateSkyBox(float x, float y, float z,
     float box_width, float box_height,
     float box_length)
 {
@@ -165,4 +183,106 @@ void  CSkyBox::CreateSkyBox(float x, float y, float z,
     }
         
 
+}
+
+/** 构造渲染盒 
+*  x y z : 盒中心位置
+*  box_width box_height box_length :盒的大小参数
+*/
+void  RenderBox::CreateRenderBox(float x, float y, float z,
+    float box_width, float box_height,
+    float box_length) {
+
+    /** 计算长 宽 高 */
+    float width = box_width;
+    float height = box_height;
+    float length = box_length;
+
+    /** 计算天空盒中心位置 */
+    x = x - width / 2;
+    y = y - height / 2;
+    z = z - length / 2;
+    std::cout << "4654654564" << x << " " << y << " " << z << std::endl;
+    /** 开始绘制 */
+    glPushMatrix();
+    //glTranslatef(-x, -y, -z);
+    glColor4f(1, 1, 1, 1);
+    /** 绘制背面 */
+    glBindTexture(GL_TEXTURE_2D, m_texture[0].ID);
+
+    glBegin(GL_QUADS);
+
+    /** 指定纹理坐标和顶点坐标 */
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(x + width, y, z);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(x + width, y + height, z);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(x, y + height, z);
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(x, y, z);
+
+    glEnd();
+
+    /** 绘制前面 */
+    glBindTexture(GL_TEXTURE_2D, m_texture[1].ID);
+
+    glBegin(GL_QUADS);
+
+    /** 指定纹理坐标和顶点坐标 */
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(x, y, z + length);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(x, y + height, z + length);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(x + width, y + height, z + length);
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(x + width, y, z + length);
+
+    glEnd();
+
+    /** 绘制底面 */
+    glBindTexture(GL_TEXTURE_2D, m_texture[2].ID);
+
+    glBegin(GL_QUADS);
+
+    /** 指定纹理坐标和顶点坐标 */
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(x, y, z);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(x, y, z + length);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(x + width, y, z + length);
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(x + width, y, z);
+
+    glEnd();
+
+    /** 绘制顶面 */
+    glBindTexture(GL_TEXTURE_2D, m_texture[3].ID);
+
+    glBegin(GL_QUADS);
+
+    /** 指定纹理坐标和顶点坐标 */
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(x + width, y + height, z);
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(x + width, y + height, z + length);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(x, y + height, z + length);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(x, y + height, z);
+
+    glEnd();
+
+    /** 绘制左面 */
+    glBindTexture(GL_TEXTURE_2D, m_texture[4].ID);
+
+    glBegin(GL_QUADS);
+
+    /** 指定纹理坐标和顶点坐标 */
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(x, y + height, z);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(x, y + height, z + length);
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(x, y, z + length);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(x, y, z);
+
+    glEnd();
+
+    /** 绘制右面 */
+    glBindTexture(GL_TEXTURE_2D, m_texture[5].ID);
+
+    glBegin(GL_QUADS);
+
+    /** 指定纹理坐标和顶点坐标 */
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(x + width, y, z);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(x + width, y, z + length);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(x + width, y + height, z + length);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(x + width, y + height, z);
+    glEnd();
+
+    glPopMatrix();                 /** 绘制结束 */
 }

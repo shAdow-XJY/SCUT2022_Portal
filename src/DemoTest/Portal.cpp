@@ -41,12 +41,14 @@
 #include "../Common/PVD.h"
 #include "../Utils/Utils.h"
 #include "../Role/Role.h"
-
+#include "../LoadModel/Model.h"
+#include "../Render/BMPLoader.h"
 #include<vector>
 #include<string>
 #include <glut.h>
 #include<iostream>
 #include<time.h>
+#include<map>
 
 
 
@@ -83,6 +85,7 @@ const char* PigName = "pig";
 Role* role = NULL;
 PxControllerManager* cManager = NULL;
 
+
 // 右键鼠标按下
 bool press = false;
 
@@ -99,6 +102,7 @@ int mouseX, mouseY;
 // 提示字符的位置（测试用）
 int textX = 0, textY = 0;
 
+std::map<string, unsigned int> textureMap;
 
 
 //创建立方体堆
@@ -197,7 +201,7 @@ void initPhysics(bool interactive)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 
-	groundPlane->setName("over");
+	groundPlane->setName("Over");
 	gScene->addActor(*groundPlane);
 
 	//// 测试代码
@@ -205,10 +209,16 @@ void initPhysics(bool interactive)
 	//testModel.attachMeshes((PxTransform(PxVec3(20, 30, 30))).transform(PxTransform(PxQuat(-PxHalfPi,PxVec3(1.0f,0.0f,0.0f)))));
 	//testModel.createMeshActor(PxTransform(20, 30, 30));
 	// end
+	std::string textture[] = { "door","wall","road" };
+	for (auto name : textture) {
+		CBMPLoader* BMPLoader = new CBMPLoader();
+		unsigned int id = BMPLoader->generateID((name + ".bmp").c_str());
+		textureMap.insert(std::pair<string, unsigned int>(name, id));
+		std::cout << id << std::endl;
+	}
 
 	extern void createGameScene(const PxTransform & t);
 	createGameScene(t);
-	
 
 	role = new Role();
 	//初始位置
