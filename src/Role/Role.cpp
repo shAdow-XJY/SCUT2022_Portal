@@ -129,7 +129,7 @@ void Role::stopMoving() {
 * @param status 按下(T)/弹起(F)
 * @param free	相机是否自由移动
 **/
-void Role::move(GLint key,bool status,bool free) {
+void Role::move(GLint key, bool status, bool free) {
 	if (!this->canMove) {
 		return;
 	}
@@ -137,8 +137,7 @@ void Role::move(GLint key,bool status,bool free) {
 		this->setSpeed(PxVec3(0, 0, 0));
 		return;
 	}
-	this->isAutoMoving = false; //停止自动移动
-	//移动按键按下
+	//按下
 	if (status) {
 		PxVec3 dir;
 		if (!free) dir = this->faceDir; //非自由镜头以人物朝向为前进方向
@@ -155,35 +154,11 @@ void Role::move(GLint key,bool status,bool free) {
 		}case GLUT_KEY_LEFT: {
 			PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
 			dir = rotate.rotate(dir);
-			PxTransform currfront = role->getGlobalPose();
-
-			//PxU32 NbShapes = role->getNbShapes();
-			//PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
-			//role->getShapes(shapes, NbShapes);
-			//for (PxU32 i = 0; i < NbShapes; i++) {
-			//	role->detachShape(*shapes[i]);
-			//	//shapes[i]->setLocalPose(PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0))));
-			//}
-			//model->attachMeshes(PxTransform(PxQuat(-PxHalfPi, PxVec3(0, 1, 0))),role);
-
-			role->setGlobalPose(rotate);
-
-			cout << "LEFT!" << endl;
 			break;
 
 		}case GLUT_KEY_RIGHT: {
 			PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
 			dir = rotate.rotate(-dir);
-
-			//PxU32 NbShapes = role->getNbShapes();
-			//PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
-			//role->getShapes(shapes, NbShapes);
-			//for (PxU32 i = 0; i < NbShapes; i++) {
-			//	role->detachShape(*shapes[i]);
-			//	//shapes[i]->setLocalPose(PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0))));
-			//}
-			//model->attachMeshes(PxTransform(PxQuat(-PxHalfPi, PxVec3(0, 1, 0))), role);
-			role->setGlobalPose(rotate);
 			break;
 
 		}
@@ -195,10 +170,9 @@ void Role::move(GLint key,bool status,bool free) {
 		this->lastPressDir = dir.getNormalized();
 		if (this->isJump || this->isFall) return;
 		this->roleController->move(this->speed * 4, 0.0001, 1.0f / 120.0f, NULL);
-		std::cout << speed.x << " " << speed.y << ' ' << speed.z << ' ' << std::endl;
 		this->updatePosition();
 	}
-	//移动按键弹起
+	//弹起
 	else
 	{
 		if (!this->isJump && !this->isFall) {
@@ -206,14 +180,14 @@ void Role::move(GLint key,bool status,bool free) {
 			if (!free) {
 				this->dir = this->faceDir;//抬起的时候才更新角色朝向，确保持续移动
 			}
-			this->speed = PxVec3(0, 0, 0); //重置速度
+			this->speed = PxVec3(0, 0, 0);
 
 		}
 		else
 		{
-			//空中存在移动惯性
 			this->speed = this->speed * 0.5f;
 		}
+
 	}
 }
 
