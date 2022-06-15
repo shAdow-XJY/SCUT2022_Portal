@@ -138,6 +138,7 @@ void renderCallback()
 				role->move();
 				role->roleJump();
 				role->roleFall();
+				role->roleSlide();
 			}
 		}
 		else {
@@ -145,6 +146,7 @@ void renderCallback()
 			{
 				role->roleJump();
 				role->roleFall();
+				role->roleSlide();
 			}
 		}
 		role->simulationGravity();

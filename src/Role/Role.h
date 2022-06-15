@@ -62,6 +62,8 @@ private:
 	//本次跳跃是否能够向前
 	bool canForward = true;
 	bool standingOnBlock = true;
+	//滑动
+	bool slide = false;
 
 public:
 	Role();
@@ -124,6 +126,9 @@ public:
 	void pickUpObj();
 	//放置物体
 	void layDownObj();
+
+	//角色滑动
+	void roleSlide();
 
 };
 

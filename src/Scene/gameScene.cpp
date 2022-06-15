@@ -69,6 +69,9 @@ const char* typeMapName(BlockType type) {
 	case BlockType::seesawbox:{
 		return "SeesawBox";
 	}
+	case BlockType::iceroad: {
+		return "IceRoad";
+	}
 	default:
 		return "Block";
 		break;

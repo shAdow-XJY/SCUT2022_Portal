@@ -21,7 +21,8 @@ enum BlockType
 	prop = 3,
 	door = 4, //ÃÅ
 	seesaw =5,
-	seesawbox = 6
+	seesawbox = 6,
+	iceroad = 7  //±ùÃæ
 };
 
 

@@ -166,10 +166,11 @@ void Role::move(GLint key, bool status, bool free) {
 			return;
 		}
 		}
-		this->speed = dir * 0.12f;
+		this->slide = false;
+		this->speed = dir * 0.96f;
 		this->lastPressDir = dir.getNormalized();
 		if (this->isJump || this->isFall) return;
-		this->roleController->move(this->speed * 4, 0.0001, 1.0f / 120.0f, NULL);
+		this->roleController->move(this->speed, 0.0001, 1.0f / 120.0f, NULL);
 		this->updatePosition();
 	}
 	//弹起
@@ -180,7 +181,16 @@ void Role::move(GLint key, bool status, bool free) {
 			if (!free) {
 				this->dir = this->faceDir;//抬起的时候才更新角色朝向，确保持续移动
 			}
-			this->speed = PxVec3(0, 0, 0);
+
+			if (standingBlock.getType() == BlockType::iceroad) {
+				std::cout << "in the ice" << std::endl;
+				//this->setSpeed(this->speed);
+				this->slide = true;
+			}
+			else {
+				std::cout << "SET ZERO" << std::endl;
+				this->speed = PxVec3(0, 0, 0);
+			}
 
 		}
 		else
@@ -190,7 +200,6 @@ void Role::move(GLint key, bool status, bool free) {
 
 	}
 }
-
 
 /**
 * @brief 获取角色controller的底部坐标
@@ -302,6 +311,30 @@ void Role::roleFall() {
 			};
 		}
 		
+	}
+}
+
+/**
+* @brief 角色滑动函数
+* @return void
+**/
+void Role::roleSlide() {
+	if (this->speed.isZero()) {
+		this->slide = false;
+	}
+	else if (slide) {
+		//std::cout << this->speed.x << "  " <<  this->speed.y << "  " << this->speed.z << std::endl;
+		this->setSpeed(this->speed * 0.96f);
+		std::cout << "  " << this->speed.abs().x << "  " << this->speed.abs().y << "  " << this->speed.abs().z << std::endl;
+		//std::cout << "  " << this->speed.abs().minElement() << "  " << this->speed.abs().minElement() << "  " << this->speed.abs().minElement() << std::endl;
+		if (this->speed.abs().x > 0.001f || this->speed.abs().y > 0.001f || this->speed.abs().z > 0.001f) {
+			this->roleController->move(this->speed, 0.0001, 1.0f / 120.0f, NULL);
+		}
+		else
+		{
+			this->speed = PxVec3(0, 0, 0);
+		}
+
 	}
 }
 
@@ -420,7 +453,7 @@ void Role::simulationGravity() {
 			//cout << block->getType() << endl;
 			if (block->getType() == BlockType::road) {
 				//std::cout << role->standingBlock.getName()<<std::endl;
-
+				//std::cout << "yes" << std::endl;
 			}
 			else if (block->getType() == BlockType::seesaw) {
 				cout << "施加重力" << endl;
@@ -430,6 +463,7 @@ void Role::simulationGravity() {
 				PxRigidBodyExt::addForceAtPos(*seesawBody, force, this->getFootPosition());
 				//seesawBody->addForce()
 			}
+			//std::cout << "yes" << std::endl;
 			this->standingBlock = *block;
 		}
 	}
