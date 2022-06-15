@@ -160,6 +160,18 @@ PxRigidStatic* createRoad(const PxTransform& t, const PxVec3& v, PxReal x, PxRea
 	return roadActor;
 }
 
+/**
+* @brief 创建冰路
+**/
+PxRigidStatic* createIceRoad(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose) {
+	PxRigidStatic* roadActor = createStaticBox(t, v, x, y, z, pose, BlockType::road);
+	//std::cout << "v::" <<  v.x << " " << v.y << " " << v.z << endl;
+	PxVec3 position = roadActor->getGlobalPose().p;
+	Road* road = new Road("路面", position, x, y, z, roadActor,BlockType::iceroad);
+	roadActor->userData = road;
+	return roadActor;
+}
+
 float center_y(float y) {
 	return y + 2 * boxHeight;
 }
@@ -288,7 +300,8 @@ void createMaze(const PxTransform& t, PxVec3 v, float scale, PxTransform& pose) 
 PxRevoluteJoint* createSeesaw(const PxTransform& t,PxVec3 v,float x, float y, float z, PxTransform& pose) {
 	PxTransform pos(t.transform(PxTransform(v)));
 	PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(0, 0, 0), x, y, z, pose, BlockType::seesaw);
-	Seesaw* seesaw = new Seesaw("翘板",actor0->getGlobalPose().p,x,y,z,actor0);
+	PxVec3 position = PxVec3(actor0->getGlobalPose().p.x, actor0->getGlobalPose().p.y, actor0->getGlobalPose().p.z);
+	Seesaw* seesaw = new Seesaw("翘板",position,x,y,z,actor0);
 	actor0->userData = seesaw;
 	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(-(x+y+0.5), 0, 0), y, y, y, pose, BlockType::seesawbox);
 	createStaticBox(pos, PxVec3(x+y+0.5, 0, 0), y, y, y, pose, BlockType::seesawbox);
@@ -296,6 +309,7 @@ PxRevoluteJoint* createSeesaw(const PxTransform& t,PxVec3 v,float x, float y, fl
 	PxTransform localFrame1(PxVec3(x+y+0.5, 0, 0));
 	PxRevoluteJoint* revolute = PxRevoluteJointCreate(*gPhysics, actor0, localFrame0, actor1, localFrame1);
 	//revolute->setLocalPose(PxJointActorIndex::Enum::eACTOR0, PxTransform(PxVec3(0, 0, 0), PxQuat(1.75 * PxHalfPi, PxVec3(1, 0, 0))));
+	seesaw->attachRevolute(revolute);
 	return revolute;
 }
 
@@ -359,7 +373,7 @@ void createGameScene(const PxTransform& t) {
 	float c_2_x = r_2_l - r_1_l;
 	float c_2_y = center_y(c_1_y);
 	float c_2_z = r_1_w + r_2_w;
-	createRoad(t, PxVec3(c_2_x, c_2_y, c_2_z), r_2_l , boxHeight, r_2_w, defaultPose);
+	createIceRoad(t, PxVec3(c_2_x, c_2_y, c_2_z), r_2_l , boxHeight, r_2_w, defaultPose);
 
 	//创建道具类场景
 	createPorp(t, PxVec3(c_2_x, c_2_y + 2.5, c_2_z), boxHeight, boxHeight, boxHeight);
