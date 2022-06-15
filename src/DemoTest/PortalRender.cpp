@@ -54,6 +54,11 @@ extern void RayCastByRole();
 extern void calculateElapsedClocksFromLastFrame();
 
 
+//角色背后照相机默认位置
+PxVec3 roleBackPosition = PxVec3(0, 0, 0);
+
+//看向角色的视线
+PxVec3 dir = PxVec3(0, 0, 0);
 
 
 bool beginGame = true;
@@ -62,7 +67,6 @@ namespace
 {
 	Snippets::Camera*	sCamera;
 
-	
 
 	void motionCallback(int x, int y)
 	{
@@ -110,24 +114,29 @@ void renderCallback()
 {
 	stepPhysics(true);
 
-	
+		
 		if (!sCamera->isFree() || beginGame) {
 			if (beginGame) {
 				sCamera->isChangeImmediate = true;
 				beginGame = false;
 			}
-			PxVec3 position = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getFaceDir() * -50);
+			roleBackPosition = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getFaceDir() * -50);
 			if (!sCamera->isMoving) {
-				sCamera->setEye(position);
+				sCamera->setEye(roleBackPosition);
 				role->changeCanMove(true);
 			}
 			else {
 				role->changeCanMove(false);
 			}
-			PxVec3 dir = role->getPosition() - position;
+			dir = role->getPosition() - roleBackPosition;
 			sCamera->targetDir = dir;
 			sCamera->updateDir(role->getPosition());
 			
+		}
+		else
+		{
+			dir = role->getPosition() - roleBackPosition;
+			roleBackPosition = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getDir() * -50);
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 

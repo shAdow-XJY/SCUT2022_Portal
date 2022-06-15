@@ -71,23 +71,9 @@ PxPvd*                  gPvd        = NULL;
 PxReal stackZ = 10.0f;
 
 
-std::vector<PxRigidDynamic*>			ballToDispear;
-std::vector<PxRigidDynamic*>			ballBirdList;
-std::vector<PxRigidDynamic*>			ballPigList;
-PxRigidDynamic*                         ballBird;
-PxRigidDynamic*                         ballPig;
-
-
-const char* BirdName = "bird";
-const char* PigName = "pig";
-
 
 Role* role = NULL;
 PxControllerManager* cManager = NULL;
-
-
-// 右键鼠标按下
-bool press = false;
 
 
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
@@ -96,68 +82,7 @@ const PxTransform t = PxTransform(PxVec3(-100, 0, -200));
 extern void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z);
 
 
-// 鼠标点击时的坐标
-int mouseX, mouseY;
-
-// 提示字符的位置（测试用）
-int textX = 0, textY = 0;
-
 std::map<string, unsigned int> textureMap;
-
-
-//创建立方体堆
-void createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
-{
-	/*
-	PxShape 碰撞形状的抽象类;形状是共享的，引用计数的对象。
-	可以通过调用PxRigidActor类的createShape()方法或PxPhysics类的createShape()方法来创建实例。
-	Box,Sphere,Capsule,Plane,ConvexMesh,TriangleMesh,HeightField
-	可以设置Material,offset,flags,name
-	*/
-	//createShape构建形状;(halfExtent x,y,z)
-	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *gMaterial);
-	
-
-
-	for(PxU32 i=0; i<size;i++)
-	{
-		for(PxU32 j=0;j<size;j++)
-		{
-			//指定位置(-10/-7..9,1,0)(-7..,3,0)(-4..,5,0)...
-			PxTransform localTm(PxVec3(PxReal(j*2) - PxReal(size), PxReal(i*2+1), 0) * halfExtent);
-			//createRigidDynamic构建刚体
-			PxRigidDynamic* body = gPhysics->createRigidDynamic(t.transform(localTm));
-			//attachShape绑定形状到刚体上;
-			body->attachShape(*shape);
-			//更新质量和惯性（数值表示密度）
-			PxRigidBodyExt::updateMassAndInertia(*body, 1.0f);
-
-			body->setName(PigName);
-
-			body->userData = body;
-
-			
-			ballPigList.push_back(body);
-
-			gScene->addActor(*body);
-		}
-	}
-	shape->release();
-}
-
-////创建道路方块
-//void createRoad(const PxTransform& t,PxReal halfExtent,std::string name) {
-//	Block* r = new Block(halfExtent,name);
-//	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *gMaterial);
-//	shape->setQueryFilterData(collisionGroup);
-//	PxRigidDynamic* body = gPhysics->createRigidDynamic(t);
-//	body->attachShape(*shape);
-//	//更新质量和惯性（数值表示密度）
-//	PxRigidBodyExt::updateMassAndInertia(*body, 1.0f);
-//	body->setName("Ground");
-//	body->userData = r;
-//	gScene->addActor(*body);
-//}
 
 ///实例化物理
 void initPhysics(bool interactive)
@@ -302,116 +227,9 @@ void cleanupPhysics(bool interactive)
 	transport->release();
 
 	gFoundation->release();
-
-	printf("HelloWorld done.\n");
 }
 
-//按键设置
-void keyPress(unsigned char key, const PxTransform& camera)
-{
-	switch (toupper(key))
-	{
-	case 'B':	createStack(PxTransform(PxVec3(-100, 0, 0)).transform(PxTransform(PxVec3(-30, 10 + 2 * boxHeight, 0))), 10, 2.0f); break;
-	//case 'B':	createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 2.0f); break;
-		//PxSphereGeometry Transform,geometry,velocity（速度）t.transform(PxTransform(PxVec3(-20, 10+2*boxHeight, 0)))
-	case ' ':
-	{
-		role->tryJump(false);
-		break;
-	}
-	case 'Z':
-	{
-		role->roleCrouch();
-		break;
-	}
-	case 'E':
-	{
-		if (role->getEquiped()) {
-			role->layDownObj();
 
-		}
-		else {
-			role->pickUpObj();
-
-		}
-
-		break;
-	}
-	default:
-		break;
-	}
-}
-
-void keyRelease(unsigned char key)
-{
-	switch (toupper(key))
-	{
-	case ' ':
-	{
-		role->tryJump(true);
-		break;
-	}
-	case 'Z':
-	{
-		role->roleNoCrouch();
-		break;
-	}
-	default:
-		break;
-	}
-}
-
-//特殊键设置
-void specialKeyPress(GLint key) {
-	switch (key) {
-	default: {
-		return;
-	}
-	}
-}
-
-void specialKeyRelease(GLint key) {
-
-}
-
-//鼠标点击
-void mousePress(int button, int state, int x, int y) {
-	switch (button)
-	{
-		//点击右键
-	case 0: {
-		//右键抬起
-		if (state == 1) {
-			//if (role->getMovingStatus())return;
-			////role->roleMoveByMouse(x, y);
-			//PxVec3 position = ScenetoWorld(x, y);
-			//Block road;
-			//if (RayCast(position, PxVec3(0, 5, 0), road))
-			//{
-			//	PxVec3 blockPosition = road.getPosition();
-			//	//role->roleMoveByMouse(PxVec3(blockPosition.x, role->getFootPosition().y, blockPosition.z));
-			//	role->roleMoveByMouse(position);
-			//}
-			//else {
-			//	std::cout << "不可点击";
-			//}
-		}
-		break;
-	}
-	case 2: {
-		if (state == 1) {
-			press = true;
-			mouseX = x;
-			mouseY = y;
-			std::cout << "mouseX: " << x << std::endl;
-			std::cout << "mouseY: " << y << std::endl;
-		}
-		break;
-	}
-	default:
-		break;
-	}
-}
 
 #define RENDER_SNIPPET 1
 //main

@@ -6,6 +6,8 @@
 
 using namespace physx;
 extern clock_t deltaClock;
+extern PxVec3 roleBackPosition;
+extern PxVec3 dir;
 
 namespace Snippets
 {
@@ -21,10 +23,28 @@ namespace Snippets
 
 	void Camera::handleMouse(int button, int state, int x, int y)
 	{
-		PX_UNUSED(state);
-		PX_UNUSED(button);
 		mMouseX = x;
 		mMouseY = y;
+		switch (button)
+		{
+		case 0: {
+			if (state == 1) {
+			}
+			break;
+		}
+		case 2: {
+			if (state == 1) {
+				if (this->free) {
+					this->mEye = roleBackPosition;
+					this->targetDir = dir.getNormalized();
+					this->mDir = dir.getNormalized();
+				}
+			}
+			break;
+		}
+		default:
+			break;
+		}
 	}
 
 void Camera::goFront(float speed)
