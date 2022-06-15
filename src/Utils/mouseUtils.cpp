@@ -1,7 +1,9 @@
 ﻿#include "PxPhysicsAPI.h"
 #include "../Render/Render.h"
+#include <iostream>
 #include <time.h>
 using namespace physx;
+using namespace std;
 
 /**
 * @brief 屏幕二维坐标转换到三维屏幕坐标
@@ -42,4 +44,11 @@ void calculateElapsedClocksFromLastFrame() {
 	//deltaTime = static_cast<double>((currClock - lastClock) / CLOCKS_PER_SEC);
 	deltaClock = currClock - lastClock;
 	lastClock = currClock;
+}
+
+/**
+* @brief 通用打印PxVec函数
+**/
+void printPxVecFun(const PxVec3& vec) {
+	cout << "X:" << vec.x << " " << "Y:" << vec.y << " " << "Z:" << vec.z << endl;
 }
