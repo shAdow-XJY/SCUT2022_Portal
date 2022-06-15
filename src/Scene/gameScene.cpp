@@ -285,7 +285,8 @@ void createMaze(const PxTransform& t, PxVec3 v, float scale, PxTransform& pose) 
 PxRevoluteJoint* createSeesaw(const PxTransform& t,PxVec3 v,float x, float y, float z, PxTransform& pose) {
 	PxTransform pos(t.transform(PxTransform(v)));
 	PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(0, 0, 0), x, y, z, pose, BlockType::seesaw);
-	Seesaw* seesaw = new Seesaw("гл╟Е",actor0->getGlobalPose().p,x,y,z,actor0);
+	PxVec3 position = PxVec3(actor0->getGlobalPose().p.x, actor0->getGlobalPose().p.y, actor0->getGlobalPose().p.z);
+	Seesaw* seesaw = new Seesaw("гл╟Е",position,x,y,z,actor0);
 	actor0->userData = seesaw;
 	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(-(x+y+0.5), 0, 0), y, y, y, pose, BlockType::seesawbox);
 	createStaticBox(pos, PxVec3(x+y+0.5, 0, 0), y, y, y, pose, BlockType::seesawbox);
@@ -293,6 +294,7 @@ PxRevoluteJoint* createSeesaw(const PxTransform& t,PxVec3 v,float x, float y, fl
 	PxTransform localFrame1(PxVec3(x+y+0.5, 0, 0));
 	PxRevoluteJoint* revolute = PxRevoluteJointCreate(*gPhysics, actor0, localFrame0, actor1, localFrame1);
 	//revolute->setLocalPose(PxJointActorIndex::Enum::eACTOR0, PxTransform(PxVec3(0, 0, 0), PxQuat(1.75 * PxHalfPi, PxVec3(1, 0, 0))));
+	seesaw->attachRevolute(revolute);
 	return revolute;
 }
 
