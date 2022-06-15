@@ -163,12 +163,8 @@ public:
 		if (name == "Door") {
 			Door* door = (Door*)actor.userData;
 			if (door->canOpen()) {
-				PxRigidBody* doorActor = door->getDoorActor();
 				float scale = 9000.0f;
-				doorActor->addForce(role->getFaceDir() * scale);
-				PxRevoluteJoint* revoluteJoint = door->getJoint();
-				PxJointAngularLimitPair limits(-PxPi / 2, PxPi / 2, 0.01f);
-				revoluteJoint->setLimit(limits);
+				door->addPForce(role->getFaceDir() * scale);			
 			}
 		}
 		else if (name == "Seesaw") {

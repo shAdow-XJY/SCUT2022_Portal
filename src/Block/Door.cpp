@@ -14,3 +14,9 @@ bool Door::canOpen() {
 PxRevoluteJoint* Door::getJoint() {
 	return this->joint;
 }
+
+void Door::addPForce(PxVec3 force) {
+	door->addForce(force);
+	PxJointAngularLimitPair limits(-PxPi / 2, PxPi / 2, 0.01f);
+	joint->setLimit(limits);
+}

@@ -41,10 +41,10 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 	switch (toupper(key))
 	{
 		if (this->free) {
-	case 'W':	mEye += mDir * 2.0f * speed * deltaClock;		break;
-	case 'S':	mEye -= mDir * 2.0f * speed * deltaClock;		break;
-	case 'A':	mEye -= viewY * 2.0f * speed * deltaClock;		break;
-	case 'D':	mEye += viewY * 2.0f * speed * deltaClock;		break;
+	case 'W':	mEye += mDir * 0.25f * speed * deltaClock;		break;
+	case 'S':	mEye -= mDir * 0.25f * speed * deltaClock;		break;
+	case 'A':	mEye -= viewY * 0.25f * speed * deltaClock;		break;
+	case 'D':	mEye += viewY * 0.25f * speed * deltaClock;		break;
 		}
 	
 		//切换是否为自由视角

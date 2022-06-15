@@ -185,17 +185,15 @@ void Role::move(GLint key, bool status, bool free) {
 			if (!free) {
 				this->dir = this->faceDir;//抬起的时候才更新角色朝向，确保持续移动
 			}
-
-		if (standingBlock.getType() == BlockType::iceroad) {
-			std::cout << "in the ice" << std::endl;
-			//this->setSpeed(this->speed);
-			this->slide = true;
-		}
-		else {
-			std::cout << "SET ZERO" << std::endl;
-			this->speed = PxVec3(0, 0, 0);
-		}
-
+			if (standingBlock.getType() == BlockType::iceroad) {
+				std::cout << "in the ice" << std::endl;
+				//this->setSpeed(this->speed);
+				this->slide = true;
+			}
+			else {
+				std::cout << "SET ZERO" << std::endl;
+				this->speed = PxVec3(0, 0, 0);
+			}
 		}
 		else
 		{

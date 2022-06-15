@@ -223,9 +223,9 @@ void initPhysics(bool interactive)
 
 	role = new Role();
 	//初始位置
-	role->setFootPosition(PxVec3(-100, 20, -210));
+	//role->setFootPosition(PxVec3(-100, 20, -210));
 	//迷宫前位置
-	//role->setFootPosition(PxVec3(83, 20, -136));
+	role->setFootPosition(PxVec3(83, 20, -136));
 
 	//role->attachModel("../../models/paimon/paimon.obj");
 	role->attachModel("../../models/human.obj");
