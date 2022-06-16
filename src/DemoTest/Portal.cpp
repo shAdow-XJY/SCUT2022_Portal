@@ -43,6 +43,7 @@
 #include "../Role/Role.h"
 #include "../LoadModel/Model.h"
 #include "../Render/BMPLoader.h"
+#include "../Sound/SoundTools.h"
 #include<vector>
 #include<string>
 #include <glut.h>
@@ -83,6 +84,9 @@ extern void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y
 
 
 std::map<string, unsigned int> textureMap;
+
+//音频类
+SoundTool soundtool = SoundTool();
 
 ///实例化物理
 void initPhysics(bool interactive)

@@ -241,8 +241,8 @@ void Role::updatePosition() {
 /**
 * @brief ½ÇÉ«ÌøÔ¾Ìõ¼þÅÐ¶Ï
 **/
-void Role::tryJump(bool release) {
-	if (!this->isAlive) return;
+bool Role::tryJump(bool release) {
+	if (!this->isAlive) return false;
 	if (!isJump && !isFall) {
 		if (!release) {
 			//std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
@@ -252,7 +252,9 @@ void Role::tryJump(bool release) {
 		{
 			isJump = true;
 		}
+		return true;
 	}
+	return false;
 }
 extern clock_t deltaClock;
 /**

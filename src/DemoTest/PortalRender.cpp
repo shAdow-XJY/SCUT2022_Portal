@@ -217,7 +217,7 @@ void renderLoop()
 	glutSpecialUpFunc(specialKeyUpCallback);
 	glutMouseFunc(mouseCallback);
 	glutMotionFunc(motionCallback);
-	glutReshapeFunc(reshape);
+	//glutReshapeFunc(reshape);
 	motionCallback(0,0);
 	atexit(exitCallback);
 	

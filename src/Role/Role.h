@@ -110,7 +110,7 @@ public:
 	bool getEquiped();
 
 	//ÌøÔ¾
-	void tryJump(bool release);
+	bool tryJump(bool release);
 	void roleJump();
 	void roleFall();
 	void fall();

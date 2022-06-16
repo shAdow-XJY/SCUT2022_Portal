@@ -2,9 +2,11 @@
 #include "PxPhysicsAPI.h"
 #include "../Role/Role.h"
 #include "../Render/Camera.h"
+#include "../Sound/SoundTools.h"
 using namespace physx;
 
 extern Role* role;
+extern SoundTool soundtool;
 
 // ÓÒ¼üÊó±ê°´ÏÂ
 bool press = false;
@@ -24,7 +26,9 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	{
 	case ' ':
 	{
-		role->tryJump(false);
+		if (role->tryJump(false)) {
+			soundtool.playSound("jumpLoading.wav");
+		}
 		break;
 	}
 	case 'Z':
@@ -56,7 +60,10 @@ void keyRelease(unsigned char key)
 	{
 	case ' ':
 	{
-		role->tryJump(true);
+		//soundtool.pauseSound();
+		if (role->tryJump(true)) {
+			soundtool.playSound("jump.wav");
+		}
 		break;
 	}
 	case 'Z':
