@@ -26,7 +26,6 @@
 // Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
-
 // ****************************************************************************
 // This snippet illustrates simple use of physx
 //
@@ -43,6 +42,7 @@
 #include "../Role/Role.h"
 #include "../LoadModel/Model.h"
 #include "../Render/BMPLoader.h"
+#include "../Sound/SoundTools.h"
 #include<vector>
 #include<string>
 #include <glut.h>
@@ -103,6 +103,9 @@ int mouseX, mouseY;
 int textX = 0, textY = 0;
 
 std::map<string, unsigned int> textureMap;
+
+//音效播放类
+SoundTool soundTool = SoundTool();
 
 
 //创建立方体堆
@@ -209,6 +212,8 @@ void initPhysics(bool interactive)
 	//testModel.attachMeshes((PxTransform(PxVec3(20, 30, 30))).transform(PxTransform(PxQuat(-PxHalfPi,PxVec3(1.0f,0.0f,0.0f)))));
 	//testModel.createMeshActor(PxTransform(20, 30, 30));
 	// end
+	
+	//预加载材质贴图生成材质ID
 	std::string texture[] = { "Door","Wall","Road","SeesawBox","Seesaw"};
 	for (auto name : texture) {
 		string baseUrl = "../../texture/";
@@ -218,6 +223,7 @@ void initPhysics(bool interactive)
 		std::cout << id << std::endl;
 	}
 	textureMap.insert(std::pair<string, unsigned int>("Block", 0));
+
 	extern void createGameScene(const PxTransform & t);
 	createGameScene(t);
 
@@ -278,8 +284,6 @@ PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir)
 
 
 
-
-
 //（在render中调用）
 void stepPhysics(bool interactive)
 {
@@ -316,7 +320,10 @@ void keyPress(unsigned char key, const PxTransform& camera)
 		//PxSphereGeometry Transform,geometry,velocity（速度）t.transform(PxTransform(PxVec3(-20, 10+2*boxHeight, 0)))
 	case ' ':
 	{
-		role->tryJump(false);
+		if (role->tryJump(false)) 
+		{
+			soundTool.playSound("jumpLoading.wav");
+		};
 		break;
 	}
 	case 'Z':
@@ -348,7 +355,10 @@ void keyRelease(unsigned char key)
 	{
 	case ' ':
 	{
-		role->tryJump(true);
+		soundTool.pauseSound();
+		if (role->tryJump(true)) {
+			soundTool.playSound("jump.wav");
+		}
 		break;
 	}
 	case 'Z':

@@ -37,7 +37,7 @@
 #include "../Render/Camera.h"
 #include "../Role/Role.h"
 #include <Render/RenderBox.h>
-
+#include <Sound/SoundTools.h>
 
 
 using namespace physx;
@@ -52,7 +52,7 @@ extern void specialKeyRelease(GLint key);
 extern Role* role;
 extern void RayCastByRole();
 extern void calculateElapsedClocksFromLastFrame();
-
+extern SoundTool soundTool;
 
 
 
@@ -62,12 +62,10 @@ namespace
 {
 	Snippets::Camera*	sCamera;
 
-	
-
-	void motionCallback(int x, int y)
-	{
-		sCamera->handleMotion(x, y);
-	}
+void motionCallback(int x, int y)
+{
+	sCamera->handleMotion(x, y);
+}
 
 void keyboardDownCallback(unsigned char key, int x, int y)
 {
@@ -106,8 +104,14 @@ void idleCallback()
 	glutPostRedisplay();
 }
 
+
+
 void renderCallback()
 {
+	if (soundTool.getSoundResult()!= FMOD_OK) {
+		soundTool.SoundUpdate();
+	}
+
 	stepPhysics(true);
 
 	
@@ -167,11 +171,12 @@ void renderCallback()
 		calculateElapsedClocksFromLastFrame();
 	}
 
-	void exitCallback(void)
+void exitCallback(void)
 	{
 		delete sCamera;
 		cleanupPhysics(true);
 	}
+
 
 }
 
@@ -180,10 +185,12 @@ void renderLoop()
 	sCamera = new Snippets::Camera(PxVec3(50.0f, 50.0f, 50.0f), PxVec3(-0.6f, -0.2f, -0.7f));
 
 	Snippets::setupDefaultWindow("PhysX Demo");
+
 	Snippets::setupDefaultRenderState();
 
 	/** ³õÊ¼»¯Ìì¿Õ */
 	skyBox.Init(true);
+
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();

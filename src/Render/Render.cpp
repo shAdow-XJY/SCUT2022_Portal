@@ -328,10 +328,10 @@ namespace Snippets
 
 namespace
 {
-void reshapeCallback(int width, int height)
-{
-	glViewport(0, 0, width, height);
-}
+	void reshapeCallback(int width, int height)
+	{
+		glViewport(0, 0, width, height);
+	}
 }
 
 void setupDefaultWindow(const char *name)
@@ -347,6 +347,7 @@ void setupDefaultWindow(const char *name)
 	glutInitDisplayMode(GLUT_RGB|GLUT_DOUBLE|GLUT_DEPTH);
 	int mainHandle = glutCreateWindow(name);
 	glutSetWindow(mainHandle);
+
 	glutReshapeFunc(reshapeCallback);
 	
 	delete[] namestr;

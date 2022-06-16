@@ -40,6 +40,7 @@
     <ClCompile Include="..\..\src\Render\Vector.cpp" />
     <ClCompile Include="..\..\src\Role\Role.cpp" />
     <ClCompile Include="..\..\src\Scene\gameScene.cpp" />
+    <ClCompile Include="..\..\src\Sound\SoundTools.cpp" />
     <ClCompile Include="..\..\src\Utils\mouseUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -62,6 +63,7 @@
     <ClInclude Include="..\..\src\Render\RenderBox.h" />
     <ClInclude Include="..\..\src\Render\Vector.h" />
     <ClInclude Include="..\..\src\Role\Role.h" />
+    <ClInclude Include="..\..\src\Sound\SoundTools.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -152,7 +154,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>./../../../Common/lib/vc16win64;./../../lib/vc16win64;./../../../../PxShared/lib/vc16win64;./../../Graphics/lib/win64/glut;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Winmm.lib;OpenGL32.lib;glut32.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>fmod_vc.lib;fmodL_vc.lib;Winmm.lib;OpenGL32.lib;glut32.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/LIBPATH:../../../Lib/vc16win64 PhysX3CommonDEBUG_x64.lib PhysX3DEBUG_x64.lib PhysX3CookingDEBUG_x64.lib PhysX3CharacterKinematicDEBUG_x64.lib PhysX3ExtensionsDEBUG.lib PhysX3VehicleDEBUG.lib PxTaskDEBUG_x64.lib PxFoundationDEBUG_x64.lib PsFastXmlDEBUG_x64.lib PxPvdSDKDEBUG_x64.lib /LIBPATH:../../lib/vc16win64 UtilsDEBUG.lib /DEBUG</AdditionalOptions>
     </Link>
     <PostBuildEvent>
