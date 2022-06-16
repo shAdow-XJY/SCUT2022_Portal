@@ -404,8 +404,8 @@ void renderImGui() {
 
 void startRender(const PxVec3& cameraEye, const PxVec3& cameraDir, PxReal clipNear, PxReal clipFar)
 {
-	ImGui_ImplOpenGL2_NewFrame();
-	ImGui_ImplGLUT_NewFrame();
+	/*ImGui_ImplOpenGL2_NewFrame();
+	ImGui_ImplGLUT_NewFrame();*/
 	lastTime = currTime;
 	currTime = clock();
 	 
@@ -497,8 +497,8 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 
 void finishRender()
 {
-	// 把ui渲染放在这里 是为了其能显示在最上层
-	renderImGui();
+	 //把ui渲染放在这里 是为了其能显示在最上层
+	//renderImGui();
 	if (textShouldRaster == true) {
 		rasterTime += double(currTime - lastTime)/CLOCKS_PER_SEC;
 		if (rasterTime >= 3) {
