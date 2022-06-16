@@ -323,16 +323,11 @@ void renderGeometry(const PxGeometryHolder& h, string name,bool shadow)
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+extern void reshape(int width, int height);
+
 namespace Snippets
 {
 
-namespace
-{
-void reshapeCallback(int width, int height)
-{
-	glViewport(0, 0, width, height);
-}
-}
 
 void setupDefaultWindow(const char *name)
 {
@@ -347,7 +342,7 @@ void setupDefaultWindow(const char *name)
 	glutInitDisplayMode(GLUT_RGB|GLUT_DOUBLE|GLUT_DEPTH);
 	int mainHandle = glutCreateWindow(name);
 	glutSetWindow(mainHandle);
-	glutReshapeFunc(reshapeCallback);
+	glutReshapeFunc(reshape);
 	
 	delete[] namestr;
 }
@@ -436,9 +431,9 @@ void startRender(const PxVec3& cameraEye, const PxVec3& cameraDir, PxReal clipNe
 }
 
 void renderGameOver(const char text[], int len) 
-	{
-		renderText(190,250,text,len);
-	}
+{
+	renderText(190,250,text,len);
+}
 
 void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, const PxVec3 & color)/*‰÷»æactor*/
 {
@@ -543,3 +538,9 @@ void renderText(int x, int y, const char text[], int len)
 }
 } //namespace Snippets
 
+
+void renderGameOver() {
+	const char* msg = "Game Over!";
+	//int len = sizeof(msg) / sizeof(char);
+	Snippets::renderText(45, 50, msg, 10);
+}

@@ -13,7 +13,7 @@ extern PxPhysics* gPhysics;
 extern PxControllerManager* cManager;
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
 extern PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir);
-
+extern void renderGameOver();
 const int primaryJumpHeight = 4.0f;
 
 class Role {
@@ -169,8 +169,12 @@ public:
 		}
 		else if (name == "Seesaw") {
 		}
-		else if (name == "over") {
+		else if (name == "Over") {
 			this->role->gameOver();
+			const char* msg = "游戏结束";
+			//渲染游戏结束
+			renderGameOver();
+
 		}
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
 	}

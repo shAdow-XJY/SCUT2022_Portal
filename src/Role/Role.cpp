@@ -270,7 +270,7 @@ void Role::roleJump() {
 		}
 		PxVec3 jumpSpeed = PxVec3(0.0, speed, 0.0);
 		if (canForward && canMove) {
-			jumpSpeed += this->speed * 0.2;
+			jumpSpeed += this->speed * 0.5;
 		}
 		
 		PxControllerCollisionFlags flag = roleController->move(jumpSpeed, PxF32(0.001), deltaClock, NULL);
@@ -299,7 +299,7 @@ void Role::roleFall() {
 	if (isFall) {
 		PxVec3 fallSpeed = PxVec3(0.0, -midFallSpeed, 0.0);
 		if (canForward && canMove) {
-			fallSpeed += this->speed * 0.2;
+			fallSpeed += this->speed * 0.5;
 		}
 		PxControllerCollisionFlags flag = roleController->move(fallSpeed, PxF32(0.00001), deltaClock, NULL);
 		if (flag == PxControllerCollisionFlag::eCOLLISION_SIDES) {
