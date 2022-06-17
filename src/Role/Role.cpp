@@ -332,7 +332,10 @@ void Role::roleSlide() {
 		std::cout << "  " << this->speed.abs().x << "  " << this->speed.abs().y << "  " << this->speed.abs().z << std::endl;
 		//std::cout << "  " << this->speed.abs().minElement() << "  " << this->speed.abs().minElement() << "  " << this->speed.abs().minElement() << std::endl;
 		if (this->speed.abs().x > 0.001f || this->speed.abs().y > 0.001f || this->speed.abs().z > 0.001f) {
-			this->roleController->move(this->speed, 0.0001, 1.0f / 120.0f, NULL);
+			PxControllerCollisionFlags flag = this->roleController->move(this->speed, 0.0001, 1.0f / 120.0f, NULL);
+			if (flag == PxControllerCollisionFlag::eCOLLISION_SIDES) {
+				this->setSpeed(PxVec3(0, 0, 0));
+			}
 		}
 		else
 		{

@@ -478,16 +478,18 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 			}
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-			if (shadows)/*阴影，，，效果表现上有瑕疵但不知道怎么优化*/
+			if (shadows)/*阴影*/
 			{
 				const PxVec3 shadowDir(0.0f, -0.7071067f, -0.7071067f);
 				const PxReal shadowMat[] = { 1,0,0,0, -shadowDir.x / shadowDir.y,0,-shadowDir.z / shadowDir.y,0, 0,0,1,0, 0,0,0,1 };
 				glPushMatrix();
 				glMultMatrixf(shadowMat);
 				glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
+				glEnable(GL_CULL_FACE);
 				glDisable(GL_LIGHTING);
 				glColor4f(0.1f, 0.2f, 0.3f, 1.0f);
 				renderGeometry(h, "Block",true);
+				glDisable(GL_CULL_FACE);
 				glEnable(GL_LIGHTING);
 				glPopMatrix();
 			}	

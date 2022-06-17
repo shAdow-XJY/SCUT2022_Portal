@@ -669,14 +669,14 @@ void createGameScene(const PxTransform& t) {
 	float r_1_w = 15.0;  //road_1_width 8 100
 	float c_1_y = boxHeight;  //the position of the center of road_1
 	// create road_1
-	createRoad(t, PxVec3(0, c_1_y, 0), r_1_l, boxHeight, r_1_w, defaultPose);
+	createIceRoad(t, PxVec3(0, c_1_y, 0), r_1_l, boxHeight, r_1_w, defaultPose);
 
 	float r_2_w = 4.0;
 	float r_2_l = 20.0;
 	float c_2_x = r_2_l - r_1_l;
 	float c_2_y = center_y(c_1_y);
 	float c_2_z = r_1_w + r_2_w;
-	createIceRoad(t, PxVec3(c_2_x, c_2_y, c_2_z), r_2_l , boxHeight, r_2_w, defaultPose);
+	createRoad(t, PxVec3(c_2_x, c_2_y, c_2_z), r_2_l , boxHeight, r_2_w, defaultPose);
 
 	//创建道具类场景
 	createPorp(t, PxVec3(c_2_x, c_2_y + 2.5, c_2_z), boxHeight, boxHeight, boxHeight);

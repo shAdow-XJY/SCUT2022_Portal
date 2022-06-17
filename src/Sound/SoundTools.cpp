@@ -6,7 +6,7 @@ using namespace std;
 SoundTool::SoundTool() {
 	result = FMOD::System_Create(&systemA);
 	result = systemA->init(32, FMOD_INIT_NORMAL, NULL);
-	result = systemA->createSound("../../sounds/bgm.wav", FMOD_LOOP_BIDI, 0, &soundA);
+	result = systemA->createSound("../../sounds/bgm.wav", FMOD_LOOP_NORMAL, 0, &soundA);
 	result = systemA->playSound(soundA, 0, 0, &channelA);
 	SoundInit();
 }

@@ -159,7 +159,7 @@ void renderCallback()
 		{
 			std::vector<PxRigidActor*> actors(nbActors);
 			scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
-			Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), false);
+			Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
 		}
 		/** »æÖÆÌì¿Õ */
 		skyBox.CreateSkyBox(-2000, -200, -2000, 1.0, 0.5, 1.0);
@@ -222,6 +222,7 @@ void renderLoop()
 	motionCallback(0,0);
 	atexit(exitCallback);
 	
+
 	initPhysics(true);
 	loadTexture();
 	initGame();
