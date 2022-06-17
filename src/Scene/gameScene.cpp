@@ -157,6 +157,7 @@ PxRigidStatic* createRoad(const PxTransform& t, const PxVec3& v, PxReal x, PxRea
 	PxVec3 position = roadActor->getGlobalPose().p;
 	Road* road = new Road("路面",position, x, y, z,roadActor);
 	roadActor->userData = road;
+	roadActor->setName("Road");
 	return roadActor;
 }
 
@@ -167,8 +168,9 @@ PxRigidStatic* createIceRoad(const PxTransform& t, const PxVec3& v, PxReal x, Px
 	PxRigidStatic* roadActor = createStaticBox(t, v, x, y, z, pose, BlockType::road);
 	//std::cout << "v::" <<  v.x << " " << v.y << " " << v.z << endl;
 	PxVec3 position = roadActor->getGlobalPose().p;
-	Road* road = new Road("路面", position, x, y, z, roadActor,BlockType::iceroad);
+	Road* road = new Road("冰路面", position, x, y, z, roadActor,BlockType::iceroad);
 	roadActor->userData = road;
+	roadActor->setName("Ice");
 	return roadActor;
 }
 
@@ -373,7 +375,7 @@ void createGameScene(const PxTransform& t) {
 	float c_2_x = r_2_l - r_1_l;
 	float c_2_y = center_y(c_1_y);
 	float c_2_z = r_1_w + r_2_w;
-	createRoad(t, PxVec3(c_2_x, c_2_y, c_2_z), r_2_l , boxHeight, r_2_w, defaultPose);
+	createIceRoad(t, PxVec3(c_2_x, c_2_y, c_2_z), r_2_l , boxHeight, r_2_w, defaultPose);
 
 	//创建道具类场景
 	createPorp(t, PxVec3(c_2_x, c_2_y + 2.5, c_2_z), boxHeight, boxHeight, boxHeight);

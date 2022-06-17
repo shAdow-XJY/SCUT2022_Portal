@@ -49,8 +49,9 @@ extern void keyRelease(unsigned char key);
 extern void mousePress(int button, int state, int x, int y);
 extern void specialKeyPress(GLint key);
 extern void specialKeyRelease(GLint key);
-extern void RayCastByRole();
 extern void calculateElapsedClocksFromLastFrame();
+extern void loadTexture();
+extern void initGame();
 
 extern Role* role;
 
@@ -222,6 +223,8 @@ void renderLoop()
 	atexit(exitCallback);
 	
 	initPhysics(true);
+	loadTexture();
+	initGame();
 	glutMainLoop();
 
 	ImGui_ImplOpenGL2_Shutdown();

@@ -84,9 +84,38 @@ extern void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y
 
 
 std::map<string, unsigned int> textureMap;
+std::string texture[] = { "Door","Wall","Road","SeesawBox","Seesaw","Ice"};
 
 //音频类
 SoundTool soundtool = SoundTool();
+
+//加载纹理
+void loadTexture() {	
+	for (auto name : texture) {
+		string baseUrl = "../../texture/";
+		CBMPLoader* BMPLoader = new CBMPLoader();
+		unsigned int id = BMPLoader->generateID((baseUrl + name + ".bmp").c_str());
+		textureMap.insert(std::pair<string, unsigned int>(name, id));
+		std::cout << id << std::endl;
+	}
+	textureMap.insert(std::pair<string, unsigned int>("Block", 0));
+}
+
+//初始化游戏场景和人物
+void initGame() {
+	extern void createGameScene(const PxTransform & t);
+	createGameScene(t);
+
+	role = new Role();
+	//初始位置
+	role->setFootPosition(PxVec3(-100, 20, -210));
+	//迷宫前位置
+	//role->setFootPosition(PxVec3(83, 20, -136));
+
+	//role->attachModel("../../models/paimon/paimon.obj");
+	role->attachModel("../../models/human.obj");
+	role->fall();
+}
 
 ///实例化物理
 void initPhysics(bool interactive)
@@ -138,27 +167,6 @@ void initPhysics(bool interactive)
 	//testModel.attachMeshes((PxTransform(PxVec3(20, 30, 30))).transform(PxTransform(PxQuat(-PxHalfPi,PxVec3(1.0f,0.0f,0.0f)))));
 	//testModel.createMeshActor(PxTransform(20, 30, 30));
 	// end
-	std::string texture[] = { "Door","Wall","Road","SeesawBox","Seesaw"};
-	for (auto name : texture) {
-		string baseUrl = "../../texture/";
-		CBMPLoader* BMPLoader = new CBMPLoader();
-		unsigned int id = BMPLoader->generateID((baseUrl + name + ".bmp").c_str());
-		textureMap.insert(std::pair<string, unsigned int>(name, id));
-		std::cout << id << std::endl;
-	}
-	textureMap.insert(std::pair<string, unsigned int>("Block", 0));
-	extern void createGameScene(const PxTransform & t);
-	createGameScene(t);
-
-	role = new Role();
-	//初始位置
-	//role->setFootPosition(PxVec3(-100, 20, -210));
-	//迷宫前位置
-	role->setFootPosition(PxVec3(83, 20, -136));
-
-	//role->attachModel("../../models/paimon/paimon.obj");
-	role->attachModel("../../models/human.obj");
-	role->fall();
 
 }
 

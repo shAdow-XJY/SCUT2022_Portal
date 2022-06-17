@@ -154,6 +154,7 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 			this->isMoving = 0;
 			return;
 		};
+		//通过点乘判断两个向量的接近程度
 		float dis = std::abs(this->mDir.getNormalized().dot(this->targetDir.getNormalized()));
 		if (dis > 0.99f) {
 			this->mDir = this->targetDir;
