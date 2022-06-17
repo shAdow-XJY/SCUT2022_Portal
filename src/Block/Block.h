@@ -22,7 +22,9 @@ enum BlockType
 	door = 4, //门
 	seesaw =5,
 	seesawbox = 6,
-	iceroad = 7  //冰面
+	iceroad = 7,  //冰面
+	rotateRod = 8, //旋转杆
+	prismaticRoad = 9 //平移路面
 };
 
 

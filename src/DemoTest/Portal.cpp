@@ -79,7 +79,7 @@ PxControllerManager* cManager = NULL;
 
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
 
-const PxTransform t = PxTransform(PxVec3(-100, 0, -200));
+const PxTransform t = PxTransform(PxVec3(-50, 0, -250));
 extern void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z);
 
 
@@ -107,14 +107,21 @@ void initGame() {
 	createGameScene(t);
 
 	role = new Role();
-	//初始位置
-	role->setFootPosition(PxVec3(-100, 20, -210));
-	//迷宫前位置
-	//role->setFootPosition(PxVec3(83, 20, -136));
-
-	//role->attachModel("../../models/paimon/paimon.obj");
-	role->attachModel("../../models/human.obj");
-	role->fall();
+		//初始位置
+		role->setFootPosition(PxVec3(-50, 20, -250));
+		//摆锤前位置
+		//role->setFootPosition(t.transform(PxVec3(58, 20, 19)));
+		//迷宫前位置
+		//role->setFootPosition(t.transform(PxVec3(183, 20, 64)));
+		//迷宫出口位置
+		//role->setFootPosition(t.transform(PxVec3(35, 20, 385.8)));
+		//平移路段前位置
+		//role->setFootPosition(t.transform(PxVec3(3, 45, 416.8)));
+		//旋转杆关卡角落位置
+		//role->setFootPosition(t.transform(PxVec3(-17, 45, 406.8)));
+		//role->attachModel("../../models/paimon/paimon.obj");
+		role->attachModel("../../models/human.obj");
+		role->fall();
 }
 
 ///实例化物理
@@ -157,8 +164,9 @@ void initPhysics(bool interactive)
 	cManager->setOverlapRecoveryModule(true);
 	//静摩擦，动摩擦，restitution恢复原状(弹性)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
-	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 
+	
+	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	groundPlane->setName("Over");
 	gScene->addActor(*groundPlane);
 

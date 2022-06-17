@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <iostream>
 #include "PxPhysicsAPI.h"
+#include "../Sphere/Pendulum.h"
 #include "../Block/Door.h"
 #include "../LoadModel/Model.h"
 #include "../Block/Seesaw.h"
@@ -167,7 +168,13 @@ public:
 		}
 		else if (name == "Seesaw") {
 		}
-		else if (name == "Over") {
+		else if (name == "Pendulum") {
+
+		}
+		else if (name == "PrismaticRoad") {
+
+		}
+		else if (name == "over") {
 			this->role->gameOver();
 			const char* msg = "游戏结束";
 			//渲染游戏结束

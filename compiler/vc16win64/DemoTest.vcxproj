@@ -20,7 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Block\Door.cpp" />
+    <ClCompile Include="..\..\src\Block\PrismaticRoad.cpp" />
     <ClCompile Include="..\..\src\Block\Road.cpp" />
+    <ClCompile Include="..\..\src\Block\RotateRod.cpp" />
     <ClCompile Include="..\..\src\Block\Seesaw.cpp" />
     <ClCompile Include="..\..\src\Common\ClassicMain.cpp" />
     <ClCompile Include="..\..\src\DemoTest\Portal.cpp" />
@@ -41,13 +43,16 @@
     <ClCompile Include="..\..\src\Render\Vector.cpp" />
     <ClCompile Include="..\..\src\Role\Role.cpp" />
     <ClCompile Include="..\..\src\Scene\gameScene.cpp" />
+    <ClCompile Include="..\..\src\Sphere\Pendulum.cpp" />
     <ClCompile Include="..\..\src\Sound\SoundTools.cpp" />
     <ClCompile Include="..\..\src\Utils\GameUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\Block\Block.h" />
     <ClInclude Include="..\..\src\Block\Door.h" />
+    <ClInclude Include="..\..\src\Block\PrismaticRoad.h" />
     <ClInclude Include="..\..\src\Block\Road.h" />
+    <ClInclude Include="..\..\src\Block\RotateRod.h" />
     <ClInclude Include="..\..\src\Block\Seesaw.h" />
     <ClInclude Include="..\..\src\ImGui\imconfig.h" />
     <ClInclude Include="..\..\src\ImGui\imgui.h" />
@@ -64,6 +69,8 @@
     <ClInclude Include="..\..\src\Render\RenderBox.h" />
     <ClInclude Include="..\..\src\Render\Vector.h" />
     <ClInclude Include="..\..\src\Role\Role.h" />
+    <ClInclude Include="..\..\src\Sphere\Pendulum.h" />
+    <ClInclude Include="..\..\src\Sphere\Sphere.h" />
     <ClInclude Include="..\..\src\Sound\SoundTools.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
