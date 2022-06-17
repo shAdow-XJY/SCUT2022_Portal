@@ -28,7 +28,7 @@ namespace Snippets
 		int					isMoving = 0; //旋转方向 1逆时针 -1顺时针 0不旋转
 		void				updateDir(physx::PxVec3);
 		void				calDirMoving(GLint);
-		float				rotateSpeed = 80.0f; //旋转速度
+		float				rotateSpeed = 200.0f; //旋转速度
 		bool				isChangeImmediate = false; //是否立即改变视角
 	private:
 		physx::PxVec3	mEye;	

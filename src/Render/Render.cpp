@@ -30,6 +30,11 @@
 #include "Render.h"
 #include<time.h>
 #include <iostream>
+#include "BMPLoader.h"
+#include <string>
+#include <map>
+#include <Block/Block.h>
+using namespace std;
 #include "../LoadModel/Model.h"
 using namespace physx;
 
@@ -65,14 +70,83 @@ extern int mouseX;
 extern int mouseY;
 extern int textX, textY;
 
-void renderGeometry(const PxGeometryHolder& h)
+
+extern std::map<string, unsigned int> textureMap;
+CBMPLoader* TextureLoader;
+unsigned int textureID;
+
+static void drawBox(GLfloat x, GLfloat y, GLfloat z,bool shadow)
+{
+	static GLfloat n[6][3] =
+	{
+	  {-1.0, 0.0, 0.0},
+	  {0.0, 1.0, 0.0},
+	  {1.0, 0.0, 0.0},
+	  {0.0, -1.0, 0.0},
+	  {0.0, 0.0, 1.0},
+	  {0.0, 0.0, -1.0}
+	};
+	static GLint faces[6][4] =
+	{
+	  {0, 1, 2, 3},
+	  {3, 2, 6, 7},
+	  {7, 6, 5, 4},
+	  {4, 5, 1, 0},
+	  {5, 6, 2, 1},
+	  {7, 4, 0, 3}
+	};
+	GLfloat v[8][3];
+	GLint i;
+
+	v[0][0] = v[1][0] = v[2][0] = v[3][0] = -x / 2;
+	v[4][0] = v[5][0] = v[6][0] = v[7][0] = x / 2;
+	v[0][1] = v[1][1] = v[4][1] = v[5][1] = -y / 2;
+	v[2][1] = v[3][1] = v[6][1] = v[7][1] = y / 2;
+	v[0][2] = v[3][2] = v[4][2] = v[7][2] = -z / 2;
+	v[1][2] = v[2][2] = v[5][2] = v[6][2] = z / 2;
+	/** 启用纹理 */
+	glEnable(GL_TEXTURE_2D);
+
+
+	for (i = 5; i >= 0; i--) {
+		/** 开始绘制 */
+		glPushMatrix();
+		if (shadow) {
+			glColor4f(0.1f, 0.2f, 0.3f, 1.0f);
+		}
+		else
+		{
+			glColor4f(1, 1, 1, 1);
+		}
+
+		/** 绘制背面 */
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		//std::cout << TextureLoader->ID << std::endl;
+		glBegin(GL_QUADS);
+		glNormal3fv(&n[i][0]);
+		/** 指定纹理坐标和顶点坐标 */
+		glTexCoord2f(1.0f, 0.0f); glVertex3fv(&v[faces[i][0]][0]);
+		glTexCoord2f(1.0f, 1.0f); glVertex3fv(&v[faces[i][1]][0]);
+		glTexCoord2f(0.0f, 1.0f); glVertex3fv(&v[faces[i][2]][0]);
+		glTexCoord2f(0.0f, 0.0f); glVertex3fv(&v[faces[i][3]][0]);
+		
+		
+		glEnd();
+	}
+	glPopMatrix();                 /** 绘制结束 */
+	glFlush();
+}
+
+
+void renderGeometry(const PxGeometryHolder& h, string name,bool shadow)
 {
 	switch(h.getType())
 	{
 	case PxGeometryType::eBOX:			
 		{
-			glScalef(h.box().halfExtents.x, h.box().halfExtents.y, h.box().halfExtents.z);
-			glutSolidCube(2.0);
+	
+			textureID = textureMap[name];
+			drawBox(h.box().halfExtents.x*2, h.box().halfExtents.y*2, h.box().halfExtents.z*2,shadow);
 		}
 		break;
 	case PxGeometryType::eSPHERE:		
@@ -85,7 +159,7 @@ void renderGeometry(const PxGeometryHolder& h)
 
 			const PxF32 radius = h.capsule().radius;
 			const PxF32 halfHeight = h.capsule().halfHeight;
-
+			glColor4f(0.0f, 1.0f, 0.0f, 0.0f);
 			//Sphere
 			glPushMatrix();
 			glTranslatef(halfHeight, 0.0f, 0.0f);
@@ -251,16 +325,11 @@ void renderGeometry(const PxGeometryHolder& h)
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+extern void reshape(int width, int height);
+
 namespace Snippets
 {
 
-namespace
-{
-void reshapeCallback(int width, int height)
-{
-	glViewport(0, 0, width, height);
-}
-}
 
 void setupDefaultWindow(const char *name)
 {
@@ -275,7 +344,7 @@ void setupDefaultWindow(const char *name)
 	glutInitDisplayMode(GLUT_RGB|GLUT_DOUBLE|GLUT_DEPTH);
 	int mainHandle = glutCreateWindow(name);
 	glutSetWindow(mainHandle);
-	glutReshapeFunc(reshapeCallback);
+	glutReshapeFunc(reshape);
 	
 	delete[] namestr;
 }
@@ -299,6 +368,7 @@ void setupDefaultRenderState()
 	glEnable(GL_LIGHT0);
 	/** 启用纹理 */
 	glEnable(GL_TEXTURE_2D);
+	
 }
 
 void renderImGui() {
@@ -336,8 +406,8 @@ void renderImGui() {
 
 void startRender(const PxVec3& cameraEye, const PxVec3& cameraDir, PxReal clipNear, PxReal clipFar)
 {
-	ImGui_ImplOpenGL2_NewFrame();
-	ImGui_ImplGLUT_NewFrame();
+	/*ImGui_ImplOpenGL2_NewFrame();
+	ImGui_ImplGLUT_NewFrame();*/
 	lastTime = currTime;
 	currTime = clock();
 	 
@@ -363,9 +433,9 @@ void startRender(const PxVec3& cameraEye, const PxVec3& cameraDir, PxReal clipNe
 }
 
 void renderGameOver(const char text[], int len) 
-	{
-		renderText(190,250,text,len);
-	}
+{
+	renderText(190,250,text,len);
+}
 
 void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, const PxVec3 & color)/*渲染actor*/
 {
@@ -385,7 +455,6 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 
 			if (shapes[j]->getFlags() & PxShapeFlag::eTRIGGER_SHAPE)
 				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
 			if (shapes[j]->getFlags() & PxShapeFlag::eVISUALIZATION) {
 				// render object
 				glPushMatrix();
@@ -398,11 +467,17 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 				else {
 					glColor4f(color.x, color.y, color.z, 1.0f);
 				}
-				
-				renderGeometry(h);
+				if (actors[i]->getName()) {
+					string name = string(actors[i]->getName());
+					renderGeometry(h, name, false);
+				}
+				else
+				{
+					renderGeometry(h, "Block", false);
+				}			
+
 				glPopMatrix();
 			}
-
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 			if (shadows)/*阴影，，，效果表现上有瑕疵但不知道怎么优化*/
@@ -414,7 +489,7 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 				glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
 				glDisable(GL_LIGHTING);
 				glColor4f(0.1f, 0.2f, 0.3f, 1.0f);
-				renderGeometry(h);
+				renderGeometry(h, "Block",true);
 				glEnable(GL_LIGHTING);
 				glPopMatrix();
 			}	
@@ -424,8 +499,8 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 
 void finishRender()
 {
-	// 把ui渲染放在这里 是为了其能显示在最上层
-	renderImGui();
+	 //把ui渲染放在这里 是为了其能显示在最上层
+	//renderImGui();
 	if (textShouldRaster == true) {
 		rasterTime += double(currTime - lastTime)/CLOCKS_PER_SEC;
 		if (rasterTime >= 3) {
@@ -465,3 +540,9 @@ void renderText(int x, int y, const char text[], int len)
 }
 } //namespace Snippets
 
+
+void renderGameOver() {
+	const char* msg = "Game Over!";
+	//int len = sizeof(msg) / sizeof(char);
+	Snippets::renderText(45, 50, msg, 10);
+}

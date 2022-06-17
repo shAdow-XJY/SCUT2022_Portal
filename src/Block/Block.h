@@ -16,10 +16,13 @@ enum BlockType
 {
 	error = -1,
 	block = 0, //普通方块
-	road = 1, //道路
-	prop = 2,
-	door = 3, //门
-	seesaw =4
+	wall = 1,
+	road = 2, //道路
+	prop = 3,
+	door = 4, //门
+	seesaw =5,
+	seesawbox = 6,
+	iceroad = 7  //冰面
 };
 
 

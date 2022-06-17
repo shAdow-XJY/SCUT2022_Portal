@@ -26,4 +26,6 @@ public:
 	PxRigidDynamic* getDoorActor();
 	bool canOpen();
 	PxRevoluteJoint* getJoint();
+
+	void addPForce(PxVec3 force);
 };

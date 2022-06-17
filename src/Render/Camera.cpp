@@ -6,6 +6,8 @@
 
 using namespace physx;
 extern clock_t deltaClock;
+extern PxVec3 roleBackPosition;
+extern PxVec3 dir;
 
 namespace Snippets
 {
@@ -21,10 +23,28 @@ namespace Snippets
 
 	void Camera::handleMouse(int button, int state, int x, int y)
 	{
-		PX_UNUSED(state);
-		PX_UNUSED(button);
 		mMouseX = x;
 		mMouseY = y;
+		switch (button)
+		{
+		case 0: {
+			if (state == 1) {
+			}
+			break;
+		}
+		case 2: {
+			if (state == 1) {
+				if (this->free) {
+					this->mEye = roleBackPosition;
+					this->targetDir = dir.getNormalized();
+					this->mDir = dir.getNormalized();
+				}
+			}
+			break;
+		}
+		default:
+			break;
+		}
 	}
 
 void Camera::goFront(float speed)
@@ -41,10 +61,10 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 	switch (toupper(key))
 	{
 		if (this->free) {
-	case 'W':	mEye += mDir * 2.0f * speed * deltaClock;		break;
-	case 'S':	mEye -= mDir * 2.0f * speed * deltaClock;		break;
-	case 'A':	mEye -= viewY * 2.0f * speed * deltaClock;		break;
-	case 'D':	mEye += viewY * 2.0f * speed * deltaClock;		break;
+	case 'W':	mEye += mDir * 0.25f * speed * deltaClock;		break;
+	case 'S':	mEye -= mDir * 0.25f * speed * deltaClock;		break;
+	case 'A':	mEye -= viewY * 0.25f * speed * deltaClock;		break;
+	case 'D':	mEye += viewY * 0.25f * speed * deltaClock;		break;
 		}
 	
 		//切换是否为自由视角
@@ -140,7 +160,7 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 			this->isMoving = 0;
 			return;
 		};
-		const float delta = (this->isMoving*PxHalfPi / this->rotateSpeed ) * deltaClock;
+		const float delta = (this->isMoving * PxHalfPi / this->rotateSpeed ) * deltaClock;
 		PxTransform rotate = PxTransform(position,PxQuat(delta, PxVec3(0, 1, 0)));
 		this->mDir = rotate.rotate(this->mDir);
 		this->mEye = position - this->mDir;

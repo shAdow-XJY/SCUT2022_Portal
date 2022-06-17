@@ -13,8 +13,8 @@ extern PxPhysics* gPhysics;
 extern PxControllerManager* cManager;
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
 extern PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir);
-
-const int primaryJumpHeight = 8.0f;
+extern void renderGameOver();
+const int primaryJumpHeight = 4.0f;
 
 class Role {
 private:
@@ -40,17 +40,15 @@ private:
 	//人物上一次位置
 	PxVec3 lastPostion;	
 	//角色重力
-	float mass = 2000.0f;
+	float mass = 8000.0f;
 	//重力加速度
-	//float midFallSpeed = 0.1;
-	float gravityAcceleration = 0.0005;
+	float midFallSpeed = 0.5;
 	//跳跃相关
-	float littleJumpSpeed = 0.08;
-	float bigJumpSpeed = 0.1;
+	float littleJumpSpeed = 0.4;
+	float bigJumpSpeed = 0.5;
 	float nowJumpHeight = 0.0;
 	float wantJumpHeight = primaryJumpHeight;
-	float maxJumpHeight = 14.0;
-	PxVec3 verticalSpeed = PxVec3(0.0f, 0.0f, 0.0f);
+	float maxJumpHeight = 10.0;
 
 	/// <summary>
 	/// 状态量
@@ -65,6 +63,10 @@ private:
 	//本次跳跃是否能够向前
 	bool canForward = true;
 	bool standingOnBlock = true;
+	//冰面滑动
+	bool slide = false;
+	//边缘滑动
+	PxVec3 sliceDir = PxVec3(0, 0, 0);
 
 public:
 	Role();
@@ -96,6 +98,7 @@ public:
 
 	//速度相关
 	PxVec3 getSpeed();
+	bool isSpeedZero();
 	void setSpeed(PxVec3 speed);
 
 	//相机朝向
@@ -119,7 +122,7 @@ public:
 	bool getEquiped();
 
 	//跳跃
-	void tryJump(bool release);
+	bool tryJump(bool release);
 	void roleJump();
 	void roleFall();
 	void fall();
@@ -138,6 +141,10 @@ public:
 	void pickUpObj();
 	//放置物体
 	void layDownObj();
+
+	//角色滑动
+	void roleSlide();
+	void edgeSliding();
 
 };
 
@@ -168,18 +175,18 @@ public:
 		if (name == "Door") {
 			Door* door = (Door*)actor.userData;
 			if (door->canOpen()) {
-				PxRigidBody* doorActor = door->getDoorActor();
 				float scale = 9000.0f;
-				doorActor->addForce(role->getFaceDir() * scale);
-				PxRevoluteJoint* revoluteJoint = door->getJoint();
-				PxJointAngularLimitPair limits(-PxPi / 2, PxPi / 2, 0.01f);
-				revoluteJoint->setLimit(limits);
+				door->addPForce(role->getFaceDir() * scale);			
 			}
 		}
 		else if (name == "Seesaw") {
 		}
-		else if (name == "over") {
+		else if (name == "Over") {
 			this->role->gameOver();
+			const char* msg = "游戏结束";
+			//渲染游戏结束
+			renderGameOver();
+
 		}
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
 	}

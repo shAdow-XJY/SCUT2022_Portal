@@ -36,7 +36,7 @@
 #include "../Render/Render.h"
 #include "../Render/Camera.h"
 #include "../Role/Role.h"
-#include <Render/Skybox.h>
+#include <Render/RenderBox.h>
 
 
 
@@ -49,20 +49,25 @@ extern void keyRelease(unsigned char key);
 extern void mousePress(int button, int state, int x, int y);
 extern void specialKeyPress(GLint key);
 extern void specialKeyRelease(GLint key);
-extern Role* role;
 extern void RayCastByRole();
 extern void calculateElapsedClocksFromLastFrame();
 
-CSkyBox skyBox;
+extern Role* role;
 
 extern void renderVisible(const Role& role);
+//角色背后照相机默认位置
+PxVec3 roleBackPosition = PxVec3(0, 0, 0);
+
+//看向角色的视线
+PxVec3 dir = PxVec3(0, 0, 0);
+
 
 bool beginGame = true;
+RenderBox skyBox;
 namespace
 {
 	Snippets::Camera*	sCamera;
 
-	
 
 	void motionCallback(int x, int y)
 	{
@@ -101,54 +106,52 @@ void mouseCallback(int button, int state, int x, int y)
 	mousePress(button, state, x, y);
 }
 
-	void idleCallback()
-	{
-		glutPostRedisplay();
-	}
+void idleCallback()
+{
+	glutPostRedisplay();
+}
 
-	void renderCallback()
-	{
-		stepPhysics(true);
+void renderCallback()
+{
+	stepPhysics(true);
 
-	
+		
 		if (!sCamera->isFree() || beginGame) {
 			if (beginGame) {
 				sCamera->isChangeImmediate = true;
 				beginGame = false;
 			}
-			PxVec3 position = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getFaceDir() * -50);
+			roleBackPosition = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getFaceDir() * -50);
 			if (!sCamera->isMoving) {
-				sCamera->setEye(position);
+				sCamera->setEye(roleBackPosition);
 				role->changeCanMove(true);
 			}
 			else {
 				role->changeCanMove(false);
 			}
-			PxVec3 dir = role->getPosition() - position;
+			dir = role->getPosition() - roleBackPosition;
 			sCamera->targetDir = dir;
 			sCamera->updateDir(role->getPosition());
 			
 		}
+		else
+		{
+			dir = role->getPosition() - roleBackPosition;
+			roleBackPosition = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getDir() * -50);
+		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 
-		if (sCamera->isFree())
+		/*if (sCamera->isFree())
 		{
-			if (role)
-			{
-				role->move();
-				role->roleJump();
-				role->roleFall();
-			}
+			role->move();
+		}*/
+		if (role) {
+			role->roleJump();
+			role->roleFall();
+			role->roleSlide();
+			role->simulationGravity();
 		}
-		else {
-			if (role)
-			{
-				role->roleJump();
-				role->roleFall();
-			}
-		}
-		role->simulationGravity();
-		std::cout << role->getFaceDir().x << " " << role->getFaceDir().y << " " << role->getFaceDir().z << " " << std::endl;
+
 		PxScene* scene;
 		PxGetPhysics().getScenes(&scene,1);
 		PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
@@ -156,7 +159,7 @@ void mouseCallback(int button, int state, int x, int y)
 		{
 			std::vector<PxRigidActor*> actors(nbActors);
 			scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
-			Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
+			Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), false);
 		}
 		
 		// 渲染模型
@@ -180,6 +183,20 @@ void mouseCallback(int button, int state, int x, int y)
 
 }
 
+/**
+* @brief 窗口大小重置函数
+**/
+void reshape(int width, int height)
+{
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0, GLUT_WINDOW_WIDTH, 0, GLUT_WINDOW_HEIGHT);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+}
+
 
 void renderLoop()
 {
@@ -189,7 +206,7 @@ void renderLoop()
 	Snippets::setupDefaultRenderState();
 
 	/** 初始化天空 */
-	skyBox.Init();
+	skyBox.Init(true);
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -208,6 +225,7 @@ void renderLoop()
 	glutSpecialUpFunc(specialKeyUpCallback);
 	glutMouseFunc(mouseCallback);
 	glutMotionFunc(motionCallback);
+	glutReshapeFunc(reshape);
 	motionCallback(0,0);
 	atexit(exitCallback);
 	
@@ -218,6 +236,8 @@ void renderLoop()
 	ImGui_ImplGLUT_Shutdown();
 	ImGui::DestroyContext();
 }
+
+
 #endif
 
 LRESULT CALLBACK HostWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
