@@ -89,7 +89,7 @@ bool press = false;
 
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
 
-const PxTransform t = PxTransform(PxVec3(-100, 0, -200));
+const PxTransform t = PxTransform(PxVec3(-50, 0, -250));
 extern void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z);
 
 
@@ -191,8 +191,8 @@ void initPhysics(bool interactive)
 	cManager->setOverlapRecoveryModule(true);
 	//¾²Ä¦²Á£¬¶¯Ä¦²Á£¬restitution»Ö¸´Ô­×´(µ¯ÐÔ)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
-	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 
+	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	groundPlane->setName("over");
 	gScene->addActor(*groundPlane);
 
@@ -208,10 +208,18 @@ void initPhysics(bool interactive)
 
 	role = new Role();
 	//³õÊ¼Î»ÖÃ
-	//role->setFootPosition(PxVec3(-100, 20, -200));
+	//role->setFootPosition(PxVec3(-50, 20, -250));
+	//°Ú´¸Ç°Î»ÖÃ
+	//role->setFootPosition(t.transform(PxVec3(58, 20, 19)));
 	//ÃÔ¹¬Ç°Î»ÖÃ
-	role->setFootPosition(PxVec3(83, 20, -136));
-
+	//role->setFootPosition(t.transform(PxVec3(183, 20, 64)));
+	//ÃÔ¹¬³ö¿ÚÎ»ÖÃ
+	//role->setFootPosition(t.transform(PxVec3(35, 20, 385.8)));
+	//Æ½ÒÆÂ·¶ÎÇ°Î»ÖÃ
+	role->setFootPosition(t.transform(PxVec3(3, 45, 416.8)));
+	//Ðý×ª¸Ë¹Ø¿¨½ÇÂäÎ»ÖÃ
+	//role->setFootPosition(t.transform(PxVec3(-17, 45, 406.8)));
+	
 	role->fall();
 
 }

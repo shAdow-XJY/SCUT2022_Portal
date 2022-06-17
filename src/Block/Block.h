@@ -19,7 +19,9 @@ enum BlockType
 	road = 1, //道路
 	prop = 2,
 	door = 3, //门
-	seesaw =4
+	seesaw = 4,
+	rotateRod = 5, //旋转杆
+	prismaticRoad = 6 //平移路面
 };
 
 

@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <iostream>
 #include "PxPhysicsAPI.h"
+#include "../Sphere/Pendulum.h"
 #include "../Block/Door.h"
 #include "../Block/Seesaw.h"
 #include <glut.h>
@@ -159,6 +160,12 @@ public:
 			}
 		}
 		else if (name == "Seesaw") {
+		}
+		else if (name == "Pendulum") {
+
+		}
+		else if (name == "PrismaticRoad") {
+
 		}
 		else if (name == "over") {
 			this->role->gameOver();
