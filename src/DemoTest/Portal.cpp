@@ -82,12 +82,14 @@ extern PxVec3 ScenetoWorld(int xCord, int yCord);
 const PxTransform t = PxTransform(PxVec3(-50, 0, -250));
 extern void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z);
 
-
+//材质贴图ID数组
 std::map<string, unsigned int> textureMap;
 std::string texture[] = { "Door","Wall","Road","SeesawBox","Seesaw","Ice"};
 
 //音频类
 SoundTool soundtool = SoundTool();
+
+
 
 //加载纹理
 void loadTexture() {	

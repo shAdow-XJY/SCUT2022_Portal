@@ -38,6 +38,7 @@
     <ClCompile Include="..\..\src\LoadModel\Model.cpp" />
     <ClCompile Include="..\..\src\Render\BMPLoader.cpp" />
     <ClCompile Include="..\..\src\Render\Camera.cpp" />
+    <ClCompile Include="..\..\src\Render\DynamicCircle.cpp" />
     <ClCompile Include="..\..\src\Render\Render.cpp" />
     <ClCompile Include="..\..\src\Render\RenderBox.cpp" />
     <ClCompile Include="..\..\src\Render\Vector.cpp" />
@@ -65,6 +66,7 @@
     <ClInclude Include="..\..\src\LoadModel\Model.h" />
     <ClInclude Include="..\..\src\Render\BMPLoader.h" />
     <ClInclude Include="..\..\src\Render\Camera.h" />
+    <ClInclude Include="..\..\src\Render\DynamicCircle.h" />
     <ClInclude Include="..\..\src\Render\Render.h" />
     <ClInclude Include="..\..\src\Render\RenderBox.h" />
     <ClInclude Include="..\..\src\Render\Vector.h" />

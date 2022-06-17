@@ -84,6 +84,7 @@ public:
 	PxVec3 getFootPosition();
 	PxVec3 getPosition();
 	void updatePosition();
+	PxVec3 getRoleWorldPosition();
 
 	//速度相关
 	PxVec3 getSpeed();

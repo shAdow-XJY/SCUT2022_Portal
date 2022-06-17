@@ -27,7 +27,7 @@
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 
-
+#pragma once
 #ifndef PHYSX_SNIPPET_RENDER_H
 #define PHYSX_SNIPPET_RENDER_H
 
@@ -46,10 +46,9 @@
 #error platform not supported.
 #endif
 
-#include"../ImGui/imgui.h"
-#include"../ImGui/imgui_impl_glut.h"
-#include"../ImGui/imgui_impl_opengl2.h"
-
+#include "../ImGui/imgui.h"
+#include "../ImGui/imgui_impl_glut.h"
+#include "../ImGui/imgui_impl_opengl2.h"
 namespace Snippets
 {
 void setupDefaultWindow(const char* name);
@@ -60,6 +59,7 @@ void renderActors(physx::PxRigidActor** actors, const physx::PxU32 numActors, bo
 void finishRender();
 void renderText(int x, int y, const char text[], int len);
 void renderGameOver(const char text[], int len);
+
 }
 
 #define MAX_NUM_ACTOR_SHAPES 128

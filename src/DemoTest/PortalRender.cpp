@@ -28,18 +28,14 @@
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 #define RENDER_SNIPPET 1
 #ifdef RENDER_SNIPPET
-
 #include <vector>
 
 #include "PxPhysicsAPI.h"
-
 #include "../Render/Render.h"
 #include "../Render/Camera.h"
 #include "../Role/Role.h"
 #include <Render/RenderBox.h>
-
-
-
+#include <Render/DynamicCircle.h>
 using namespace physx;
 extern void initPhysics(bool interactive);
 extern void stepPhysics(bool interactive);	
@@ -63,11 +59,14 @@ PxVec3 dir = PxVec3(0, 0, 0);
 
 
 bool beginGame = true;
+//Ìì¿ÕÍ¼
 RenderBox skyBox;
+//¶¯Ì¬äÖÈ¾È¦
+PxVec3 roleWorldPosition = PxVec3(0);
+DynamicCircle dynamicCircle = DynamicCircle(true);
 namespace
 {
 	Snippets::Camera*	sCamera;
-
 
 	void motionCallback(int x, int y)
 	{
@@ -150,6 +149,9 @@ void renderCallback()
 			role->roleFall();
 			role->roleSlide();
 			role->simulationGravity();
+			
+			roleWorldPosition = role->getRoleWorldPosition();
+			dynamicCircle.setCenterPosition(roleWorldPosition.x, roleWorldPosition.z);
 		}
 
 		PxScene* scene;

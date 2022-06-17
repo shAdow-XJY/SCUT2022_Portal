@@ -27,7 +27,7 @@ Role::Role() {
 	this->roleController->setUserData(this);
 	this->nowPostion = this->role->getGlobalPose().p;
 	this->lastPostion = this->role->getGlobalPose().p;
-	
+	this->role->setName("Role");
 }
 
 /**
@@ -236,6 +236,13 @@ void Role::updatePosition() {
 	PxExtendedVec3 position = this->roleController->getFootPosition();
 	this->lastPostion = PxVec3(this->nowPostion.x, this->nowPostion.y, this->nowPostion.z);
 	this->nowPostion = PxVec3(position.x, position.y, position.z);
+}
+
+/**
+* @brief 获取角色世界坐标信息
+**/
+PxVec3 Role::getRoleWorldPosition() {
+	return this->role->getGlobalPose().p;
 }
 
 /**

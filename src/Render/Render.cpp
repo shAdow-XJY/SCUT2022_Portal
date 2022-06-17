@@ -26,7 +26,6 @@
 // Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
-
 #include "Render.h"
 #include<time.h>
 #include <iostream>
@@ -34,6 +33,7 @@
 #include <string>
 #include <map>
 #include <Block/Block.h>
+#include <Render/DynamicCircle.h>
 using namespace std;
 using namespace physx;
 
@@ -69,11 +69,10 @@ extern int mouseX;
 extern int mouseY;
 extern int textX, textY;
 
-
+//材质贴图ID数组
 extern std::map<string, unsigned int> textureMap;
-CBMPLoader* TextureLoader;
 unsigned int textureID;
-
+extern DynamicCircle dynamicCircle;
 static void drawBox(GLfloat x, GLfloat y, GLfloat z,bool shadow)
 {
 	static GLfloat n[6][3] =
@@ -327,9 +326,7 @@ extern void reshape(int width, int height);
 
 namespace Snippets
 {
-
-
-void setupDefaultWindow(const char *name)
+    void setupDefaultWindow(const char *name)
 {
 	char* namestr = new char[strlen(name)+1];
 	strcpy(namestr, name);
@@ -347,7 +344,7 @@ void setupDefaultWindow(const char *name)
 	delete[] namestr;
 }
 
-void setupDefaultRenderState()
+	void setupDefaultRenderState()
 {
 	// Setup default render states 初始化设置
 	glClearColor(0.7f, 0.9f, 0.86f, 1.0);
@@ -369,7 +366,7 @@ void setupDefaultRenderState()
 	
 }
 
-void renderImGui() {
+	void renderImGui() {
 
 	{
 		static float f = 0.0f;
@@ -402,7 +399,7 @@ void renderImGui() {
 	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 }
 
-void startRender(const PxVec3& cameraEye, const PxVec3& cameraDir, PxReal clipNear, PxReal clipFar)
+	void startRender(const PxVec3& cameraEye, const PxVec3& cameraDir, PxReal clipNear, PxReal clipFar)
 {
 	/*ImGui_ImplOpenGL2_NewFrame();
 	ImGui_ImplGLUT_NewFrame();*/
@@ -446,8 +443,22 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 		bool sleeping = actors[i]->is<PxRigidDynamic>() ? actors[i]->is<PxRigidDynamic>()->isSleeping() : false; 
 		/*这里以后会用到来判断每一杆的行动机会，sleeping则可以行动，不是sleeping状态说明还在运动*/
 
+		PxVec3 actorWorldPosition = actors[i]->getGlobalPose().p;
+		if (nbShapes>0 && !dynamicCircle.isInCircle(actorWorldPosition.x, actorWorldPosition.z)) {
+			continue;
+		}
+		
+
 		for(PxU32 j=0;j<nbShapes;j++)
 		{
+			//if (!dynamicCircle.isInCircle(actorWorldPosition.x, actorWorldPosition.z)) {
+			//	//cout << "model" << endl;
+			//	goto JumpFor;
+			//}
+			/*if (actors[i]->getName() == "Role") {
+				cout << "yes" << endl;
+			}*/
+
 			const PxMat44 shapePose(PxShapeExt::getGlobalPose(*shapes[j], *actors[i]));
 			PxGeometryHolder h = shapes[j]->getGeometry();
 
@@ -494,6 +505,7 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 				glPopMatrix();
 			}	
 		}
+
 	}
 }
 
@@ -538,6 +550,7 @@ void renderText(int x, int y, const char text[], int len)
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 }
+
 } //namespace Snippets
 
 
