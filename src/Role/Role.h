@@ -162,10 +162,8 @@ public:
 		string name(actor.getName());
 		if (name == "Door") {
 			Door* door = (Door*)actor.userData;
-			if (door->canOpen()) {
-				float scale = 9000.0f;
-				door->addPForce(role->getFaceDir() * scale);			
-			}
+			float scale = 9000.0f;
+			door->addPForce(role->getFaceDir() * scale);
 		}
 		else if (name == "Seesaw") {
 		}
