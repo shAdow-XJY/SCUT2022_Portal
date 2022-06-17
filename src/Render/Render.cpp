@@ -30,6 +30,7 @@
 #include "Render.h"
 #include<time.h>
 #include <iostream>
+#include "../LoadModel/Model.h"
 using namespace physx;
 
 static float gCylinderData[]={
@@ -245,6 +246,7 @@ void renderGeometry(const PxGeometryHolder& h)
 	}
 }
 
+
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -396,8 +398,8 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 				else {
 					glColor4f(color.x, color.y, color.z, 1.0f);
 				}
+				
 				renderGeometry(h);
-
 				glPopMatrix();
 			}
 

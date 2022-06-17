@@ -42,13 +42,15 @@ private:
 	//角色重力
 	float mass = 2000.0f;
 	//重力加速度
-	float midFallSpeed = 0.1;
+	//float midFallSpeed = 0.1;
+	float gravityAcceleration = 0.0005;
 	//跳跃相关
 	float littleJumpSpeed = 0.08;
 	float bigJumpSpeed = 0.1;
 	float nowJumpHeight = 0.0;
 	float wantJumpHeight = primaryJumpHeight;
 	float maxJumpHeight = 14.0;
+	PxVec3 verticalSpeed = PxVec3(0.0f, 0.0f, 0.0f);
 
 	/// <summary>
 	/// 状态量
@@ -56,6 +58,7 @@ private:
 	bool isAutoMoving = false;
 	bool canMove = true;
 	bool isJump = false;
+	bool isHanging = false;
 	bool isFall = false;
 	bool isAlive = true;
 	bool equiped = false;
@@ -71,13 +74,24 @@ public:
 	};
 
 	bool attachModel(const char*);
+	Model& getModel() const{
+		return *this->model;
+	}
+	PxShape* getShape() const {
+		PxShape* shapePtr = nullptr;
+		this->roleController->getActor()->getShapes(&shapePtr, 1);
+		return shapePtr;
+	}
+	PxRigidActor* getActor() const {
+		return this->role;
+	}
 	bool getAliveStatus();
 	void gameOver();
 
 	//角色位置信息
 	void setFootPosition(PxVec3 position);
 	PxVec3 getFootPosition();
-	PxVec3 getPosition();
+	PxVec3 getPosition() const;
 	void updatePosition();
 
 	//速度相关

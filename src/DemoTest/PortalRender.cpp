@@ -55,6 +55,7 @@ extern void calculateElapsedClocksFromLastFrame();
 
 CSkyBox skyBox;
 
+extern void renderVisible(const Role& role);
 
 bool beginGame = true;
 namespace
@@ -147,7 +148,7 @@ void mouseCallback(int button, int state, int x, int y)
 			}
 		}
 		role->simulationGravity();
-
+		std::cout << role->getFaceDir().x << " " << role->getFaceDir().y << " " << role->getFaceDir().z << " " << std::endl;
 		PxScene* scene;
 		PxGetPhysics().getScenes(&scene,1);
 		PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
@@ -157,6 +158,13 @@ void mouseCallback(int button, int state, int x, int y)
 			scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
 			Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
 		}
+		
+		// 渲染模型
+		if (role) {
+			renderVisible(*role);
+		}
+		
+
 		/** 绘制天空 */
 		skyBox.CreateSkyBox(-2000, -200, -2000, 1.0, 0.5, 1.0);
 

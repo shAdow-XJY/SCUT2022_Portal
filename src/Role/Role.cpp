@@ -4,7 +4,6 @@
 
 #define MAX_NUM_ACTOR_SHAPES 128
 
-
 Role::Role() {
 	PxCapsuleControllerDesc desc;
 	desc.radius = roleRadius;
@@ -40,9 +39,8 @@ bool Role::attachModel(const char* path) {
 	// 设为false就能只作为碰撞体而不渲染出来
 	cap->setFlag(PxShapeFlag::eVISUALIZATION, false);
 	this->model = new Model(path);
-	this->model->attachMeshes(PxTransform(PxQuat(-PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))).transform(PxTransform(PxVec3(0.0f,-0.4f,0.0f))), this->role);
-	this->role->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
-	
+	//this->model->attachMeshes(PxTransform(PxQuat(-PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))).transform(PxTransform(PxVec3(0.0f,-0.4f,0.0f))), this->role);
+	//this->role->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 	return true;
 }
 
@@ -77,7 +75,7 @@ void Role::roleMoveByMouse(PxVec3 position) {
 	this->nowPostion = position;
 	this->isAutoMoving = true;
 }
-
+extern clock_t deltaClock;
 /**
 * @brief 角色自动移动
 **/
@@ -155,35 +153,11 @@ void Role::move(GLint key,bool status,bool free) {
 		}case GLUT_KEY_LEFT: {
 			PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
 			dir = rotate.rotate(dir);
-			PxTransform currfront = role->getGlobalPose();
-
-			//PxU32 NbShapes = role->getNbShapes();
-			//PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
-			//role->getShapes(shapes, NbShapes);
-			//for (PxU32 i = 0; i < NbShapes; i++) {
-			//	role->detachShape(*shapes[i]);
-			//	//shapes[i]->setLocalPose(PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0))));
-			//}
-			//model->attachMeshes(PxTransform(PxQuat(-PxHalfPi, PxVec3(0, 1, 0))),role);
-
-			role->setGlobalPose(rotate);
-
-			cout << "LEFT!" << endl;
 			break;
 
 		}case GLUT_KEY_RIGHT: {
 			PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
 			dir = rotate.rotate(-dir);
-
-			//PxU32 NbShapes = role->getNbShapes();
-			//PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
-			//role->getShapes(shapes, NbShapes);
-			//for (PxU32 i = 0; i < NbShapes; i++) {
-			//	role->detachShape(*shapes[i]);
-			//	//shapes[i]->setLocalPose(PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0))));
-			//}
-			//model->attachMeshes(PxTransform(PxQuat(-PxHalfPi, PxVec3(0, 1, 0))), role);
-			role->setGlobalPose(rotate);
 			break;
 
 		}
@@ -191,10 +165,13 @@ void Role::move(GLint key,bool status,bool free) {
 			return;
 		}
 		}
-		this->speed = dir * 0.12f;
+		//this->speed = dir * 0.12f;
+		speed.x = dir.x * 0.12f;
+		speed.z = dir.z * 0.12f;
 		this->lastPressDir = dir.getNormalized();
 		if (this->isJump || this->isFall) return;
-		this->roleController->move(this->speed * 4, 0.0001, 1.0f / 120.0f, NULL);
+		//this->roleController->move(this->speed * 4, 0.0001, 1.0f / 120.0f, NULL);
+		this->roleController->move(this->speed * deltaClock, 0.0001, deltaClock, NULL);
 		std::cout << speed.x << " " << speed.y << ' ' << speed.z << ' ' << std::endl;
 		this->updatePosition();
 	}
@@ -231,7 +208,7 @@ PxVec3 Role::getFootPosition() {
 * @brief 获取角色controller的中心坐标
 * @return PxVec3
 **/
-PxVec3 Role::getPosition() {
+PxVec3 Role::getPosition() const{
 	PxExtendedVec3 pos = this->roleController->getPosition();
 	return PxVec3(pos.x, pos.y, pos.z);
 }
@@ -261,7 +238,8 @@ void Role::tryJump(bool release) {
 	if (!isJump && !isFall) {
 		if (!release) {
 			//std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
-			wantJumpHeight = wantJumpHeight <= maxJumpHeight ? (wantJumpHeight + bigJumpSpeed*5) : maxJumpHeight;
+			//wantJumpHeight = wantJumpHeight <= maxJumpHeight ? (wantJumpHeight + bigJumpSpeed*5) : maxJumpHeight;
+
 		}
 		else
 		{
@@ -269,14 +247,22 @@ void Role::tryJump(bool release) {
 		}
 	}
 }
-extern clock_t deltaClock;
+
 /**
 * @brief 角色跳跃
 **/
 void Role::roleJump() {
 	if (isJump) {
-		float speed = 0.0;
-		if (nowJumpHeight <= wantJumpHeight / 2) {
+		if (!isHanging) {
+			float initverticalSpeed = 0.1f;
+			this->speed.y += initverticalSpeed;
+			isHanging = true;
+		}
+		auto speed = this->speed;
+		float y = speed.y;
+		speed *= 0.15f;
+		speed.y = y;
+		/*if (nowJumpHeight <= wantJumpHeight / 2) {
 			speed = bigJumpSpeed ;
 		}
 		else
@@ -286,22 +272,33 @@ void Role::roleJump() {
 		PxVec3 jumpSpeed = PxVec3(0.0, speed, 0.0);
 		if (canForward && canMove) {
 			jumpSpeed += this->speed * 0.3;
-		}
+		}*/
 		
-		PxControllerCollisionFlags flag = roleController->move(jumpSpeed, PxF32(0.001), deltaClock, NULL);
-		nowJumpHeight += speed;
+		PxControllerCollisionFlags flag = roleController->move(speed * deltaClock, PxF32(0.001), deltaClock, NULL);
+		this->speed.y -= gravityAcceleration * deltaClock;
+		
+
+		//nowJumpHeight += speed;
+
 		//std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
 		//std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;
-		if (nowJumpHeight >= wantJumpHeight)
-		{
-			/*std::cout << "max height" << std::endl;
-			std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
-			std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;*/
+		// 
+		//if (nowJumpHeight >= wantJumpHeight)
+		//{
+		//	/*std::cout << "max height" << std::endl;
+		//	std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
+		//	std::cout << "nowJumpHeight" << nowJumpHeight << std::endl;*/
 
-			nowJumpHeight = 0.0;
-			wantJumpHeight = primaryJumpHeight;
+		//	nowJumpHeight = 0.0;
+		//	wantJumpHeight = primaryJumpHeight;
+		//	isJump = false;
+		//	isFall = true;
+		//}
+		if (speed.y <= 0.0) {
 			isJump = false;
+			isHanging = false;
 			isFall = true;
+			speed.y = 0.0f;
 		}
 		//this->updatePosition();
 	}
@@ -312,16 +309,22 @@ void Role::roleJump() {
 **/
 void Role::roleFall() {
 	if (isFall) {
-		PxVec3 fallSpeed = PxVec3(0.0, -midFallSpeed, 0.0);
+		//PxVec3 fallSpeed = PxVec3(0.0, 0.0, 0.0);
 		if (canForward && canMove) {
-			fallSpeed += this->speed * 0.3;
+			//fallSpeed += this->speed * 0.3;
+			
 		}
-		PxControllerCollisionFlags flag = roleController->move(fallSpeed, PxF32(0.00001), deltaClock, NULL);
+		auto speed = this->speed;
+		float y = speed.y;
+		speed *= 0.15f;
+		speed.y = y;
+		this->speed.y -= gravityAcceleration * deltaClock;
+		PxControllerCollisionFlags flag = roleController->move(speed * deltaClock, PxF32(0.00001), deltaClock, NULL);
 		if (flag == PxControllerCollisionFlag::eCOLLISION_SIDES) {
 			this->setSpeed(PxVec3(0, 0, 0));
 		}
 		else if (flag == PxControllerCollisionFlag::eCOLLISION_DOWN) {
-			this->setSpeed(PxVec3(0, 0, 0));
+			this->setSpeed(PxVec3(speed.x, 0, speed.z));
 			isFall = false;
 			if (!this->isAutoMoving) {
 				this->updatePosition();
@@ -392,7 +395,9 @@ PxVec3 Role::getDir() {
 PxVec3 Role::getFaceDir() {
 	PxVec3 dir = this->speed.getNormalized();
 	if (!this->speed.x || !this->speed.y || !this->speed.z) return this->faceDir;
-	return this->speed.getNormalized();
+	auto ret = this->speed.getNormalized();
+	ret.y = 0;
+	return ret;
 }
 
 /**

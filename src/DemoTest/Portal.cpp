@@ -182,7 +182,7 @@ void initPhysics(bool interactive)
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
 	gScene = gPhysics->createScene(sceneDesc);
 
-
+	
 
 	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
 	if (pvdClient)
@@ -266,9 +266,6 @@ PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir)
 }
 
 
-
-
-
 //（在render中调用）
 void stepPhysics(bool interactive)
 {
@@ -306,6 +303,7 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	case ' ':
 	{
 		role->tryJump(false);
+		
 		break;
 	}
 	case 'Z':

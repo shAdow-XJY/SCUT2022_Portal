@@ -140,7 +140,7 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 			this->isMoving = 0;
 			return;
 		};
-		const float delta = (PxHalfPi / (this->rotateSpeed * this->isMoving)) * deltaClock;
+		const float delta = (this->isMoving*PxHalfPi / this->rotateSpeed ) * deltaClock;
 		PxTransform rotate = PxTransform(position,PxQuat(delta, PxVec3(0, 1, 0)));
 		this->mDir = rotate.rotate(this->mDir);
 		this->mEye = position - this->mDir;
