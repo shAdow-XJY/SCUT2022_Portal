@@ -1,4 +1,4 @@
-//
+ï»¿//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
 // are met:
@@ -60,7 +60,7 @@ static clock_t lastTime, currTime;
 double rasterTime;
 static bool textShouldRaster = false;
 
-// ´Ë´¦Ô­ÏÈ¶¨ÒåÎª1024£¬ ¶øTriangleMeshÖĞÒ»¸öÈı½ÇĞÎ¾ÍÒªÕ¼ÓÃ2¸öVec3£¬¸´ÔÓÄ£ĞÍ¸ù±¾²»¹»ÓÃ
+// æ­¤å¤„åŸå…ˆå®šä¹‰ä¸º1024ï¼Œ è€ŒTriangleMeshä¸­ä¸€ä¸ªä¸‰è§’å½¢å°±è¦å ç”¨2ä¸ªVec3ï¼Œå¤æ‚æ¨¡å‹æ ¹æœ¬ä¸å¤Ÿç”¨
 #define MAX_NUM_MESH_VEC3S  524288
 
 static PxVec3 gVertexBuffer[MAX_NUM_MESH_VEC3S];
@@ -69,7 +69,7 @@ extern int mouseX;
 extern int mouseY;
 extern int textX, textY;
 
-//²ÄÖÊÌùÍ¼IDÊı×é
+//æè´¨è´´å›¾IDæ•°ç»„
 extern std::map<string, unsigned int> textureMap;
 unsigned int textureID;
 extern DynamicCircle dynamicCircle;
@@ -102,12 +102,12 @@ static void drawBox(GLfloat x, GLfloat y, GLfloat z,bool shadow)
 	v[2][1] = v[3][1] = v[6][1] = v[7][1] = y / 2;
 	v[0][2] = v[3][2] = v[4][2] = v[7][2] = -z / 2;
 	v[1][2] = v[2][2] = v[5][2] = v[6][2] = z / 2;
-	/** ÆôÓÃÎÆÀí */
+	/** å¯ç”¨çº¹ç† */
 	glEnable(GL_TEXTURE_2D);
 
 
 	for (i = 5; i >= 0; i--) {
-		/** ¿ªÊ¼»æÖÆ */
+		/** å¼€å§‹ç»˜åˆ¶ */
 		glPushMatrix();
 		if (shadow) {
 			glColor4f(0.1f, 0.2f, 0.3f, 1.0f);
@@ -117,12 +117,12 @@ static void drawBox(GLfloat x, GLfloat y, GLfloat z,bool shadow)
 			glColor4f(1, 1, 1, 1);
 		}
 
-		/** »æÖÆ±³Ãæ */
+		/** ç»˜åˆ¶èƒŒé¢ */
 		glBindTexture(GL_TEXTURE_2D, textureID);
 		//std::cout << TextureLoader->ID << std::endl;
 		glBegin(GL_QUADS);
 		glNormal3fv(&n[i][0]);
-		/** Ö¸¶¨ÎÆÀí×ø±êºÍ¶¥µã×ø±ê */
+		/** æŒ‡å®šçº¹ç†åæ ‡å’Œé¡¶ç‚¹åæ ‡ */
 		glTexCoord2f(1.0f, 0.0f); glVertex3fv(&v[faces[i][0]][0]);
 		glTexCoord2f(1.0f, 1.0f); glVertex3fv(&v[faces[i][1]][0]);
 		glTexCoord2f(0.0f, 1.0f); glVertex3fv(&v[faces[i][2]][0]);
@@ -131,7 +131,7 @@ static void drawBox(GLfloat x, GLfloat y, GLfloat z,bool shadow)
 		
 		glEnd();
 	}
-	glPopMatrix();                 /** »æÖÆ½áÊø */
+	glPopMatrix();                 /** ç»˜åˆ¶ç»“æŸ */
 	glFlush();
 }
 
@@ -307,9 +307,9 @@ void renderGeometry(const PxGeometryHolder& h, string name,bool shadow)
 	case PxGeometryType::eINVALID:
 	case PxGeometryType::eHEIGHTFIELD:
 	case PxGeometryType::eGEOMETRY_COUNT:	
-	case PxGeometryType::ePLANE:/*ÕâÀïÉèÖÃÁËÆ½Ãæ£¬¸øÁË¼¸¸öµãÈÃglut»­ÁË¸öÕı·½ĞÎ£¬ÑÕÉ«ÉèÖÃÎª120µÄÂÌÉ«£¨ÂúÖµÊÇ255£©*/
+	case PxGeometryType::ePLANE:/*è¿™é‡Œè®¾ç½®äº†å¹³é¢ï¼Œç»™äº†å‡ ä¸ªç‚¹è®©glutç”»äº†ä¸ªæ­£æ–¹å½¢ï¼Œé¢œè‰²è®¾ç½®ä¸º120çš„ç»¿è‰²ï¼ˆæ»¡å€¼æ˜¯255ï¼‰*/
 		glBegin(GL_QUADS);
-		glColor4ub(0, 159, 149, 200); glVertex3f(-1.0f, -300.0f, -300.0f);/*Õâ¸ö×ø±êÓĞµãÆæ¹Ö ºóÃæÓ¦¸ÃÊÇ±ä»»¹ı£¬²»ÓÃÌ«ÔÚÒâ£¬·´Õı¾Íµ±µÚÒ»¸öÊÇyÖá¾Í¿ÉÒÔÁË*/
+		glColor4ub(0, 159, 149, 200); glVertex3f(-1.0f, -300.0f, -300.0f);/*è¿™ä¸ªåæ ‡æœ‰ç‚¹å¥‡æ€ª åé¢åº”è¯¥æ˜¯å˜æ¢è¿‡ï¼Œä¸ç”¨å¤ªåœ¨æ„ï¼Œåæ­£å°±å½“ç¬¬ä¸€ä¸ªæ˜¯yè½´å°±å¯ä»¥äº†*/
 		glColor4ub(0, 159, 149, 200); glVertex3f(-1.0f, -300.0f, 300.0f);
 		glColor4ub(0, 159, 149, 200); glVertex3f(-1.0f, 300.0f, 300.0f);
 		glColor4ub(0, 159, 149, 200); glVertex3f(-1.0f, 300.0f, -300.0f);
@@ -346,11 +346,11 @@ namespace Snippets
 
 	void setupDefaultRenderState()
 {
-	// Setup default render states ³õÊ¼»¯ÉèÖÃ
+	// Setup default render states åˆå§‹åŒ–è®¾ç½®
 	glClearColor(0.7f, 0.9f, 0.86f, 1.0);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_COLOR_MATERIAL);
-	// Setup lighting ¹âÕÕÉèÖÃ
+	// Setup lighting å…‰ç…§è®¾ç½®
 	glEnable(GL_LIGHTING);
 	PxReal ambientColor[]	= { 0.0f, 0.1f, 0.2f, 0.0f };
 	PxReal diffuseColor[]	= { 1.0f, 1.0f, 1.0f, 0.0f };		
@@ -361,7 +361,7 @@ namespace Snippets
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specularColor);
 	glLightfv(GL_LIGHT0, GL_POSITION, position);
 	glEnable(GL_LIGHT0);
-	/** ÆôÓÃÎÆÀí */
+	/** å¯ç”¨çº¹ç† */
 	glEnable(GL_TEXTURE_2D);
 	
 }
@@ -432,7 +432,7 @@ void renderGameOver(const char text[], int len)
 	renderText(190,250,text,len);
 }
 
-void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, const PxVec3 & color)/*äÖÈ¾actor*/
+void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, const PxVec3 & color)/*æ¸²æŸ“actor*/
 {
 	PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
 	for(PxU32 i=0;i<numActors;i++)
@@ -441,7 +441,7 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 		PX_ASSERT(nbShapes <= MAX_NUM_ACTOR_SHAPES);
 		actors[i]->getShapes(shapes, nbShapes);
 		bool sleeping = actors[i]->is<PxRigidDynamic>() ? actors[i]->is<PxRigidDynamic>()->isSleeping() : false; 
-		/*ÕâÀïÒÔºó»áÓÃµ½À´ÅĞ¶ÏÃ¿Ò»¸ËµÄĞĞ¶¯»ú»á£¬sleepingÔò¿ÉÒÔĞĞ¶¯£¬²»ÊÇsleeping×´Ì¬ËµÃ÷»¹ÔÚÔË¶¯*/
+		/*è¿™é‡Œä»¥åä¼šç”¨åˆ°æ¥åˆ¤æ–­æ¯ä¸€æ†çš„è¡ŒåŠ¨æœºä¼šï¼Œsleepingåˆ™å¯ä»¥è¡ŒåŠ¨ï¼Œä¸æ˜¯sleepingçŠ¶æ€è¯´æ˜è¿˜åœ¨è¿åŠ¨*/
 
 		PxVec3 actorWorldPosition = actors[i]->getGlobalPose().p;
 		if (nbShapes>0 && !dynamicCircle.isInCircle(actorWorldPosition.x, actorWorldPosition.z)) {
@@ -451,13 +451,6 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 
 		for(PxU32 j=0;j<nbShapes;j++)
 		{
-			//if (!dynamicCircle.isInCircle(actorWorldPosition.x, actorWorldPosition.z)) {
-			//	//cout << "model" << endl;
-			//	goto JumpFor;
-			//}
-			/*if (actors[i]->getName() == "Role") {
-				cout << "yes" << endl;
-			}*/
 
 			const PxMat44 shapePose(PxShapeExt::getGlobalPose(*shapes[j], *actors[i]));
 			PxGeometryHolder h = shapes[j]->getGeometry();
@@ -468,9 +461,10 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 				// render object
 				glPushMatrix();
 				glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
-				if (sleeping)/*ÊÇ·ñ´¦ÓÚsleeping×´Ì¬*/
+				glEnable(GL_CULL_FACE);
+				if (sleeping)/*æ˜¯å¦å¤„äºsleepingçŠ¶æ€*/
 				{
-					PxVec3 darkColor = color * 0.8f;/*sleepingµÄÇé¿öÏÂÑÕÉ«*0.8*/
+					PxVec3 darkColor = color * 0.8f;/*sleepingçš„æƒ…å†µä¸‹é¢œè‰²*0.8*/
 					glColor4f(darkColor.x, darkColor.y, darkColor.z, 1.0f);
 				}
 				else {
@@ -489,13 +483,14 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 			}
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-			if (shadows)/*ÒõÓ°*/
+			if (shadows)/*é˜´å½±*/
 			{
 				const PxVec3 shadowDir(0.0f, -0.7071067f, -0.7071067f);
 				const PxReal shadowMat[] = { 1,0,0,0, -shadowDir.x / shadowDir.y,0,-shadowDir.z / shadowDir.y,0, 0,0,1,0, 0,0,0,1 };
 				glPushMatrix();
 				glMultMatrixf(shadowMat);
 				glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
+				//å¼€å¯è¡¨â¾¯å‰”é™¤(é»˜è®¤èƒŒâ¾¯å‰”é™¤)
 				glEnable(GL_CULL_FACE);
 				glDisable(GL_LIGHTING);
 				glColor4f(0.1f, 0.2f, 0.3f, 1.0f);
@@ -511,7 +506,7 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 
 void finishRender()
 {
-	 //°ÑuiäÖÈ¾·ÅÔÚÕâÀï ÊÇÎªÁËÆäÄÜÏÔÊ¾ÔÚ×îÉÏ²ã
+	 //æŠŠuiæ¸²æŸ“æ”¾åœ¨è¿™é‡Œ æ˜¯ä¸ºäº†å…¶èƒ½æ˜¾ç¤ºåœ¨æœ€ä¸Šå±‚
 	//renderImGui();
 	if (textShouldRaster == true) {
 		rasterTime += double(currTime - lastTime)/CLOCKS_PER_SEC;
@@ -519,8 +514,8 @@ void finishRender()
 			textShouldRaster = false;
 		}
 		else {
-			// TextXµÄ·¶Î§[0,90], textYµÄ·¶Î§[0,100]
-			// ÕâÀïµÄ1024ºÍ768ÊÇ´°¿Ú³ß´ç£¬ºóĞøÓ¦¿¼ÂÇ»»³É±äÁ¿±íÊ¾
+			// TextXçš„èŒƒå›´[0,90], textYçš„èŒƒå›´[0,100]
+			// è¿™é‡Œçš„1024å’Œ768æ˜¯çª—å£å°ºå¯¸ï¼Œåç»­åº”è€ƒè™‘æ¢æˆå˜é‡è¡¨ç¤º
 			textX = ((float)mouseX / 1024) * 90;
 			textY= ((float)mouseY / 768) * 100;
 			renderText(textX, 100-textY, "Test Text.", 10);

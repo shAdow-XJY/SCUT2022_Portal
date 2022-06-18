@@ -13,6 +13,10 @@ void DynamicCircle::setCenterPosition(float center_X, float center_Z)
 
 bool DynamicCircle::isInCircle(float worldLocation_X, float worldLocation_Z)
 {
+	if (!this->dynamic) {
+		return true;
+	}
+
 	float length_X = fabsf(worldLocation_X - this->center_X);
 	float length_Z = fabsf(worldLocation_Z - this->center_Z);
 
@@ -30,25 +34,3 @@ bool DynamicCircle::isInCircle(float worldLocation_X, float worldLocation_Z)
 
 	return false;
 }
-
-
-//namespace Snippets
-//{
-//	//动态渲染圈
-//	DynamicCircle dynamicCircle = DynamicCircle();
-//
-//	void setRadius(float radius)
-//	{
-//		dynamicCircle.setRadius(radius);
-//	}
-//
-//	void setCenterPosition(float center_X, float center_Y)
-//	{
-//		dynamicCircle.setCenterPosition(center_X, center_Y);
-//	}
-//
-//	bool isInCircle(float worldLocation_X, float worldLocation_Y)
-//	{
-//		return dynamicCircle.isInCircle(worldLocation_X, worldLocation_Y);
-//	}
-//}
