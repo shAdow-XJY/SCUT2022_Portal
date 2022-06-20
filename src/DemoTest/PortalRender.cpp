@@ -158,8 +158,10 @@ void renderCallback()
 		if (role) {
 			role->roleJump();
 			role->roleFall();
-			role->roleSlide();
+			role->roleSlide();	
+			role->rayAround();
 			role->simulationGravity();
+			role->stimulate();
 			
 			roleWorldPosition = role->getRoleWorldPosition();
 			dynamicBall.setCircleCenterPosition_XZ(roleWorldPosition.x, roleWorldPosition.z);
