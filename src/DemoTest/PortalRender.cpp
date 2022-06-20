@@ -35,7 +35,7 @@
 #include "../Render/Camera.h"
 #include "../Role/Role.h"
 #include <Render/RenderBox.h>
-#include <Render/DynamicCircle.h>
+#include <Render/DynamicBall.h>
 #include <Sound/SoundTools.h>
 using namespace physx;
 extern void initPhysics(bool interactive);
@@ -66,7 +66,9 @@ RenderBox skyBox;
 extern SoundTool soundtool;
 //¶¯Ì¬äÖÈ¾È¦
 PxVec3 roleWorldPosition = PxVec3(0);
-DynamicCircle dynamicCircle = DynamicCircle(false);
+
+DynamicBall dynamicBall = DynamicBall(false);
+
 namespace
 {
 	Snippets::Camera*	sCamera;
@@ -160,7 +162,7 @@ void renderCallback()
 			role->simulationGravity();
 			
 			roleWorldPosition = role->getRoleWorldPosition();
-			dynamicCircle.setCenterPosition(roleWorldPosition.x, roleWorldPosition.z);
+			dynamicBall.setCircleCenterPosition_XZ(roleWorldPosition.x, roleWorldPosition.z);
 		}
 
 		PxScene* scene;
