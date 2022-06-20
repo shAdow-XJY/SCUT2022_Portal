@@ -90,12 +90,14 @@ void keyboardUpCallback(unsigned char key, int x, int y)
 void specialKeyDownCallback(GLint key, GLint x, GLint y)
 {
 	role->move(key,true,sCamera->isFree());
+	
 	specialKeyPress(key);
 }
 
 void specialKeyUpCallback(GLint key, GLint x, GLint y)
 {
-	role->move(key,false,sCamera->isFree());
+	role->move(key, false, sCamera->isFree());
+
 	sCamera->calDirMoving(key);
 	specialKeyRelease(key);
 }

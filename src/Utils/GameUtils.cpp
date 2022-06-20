@@ -1,5 +1,6 @@
 ﻿#include "PxPhysicsAPI.h"
 #include "../Render/Render.h"
+#include "../Role/Role.h"
 #include <iostream>
 #include <time.h>
 using namespace physx;
@@ -36,7 +37,7 @@ PxVec3 ScenetoWorld(int xCord, int yCord) {
 }
 
 clock_t currClock = 0, lastClock = 0;
-clock_t deltaClock;
+clock_t deltaClock = 0;
 
 void calculateElapsedClocksFromLastFrame() {
 	//更新deltaTime给需要速度的地方使用
@@ -51,4 +52,38 @@ void calculateElapsedClocksFromLastFrame() {
 **/
 void printPxVecFun(const PxVec3& vec) {
 	cout << "X:" << vec.x << " " << "Y:" << vec.y << " " << "Z:" << vec.z << endl;
+}
+
+void renderVisible(const Role& role) {
+	size_t indices = 0;
+	glPushMatrix();
+
+	float identity[] = {
+		1.0f,0.0f,0.0f,0.0f,
+		0.0f,1.0f,0.0f,0.0f,
+		0.0f,0.0f,1.0f,0.0f,
+		0.0f,0.0f,0.0f,1.0f
+	};
+	PxMat44 modelMatrix(PxShapeExt::getGlobalPose(*role.getShape(), *role.getActor()));
+	PxMat44 rotate(PxQuat(-PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
+	glMultMatrixf(reinterpret_cast<const float*>(&modelMatrix));
+	glMultMatrixf(reinterpret_cast<const float*>(&rotate));
+	glGetFloatv(GL_MODELVIEW_MATRIX, identity);
+
+	glGetFloatv(GL_MODELVIEW_MATRIX, identity);
+	glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+	//glScalef(2.0f, 2.0f, 2.0f);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glNormalPointer(GL_FLOAT, 0, &role.getModel().m_normals[0]);
+	glVertexPointer(3, GL_FLOAT, 0, &role.getModel().m_vertices[0]);
+	glTexCoordPointer(2, GL_FLOAT, 0, &role.getModel().m_texCoords[0]);
+	//glDrawElements(GL_TRIANGLES, role.getModel().m_indices.size(), GL_UNSIGNED_INT, &role.getModel().m_indices[0]);
+	glDrawArrays(GL_TRIANGLES, 0, int(role.getModel().m_vertices.size()));
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glPopMatrix();
 }

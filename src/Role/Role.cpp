@@ -166,13 +166,14 @@ void Role::move(GLint key, bool status, bool free) {
 		}
 		}
 		this->slide = false;
-		this->speed = dir * 0.6f;
+		this->speed = dir * 0.1f;
 		if (standingBlock.getType() == BlockType::iceroad) {
-			this->speed = dir * 0.86f;
+			this->speed = dir * 0.143f;
 		}
 		this->lastPressDir = dir.getNormalized();
 		if (this->isJump || this->isFall) return;
-		this->roleController->move(this->speed, 0.0001, 1.0f / 120.0f, NULL);
+		//this->roleController->move(this->speed, 0.0001, 1.0f / 120.0f, NULL);
+		this->roleController->move(this->speed * deltaClock, 0.0001, deltaClock, NULL);
 		this->updatePosition();
 	}
 	//µ¯Æð
@@ -243,8 +244,8 @@ bool Role::tryJump(bool release) {
 	if (!this->isAlive) return false;
 	if (!isJump && !isFall) {
 		if (!release) {
-			//std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
-			//wantJumpHeight = wantJumpHeight <= maxJumpHeight ? (wantJumpHeight + bigJumpSpeed*5) : maxJumpHeight;
+			std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
+			wantJumpHeight = wantJumpHeight <= maxJumpHeight ? (wantJumpHeight + bigJumpSpeed*5) : maxJumpHeight;
 
 		}
 		else
@@ -261,20 +262,17 @@ bool Role::tryJump(bool release) {
 **/
 void Role::roleJump() {
 	if (isJump) {
-		float speed = 0.0;
-		if (nowJumpHeight <= wantJumpHeight / 2) {
-			speed = bigJumpSpeed * 0.5 ;
+		float speed_y = 0.0;
+
+		if (isHanging == false) {
+			speed_y = 0.10f;
+			isHanging = true;
 		}
-		else
-		{
-			speed = littleJumpSpeed * 0.5;
-		}
-		PxVec3 jumpSpeed = PxVec3(0.0, speed, 0.0);
-		if (canForward && canMove) {
-			jumpSpeed += this->speed * 0.3;
-		}*/
+
+		this->speed *= 0.3f;
+		this->speed.y += speed_y;
 		
-		PxControllerCollisionFlags flag = roleController->move(speed * deltaClock, PxF32(0.001), deltaClock, NULL);
+		PxControllerCollisionFlags flag = roleController->move(this->speed * deltaClock, PxF32(0.001), deltaClock, NULL);
 		this->speed.y -= gravityAcceleration * deltaClock;
 		
 
@@ -294,11 +292,11 @@ void Role::roleJump() {
 		//	isJump = false;
 		//	isFall = true;
 		//}
-		if (speed.y <= 0.0) {
+		if (this->speed.y <= 0.0) {
 			isJump = false;
 			isHanging = false;
 			isFall = true;
-			speed.y = 0.0f;
+			this->speed.y = 0.0f;
 		}
 		//this->updatePosition();
 	}

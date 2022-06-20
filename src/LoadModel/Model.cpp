@@ -65,67 +65,29 @@ void Model::processSingleMesh(aiMesh* mesh, const aiScene* scene) {
 		m_texCoords.push_back(currTexCoord);
 	}
 
+	// 处理索引
 	for (unsigned i = 0; i < mesh->mNumFaces; ++i) {
 		aiFace face = mesh->mFaces[i];
 		for (unsigned j = 0; j < face.mNumIndices; ++j) {
 			m_indices.push_back(face.mIndices[j]);
+			//m_indices[i * 3 + j] = face.mIndices[j];
 		}
 	}
 
-//	// 对每个node下面的mesh，将其转换到Px的MeshDescription类中
-//	PxTriangleMeshDesc mesh_desc;
-//	mesh_desc.points.count = mesh->mNumVertices;
-//	PxVec3* vertices = new PxVec3[mesh->mNumVertices];
-//	for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
-//		PxVec3 currVertex;
-//		currVertex.x = mesh->mVertices[i].x;
-//		currVertex.y = mesh->mVertices[i].y;
-//		currVertex.z = mesh->mVertices[i].z;
-//		vertices[i] = currVertex;
-//
-//		
-//
-//	}
-//	mesh_desc.points.data = vertices;
-//	mesh_desc.points.stride = sizeof(PxVec3);
-//	mesh_desc.triangles.count = mesh->mNumFaces;
-//
-//	PxU32* indices = new PxU32[3 * mesh->mNumVertices];
-//	for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
-//		aiFace face = mesh->mFaces[i];
-//		for (unsigned int j = 0; j < face.mNumIndices; ++j) {
-//			indices[i * 3 + j] = face.mIndices[j];
-//		}
-//	}
-//	mesh_desc.triangles.data = indices;
-//
-//	//// vector形式的索引数据对部分模型可能出现三角形错乱的情况
-//	//vector<PxU32> indices;
-//	//for (unsigned int i = 0; i < mesh->mNumFaces; ++i) {
-//	//	aiFace face = mesh->mFaces[i];
-//	//	for (unsigned int j = 0; j < face.mNumIndices; ++j) {
-//	//		indices.push_back(face.mIndices[j]);
-//	//	}
-//	//}
-//	//mesh_desc.triangles.data = &indices[0];
-//
-//	mesh_desc.triangles.stride = 3 * sizeof(PxU32);
-//
-//#ifdef _DEBUG
-//	bool res = gCooking->validateTriangleMesh(mesh_desc);
-//	PX_ASSERT(res);
-//#endif
-//	// 根据MeshDescription生成Mesh
-//	PxDefaultMemoryOutputStream writeBuffer;
-//	PxTriangleMeshCookingResult::Enum result;
-//	bool status = gCooking->cookTriangleMesh(mesh_desc, writeBuffer, &result);
-//	assert(status);
-//	PxDefaultMemoryInputData readBuffer(writeBuffer.getData(), writeBuffer.getSize());
-//	PxTriangleMesh* triMesh;
-//	triMesh = gPhysics->createTriangleMesh(readBuffer);
-//	m_triangleMesh.push_back(triMesh);
+	// 处理纹理
+	if (mesh->mMaterialIndex >= 0) {
+		auto material = scene->mMaterials[mesh->mMaterialIndex];
+		for (unsigned i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); ++i) {
+			aiString as;
+			material->GetTexture(aiTextureType_DIFFUSE, 0, &as);
+			// TODO：真正导入纹理文件的实现
+			// 已经include了BMPLoader，剩下就是创建一个实例然后导入
+		}
+	}
 
 }
+
+
 
 /*
 * @brief 为role连接上指定的模型

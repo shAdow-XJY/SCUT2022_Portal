@@ -49,6 +49,7 @@ private:
 	float nowJumpHeight = 0.0;
 	float wantJumpHeight = primaryJumpHeight;
 	float maxJumpHeight = 10.0;
+	float gravityAcceleration = 0.0005f;
 
 	/// <summary>
 	/// ×´Ì¬Á¿

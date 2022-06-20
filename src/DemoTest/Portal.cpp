@@ -156,8 +156,8 @@ void initPhysics(bool interactive)
 	//ÃÔ¹¬Ç°Î»ÖÃ
 	role->setFootPosition(PxVec3(83, 20, -136));
 
-	//role->attachModel("../../models/paimon/paimon.obj");
-	role->attachModel("../../models/human.obj");
+	role->attachModel("../../models/paimon/paimon.obj");
+	//role->attachModel("../../models/Mouse Server.obj");
 	role->fall();
 
 }

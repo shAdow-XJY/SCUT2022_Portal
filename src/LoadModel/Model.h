@@ -10,6 +10,7 @@
 #include<assimp/postprocess.h>
 
 #include "PxPhysicsAPI.h"
+#include "../Render/BMPLoader.h"
 
 using namespace physx;
 using std::vector;
@@ -20,6 +21,12 @@ extern PxCooking*	gCooking;
 extern PxPhysics*	gPhysics;
 extern PxMaterial* gMaterial;
 
+struct Texture {
+	unsigned m_texID;
+	char* filename;
+};
+
+
 class Model {
 public:
 	Model(const char* path);
@@ -28,7 +35,8 @@ public:
 	vector<PxVec3> m_vertices;
 	vector<PxU32> m_indices;
 	vector<PxVec3> m_normals;
-	vector<PxVec2>m_texCoords;
+	vector<PxVec2> m_texCoords;
+	vector<Texture> m_textures;
 private:
 	vector<PxTriangleMesh*> m_triangleMesh;
 	vector<PxShape*> m_shapes;
