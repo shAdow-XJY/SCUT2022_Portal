@@ -12,10 +12,10 @@ public:
 
 	}
 	Seesaw(std::string name, PxVec3 position, PxReal halfX, PxReal halfY, PxReal halfZ)
-		:Block(name, position, halfX, halfY, halfZ, BlockType::seesaw) {
+		:Block(name, position, halfX, halfY, halfZ, OrganType::seesaw) {
 	}
 	Seesaw(std::string name, PxVec3 position, PxReal halfX, PxReal halfY, PxReal halfZ, PxRigidDynamic* seesaw, int tiltDir = 0)
-		:Block(name, position, halfX, halfY, halfZ, BlockType::seesaw) {
+		:Block(name, position, halfX, halfY, halfZ, OrganType::seesaw) {
 		this->seesaw = seesaw;
 		this->tiltDir = tiltDir;
 	}

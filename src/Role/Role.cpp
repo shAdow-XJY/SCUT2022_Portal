@@ -169,7 +169,7 @@ void Role::move(GLint key, bool status, bool free) {
 		}
 		this->slide = false;
 		this->speed = dir * 0.6f;
-		if (standingBlock.getType() == BlockType::iceroad) {
+		if (gameSceneBasic.getType() == OrganType::iceroad) {
 			this->speed = dir * 0.86f;
 		}
 		this->lastPressDir = dir.getNormalized();
@@ -185,7 +185,7 @@ void Role::move(GLint key, bool status, bool free) {
 			if (!free) {
 				this->dir = this->faceDir;//抬起的时候才更新角色朝向，确保持续移动
 			}
-			if (standingBlock.getType() == BlockType::iceroad) {
+			if (gameSceneBasic.getType() == OrganType::iceroad) {
 				std::cout << "in the ice" << std::endl;
 				//this->setSpeed(this->speed);
 				this->slide = true;
@@ -450,7 +450,7 @@ bool Role::isSpeedZero() {
 
 
 void Role::edgeSliding() {
-	if (this->standingBlock.getType() == BlockType::seesaw) {
+	if (this->gameSceneBasic.getType() == OrganType::seesaw) {
 		PxVec3 spliceSpeed = isSpeedZero() ? this->sliceDir : this->getFaceDir();
 		this->setFootPosition(this->getFootPosition() + spliceSpeed * 2.0f);
 	}
@@ -473,15 +473,15 @@ void Role::simulationGravity() {
 		//std::cout << "碰到地面" << std::endl;
 		//cout << role->standingBlock.getName() << endl;
 		this->standingOnBlock = true;
-		Block* block = (Block*)actor->userData;
+		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;		
 		this->sliceDir = PxVec3(0, 0, 0);
-		if (block != NULL) {
+		if (basic != NULL) {
 			//cout << block->getType() << endl;
-			if (block->getType() == BlockType::road) {
+			if (basic->getType() == OrganType::road) {
 				//std::cout << role->standingBlock.getName()<<std::endl;
 			}
-			else if (block->getType() == BlockType::seesaw) {
-				Seesaw* seesaw = (Seesaw*)block;
+			else if (basic->getType() == OrganType::seesaw) {
+				Seesaw* seesaw = (Seesaw*)basic;
 				PxVec3 force = PxVec3(0, -1, 0) * this->mass;
 				PxVec3 speed = seesaw->addGForce(this->getFootPosition(), force);
 				this->sliceDir = speed.getNormalized();
@@ -491,19 +491,19 @@ void Role::simulationGravity() {
 				
 			}
 			//std::cout << "yes" << std::endl;
-			this->standingBlock = *block;
+			this->gameSceneBasic = *basic;
 		}
 	}
 	else {
 		if (!this->isJump && !this->isFall) {
-			if (this->standingBlock.getType() != BlockType::error) {
+			if (this->gameSceneBasic.getType() != OrganType::error) {
 				//再次检测避免出现更新延迟
 				if (!RayCast(origin, PxVec3(0, -5.0f, 0))) {
 					std::cout << "边缘滑动" << endl;
 					this->edgeSliding();
 				}
 			}
-			this->standingBlock = Block();
+			this->gameSceneBasic = GameSceneBasic();
 			this->standingOnBlock = false;
 			this->fall();
 		}	
@@ -522,8 +522,8 @@ void Role::pickUpObj() {
 	PxVec3 forwardDir = this->getFaceDir() * 2;
 	PxRigidActor* actor = NULL;
 	if (actor = RayCast(origin, forwardDir)) {
-		Block* block = (Block*)actor->userData;
-		if (block->getType() == BlockType::prop) {
+		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
+		if (basic->getType() == OrganType::prop) {
 			actor->release();
 			this->equiped = true;
 			std::cout << "拾取道具成功" << std::endl;
@@ -548,8 +548,8 @@ void Role::layDownObj() {
 	PxVec3 forwardDir = PxVec3(this->getFaceDir().x * 1.5f, -3, this->getFaceDir().z * 1.5f);
 	PxRigidActor* actor = NULL;
 	if (actor = RayCast(origin, forwardDir)) {
-		Block* block = (Block*)actor->userData;
-		if (block->getType() == BlockType::road) {
+		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
+		if (basic->getType() == OrganType::road) {
 			this->equiped = false;
 			extern void createPorp(const PxTransform & t, const PxVec3 & v, PxReal x, PxReal y, PxReal z);
 			//cout << role->getPosition().x << " " << role->getPosition().y << " " << role->getPosition().z << endl;

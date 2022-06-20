@@ -56,28 +56,28 @@ vector<vector<int>> sideDoorCanOpen = {
 //extern std::map<string, CBMPLoader*> textureMap;
 //extern CBMPLoader* TextureLoader;
 
-const char* typeMapName(BlockType type) {
+const char* typeMapName(OrganType type) {
 	switch (type)
 	{
-	case BlockType::road: {
+	case OrganType::road: {
 		return "Road";
 		break;
 	}
-	case BlockType::wall: {
+	case OrganType::wall: {
 		return "Wall";
 		break;
 	}
-	case BlockType::door: {
+	case OrganType::door: {
 		return "Door";
 		break;
 	}
-	case BlockType::seesaw:{
+	case OrganType::seesaw:{
 		return "Seesaw";
 	}
-	case BlockType::seesawbox:{
+	case OrganType::seesawbox:{
 		return "SeesawBox";
 	}
-	case BlockType::iceroad: {
+	case OrganType::iceroad: {
 		return "Ice";
 	}
 	default:
@@ -91,7 +91,7 @@ t为该刚体构建的相对原点
 v为该刚体中心点相对其原点的位置
 x, y, z为该盒子的长高宽
 pose 刚体的初始朝向*/
-PxRigidStatic* createStaticBox(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose, BlockType type = BlockType::block) {
+PxRigidStatic* createStaticBox(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose, OrganType type = OrganType::block) {
 	PxTransform local(v);
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(x, y, z), *gMaterial);
 	//碰撞检测的过滤组
@@ -111,7 +111,7 @@ v为该刚体中心点相对其原点的位置
 x, y, z为该盒子的长高宽
 pose 刚体的初始朝向
 velocity 刚体的初始速度，默认为0*/
-PxRigidDynamic* createDynamicBox(bool kinematic, const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose, BlockType type = BlockType::block, const PxVec3& velocity = PxVec3(0)) {
+PxRigidDynamic* createDynamicBox(bool kinematic, const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose, OrganType type = OrganType::block, const PxVec3& velocity = PxVec3(0)) {
 	PxTransform local(v);
 	PxShape* shape = gPhysics->createShape(PxBoxGeometry(x, y, z), *gMaterial);
 	shape->setQueryFilterData(collisionGroup);
@@ -130,7 +130,7 @@ PxRigidDynamic* createDynamicBox(bool kinematic, const PxTransform& t, const PxV
 }
 
 
-//创建道具类，区别只在Block(BlockType::prop)，试验用，可修改
+//创建道具类，区别只在Block(OrganType::prop)，试验用，可修改
 void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z) {
 	PxTransform local(v);
 	//cout << v.x << " " << v.y << " " << v.z << endl;
@@ -141,8 +141,7 @@ void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxRea
 	//setupFiltering(shape, FilterGroup::ePIG, FilterGroup::eBIRD);
 	PxRigidDynamic* sceneBox = gPhysics->createRigidDynamic(t.transform(local));
 	PxRigidBodyExt::updateMassAndInertia(*sceneBox, 1.0f);
-	Block* block = new Block("道具", sceneBox->getGlobalPose().p, x, y, z);
-	block->setType(BlockType::prop);
+	Block* block = new Block("道具", sceneBox->getGlobalPose().p, x, y, z, OrganType::prop);
 	sceneBox->attachShape(*shape);
 	sceneBox->userData = block;
 	sceneBox->setName("Prop");
@@ -172,7 +171,7 @@ v为该道路中心点相对其构建原点的位置
 x, y, z为该道路的长高宽
 pose 道路的初始朝向*/
 PxRigidStatic* createRoad(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose) {
-	PxRigidStatic* roadActor = createStaticBox(t, v, x, y, z, pose, BlockType::road);
+	PxRigidStatic* roadActor = createStaticBox(t, v, x, y, z, pose, OrganType::road);
 	//std::cout << "v::" <<  v.x << " " << v.y << " " << v.z << endl;
 	PxVec3 position = roadActor->getGlobalPose().p;
 	Road* road = new Road("路面",position, x, y, z,roadActor);
@@ -185,10 +184,10 @@ PxRigidStatic* createRoad(const PxTransform& t, const PxVec3& v, PxReal x, PxRea
 * @brief 创建冰路
 **/
 PxRigidStatic* createIceRoad(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose) {
-	PxRigidStatic* roadActor = createStaticBox(t, v, x, y, z, pose, BlockType::iceroad);
+	PxRigidStatic* roadActor = createStaticBox(t, v, x, y, z, pose, OrganType::iceroad);
 	//std::cout << "v::" <<  v.x << " " << v.y << " " << v.z << endl;
 	PxVec3 position = roadActor->getGlobalPose().p;
-	Road* road = new Road("冰路面", position, x, y, z, roadActor,BlockType::iceroad);
+	Road* road = new Road("冰路面", position, x, y, z, roadActor,OrganType::iceroad);
 	roadActor->userData = road;
 	return roadActor;
 }
@@ -264,10 +263,10 @@ void createFrontDoor(const PxTransform& t, PxVec3 v, float scale, PxTransform& p
 	PxReal y = 5 * scale;
 	PxReal z = 1 * scale;
 	//实际-5  旋转角度小：-17.8  -18.56 -18.561815
-	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(0, 0, 0), 6 * scale, 10 * scale, 1 * scale, pose, BlockType::wall);
-	createStaticBox(pos, PxVec3(23 * scale, 0, 0), 6 * scale, 10 * scale, 1 * scale, pose, BlockType::wall);
+	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(0, 0, 0), 6 * scale, 10 * scale, 1 * scale, pose, OrganType::wall);
+	createStaticBox(pos, PxVec3(23 * scale, 0, 0), 6 * scale, 10 * scale, 1 * scale, pose, OrganType::wall);
 	if (canOpen) {
-		PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(6.5 * scale, -5 * scale, 0), x, y, z, pose, BlockType::door);
+		PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(6.5 * scale, -5 * scale, 0), x, y, z, pose, OrganType::door);
 		PxTransform localFrame0(PxVec3(0, 5 * scale, 0));
 		PxTransform localFrame1(PxVec3(6.5 * scale, 0, 0));
 		PxRevoluteJoint* revolute = PxRevoluteJointCreate(*gPhysics, actor0, localFrame0, actor1, localFrame1);
@@ -280,7 +279,7 @@ void createFrontDoor(const PxTransform& t, PxVec3 v, float scale, PxTransform& p
 		//return revolute;
 	}
 	else {
-		PxRigidStatic* actor0 = createStaticBox(pos, PxVec3(11.5 * scale, 0, 0), y, x, z, pose, BlockType::door);
+		PxRigidStatic* actor0 = createStaticBox(pos, PxVec3(11.5 * scale, 0, 0), y, x, z, pose, OrganType::door);
 		Door* door = new Door("假门", actor0->getGlobalPose().p, x, y, z, false);
 		actor0->userData = door;
 	}
@@ -297,10 +296,10 @@ void createSideDoor(const PxTransform& t, PxVec3 v, float scale, PxTransform& po
 	PxReal x = 10 * scale;
 	PxReal y = 1 * scale;
 	PxReal z = 5 * scale;
-	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(0, 0, 0), 1 * scale, 10 * scale, 6 * scale, pose, BlockType::wall);
-	createStaticBox(pos, PxVec3(0, 0, 23 * scale), 1 * scale, 10 * scale, 6 * scale, pose, BlockType::wall);
+	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(0, 0, 0), 1 * scale, 10 * scale, 6 * scale, pose, OrganType::wall);
+	createStaticBox(pos, PxVec3(0, 0, 23 * scale), 1 * scale, 10 * scale, 6 * scale, pose, OrganType::wall);
 	if (canOpen) {
-		PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(0, 0, 11.5 * scale), x, y, z, pose, BlockType::door);
+		PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(0, 0, 11.5 * scale), x, y, z, pose, OrganType::door);
 		PxTransform localFrame0(PxVec3(0, 0, -5 * scale));
 		PxTransform localFrame1(PxVec3(0, 0, 6.5 * scale));
 		PxRevoluteJoint* revolute = PxRevoluteJointCreate(*gPhysics, actor0, localFrame0, actor1, localFrame1);
@@ -318,7 +317,7 @@ void createSideDoor(const PxTransform& t, PxVec3 v, float scale, PxTransform& po
 		//return revolute;
 	}
 	else {
-		PxRigidStatic* actor0 =  createStaticBox(pos, PxVec3(0, 0, 11.5 * scale), y, x, z, pose, BlockType::door);
+		PxRigidStatic* actor0 =  createStaticBox(pos, PxVec3(0, 0, 11.5 * scale), y, x, z, pose, OrganType::door);
 		Door* door = new Door("假门", actor0->getGlobalPose().p, x, y, z, false);
 		actor0->userData = door;
 	}
@@ -379,12 +378,12 @@ x、y、z为长板的长高宽
 pose 刚体的初始朝向*/
 PxRevoluteJoint* createSeesaw(const PxTransform& t,PxVec3 v,float x, float y, float z, PxTransform& pose) {
 	PxTransform pos(t.transform(PxTransform(v)));
-	PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(0, 0, 0), x, y, z, pose, BlockType::seesaw);
+	PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(0, 0, 0), x, y, z, pose, OrganType::seesaw);
 	PxVec3 position = PxVec3(actor0->getGlobalPose().p.x, actor0->getGlobalPose().p.y, actor0->getGlobalPose().p.z);
 	Seesaw* seesaw = new Seesaw("翘板",position,x,y,z,actor0);
 	actor0->userData = seesaw;
-	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(-(x+y+0.5), 0, 0), y, y, y, pose, BlockType::seesawbox);
-	createStaticBox(pos, PxVec3(x+y+0.5, 0, 0), y, y, y, pose, BlockType::seesawbox);
+	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(-(x+y+0.5), 0, 0), y, y, y, pose, OrganType::seesawbox);
+	createStaticBox(pos, PxVec3(x+y+0.5, 0, 0), y, y, y, pose, OrganType::seesawbox);
 	PxTransform localFrame0(PxVec3(0, 0, 0));
 	PxTransform localFrame1(PxVec3(x+y+0.5, 0, 0));
 	PxRevoluteJoint* revolute = PxRevoluteJointCreate(*gPhysics, actor0, localFrame0, actor1, localFrame1);
@@ -621,7 +620,7 @@ void createRotateRod(const PxTransform& t, PxVec3 v, PxReal halfExtend, PxTransf
 void createPrismaticRoad(const PxTransform& t, PxVec3 v0,PxReal x0,PxReal y0,PxReal z0, PxTransform& pose0, PxVec3 v1, PxReal x1, PxReal y1, PxReal z1, PxTransform& pose1, PxJointLinearLimitPair& limits, const PxVec3& velocity = PxVec3(0)) {
 	PxTransform pos(t.transform(PxTransform(v0)));
 	PxRigidStatic* actor0 = createRoad(pos, PxVec3(0, 0, 0), x0, y0, z0, pose0);
-	PxRigidDynamic* actor1 = createDynamicBox(false, pos, v1, x1, y1, z1, pose1,BlockType::prismaticRoad, velocity);
+	PxRigidDynamic* actor1 = createDynamicBox(false, pos, v1, x1, y1, z1, pose1,OrganType::prismaticRoad, velocity);
 	PxVec3 position = actor1->getGlobalPose().p;
 	PrismaticRoad* prismaticRoad = new PrismaticRoad("平移路面", position, x1, y1, z1, actor1);
 	actor1->userData = prismaticRoad;

@@ -105,7 +105,7 @@ public:
 	void stopMoving();
 
 	//人物站立的方块基类
-	Block standingBlock;
+	GameSceneBasic gameSceneBasic;
 
 	//放置物体
 	void setEquiped(bool equip = true);

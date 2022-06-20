@@ -10,10 +10,10 @@ public:
 
 	}
 	RotateRod(string name, PxVec3 position, PxReal halfX, PxReal halfY, PxReal halfZ)
-		:Block(name, position, halfX, halfY, halfZ, BlockType::rotateRod) {
+		:Block(name, position, halfX, halfY, halfZ, OrganType::rotateRod) {
 	}
 	RotateRod(std::string name, PxVec3 position, PxReal halfX, PxReal halfY, PxReal halfZ, PxRigidDynamic* rotateRod)
-		:Block(name, position, halfX, halfY, halfZ, BlockType::rotateRod) {
+		:Block(name, position, halfX, halfY, halfZ, OrganType::rotateRod) {
 		this->rotateRod = rotateRod;
 	}
 

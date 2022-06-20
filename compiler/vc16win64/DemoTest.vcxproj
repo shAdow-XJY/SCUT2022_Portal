@@ -71,6 +71,7 @@
     <ClInclude Include="..\..\src\Render\RenderBox.h" />
     <ClInclude Include="..\..\src\Render\Vector.h" />
     <ClInclude Include="..\..\src\Role\Role.h" />
+    <ClInclude Include="..\..\src\Scene\SceneBasic.h" />
     <ClInclude Include="..\..\src\Sphere\Pendulum.h" />
     <ClInclude Include="..\..\src\Sphere\Sphere.h" />
     <ClInclude Include="..\..\src\Sound\SoundTools.h" />

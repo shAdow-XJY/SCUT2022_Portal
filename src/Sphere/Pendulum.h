@@ -10,10 +10,10 @@ public:
 
 	}
 	Pendulum(string name, PxVec3 position, PxReal halfExtend)
-		:Sphere(name, position, halfExtend, SphereType::pendulum) {
+		:Sphere(name, position, halfExtend, OrganType::pendulum) {
 	}
 	Pendulum(std::string name, PxVec3 position, PxReal halfExtend, PxRigidDynamic* pendulum)
-		:Sphere(name, position, halfExtend, SphereType::pendulum) {
+		:Sphere(name, position, halfExtend, OrganType::pendulum) {
 		this->pendulum = pendulum;
 	}
 

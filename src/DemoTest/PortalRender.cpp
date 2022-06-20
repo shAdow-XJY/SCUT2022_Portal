@@ -66,7 +66,7 @@ RenderBox skyBox;
 extern SoundTool soundtool;
 //∂ØÃ¨‰÷»æ»¶
 PxVec3 roleWorldPosition = PxVec3(0);
-DynamicCircle dynamicCircle = DynamicCircle(true);
+DynamicCircle dynamicCircle = DynamicCircle(false);
 namespace
 {
 	Snippets::Camera*	sCamera;
