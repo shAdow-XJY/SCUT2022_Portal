@@ -341,6 +341,61 @@ float createSeesawLevel(const PxTransform& t, PxVec3 v,float sx, float sy, float
 	return x8;
  }
 
+/* creates particles in the PhysX SDK */
+void createParticles(PxVec3 positions,PxVec3 velocities,PxF32 restOffsets, PxU32 maxParticles,PxU32 numParticles)
+{
+	// set immutable properties.
+	PxU32 maxParticles = 2048;
+	bool perParticleRestOffset = false;
+
+	// create particle system in PhysX SDK
+	PxParticleSystem* ps = gPhysics->createParticleSystem(maxParticles, perParticleRestOffset);
+
+	// declare particle descriptor for creating new particles
+// based on numNewAppParticles count and newAppParticleIndices,
+// newAppParticlePositions arrays and newAppParticleVelocity
+	PxParticleExt::IndexPool* indexPool = PxParticleExt::createIndexPool(maxParticles);
+	
+
+	PxParticleCreationData particleCreationData;
+	particleCreationData.numParticles = 1024;
+	PxU32 numAllocated = indexPool->allocateIndices(2048, PxStrideIterator<PxU32>(&particleCreationData.numParticles));
+	particleCreationData.indexBuffer = PxStrideIterator<const PxU32>(&numAllocated);
+	particleCreationData.positionBuffer = PxStrideIterator<const PxVec3>(newAppParticlePositions);
+
+	// create particles in *PxParticleSystem* ps
+	bool success = ps->createParticles(particleCreationData);
+
+	// lock SDK buffers of *PxParticleSystem* ps for reading
+	PxParticleReadData* rd = ps->lockParticleReadData();
+
+	// access particle data from PxParticleReadData
+	if (rd)
+	{
+		PxStrideIterator<const PxParticleFlags> flagsIt(rd->flagsBuffer);
+		PxStrideIterator<const PxVec3> positionIt(rd->positionBuffer);
+
+		for (unsigned i = 0; i < rd->validParticleRange; ++i, ++flagsIt, ++positionIt)
+		{
+			if (*flagsIt & PxParticleFlag::eVALID)
+			{
+				// access particle position
+				const PxVec3& position = *positionIt;
+			}
+		}
+
+		// return ownership of the buffers back to the SDK
+		rd->unlock();
+	}
+
+
+	// add particle system to scene, in case creation was successful
+	if (ps)
+		gScene->addActor(*ps);
+
+}
+
+
 void createGameScene(const PxTransform& t) {
 	time_t startTime = time(NULL);
 	PxTransform defaultPose(PxQuat(0, PxVec3(0, 1, 0)));  //∏’ÃÂƒ¨»œpose
