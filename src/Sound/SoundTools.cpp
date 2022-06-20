@@ -22,6 +22,8 @@ void SoundTool::SoundInit() {
 	addSound("jumpLoading.wav",true);
 	addSound("jump.wav",false);
 	addSound("rain.wav", false);
+	addSound("openDoorSlowly.wav", false);
+	addSound("openDoorQuickly.wav", false);
 	addSound("gameOver.wav", false);
 	addSound("passLevel.wav", false);
 }
@@ -55,13 +57,17 @@ void SoundTool::SoundUpdate()
 	result = systemA->update();
 }
 
-//播放/切换音频
-FMOD_RESULT SoundTool::playSound(string filename) 
+/**
+* @brief 播放/切换音频
+* @param interrupt 是否立刻中断原有音效并播放音效
+**/
+FMOD_RESULT SoundTool::playSound(string filename, bool interrupt) 
 {
 	FMOD::Sound* currentsound = 0;
 	channelB->getCurrentSound(&currentsound);
 
-	if (currentsound != soundMap[filename]) {
+	if (currentsound != soundMap[filename] || interrupt) 
+	{
 		pauseSound();
 		result = systemA->playSound(soundMap[filename], 0, 0, &channelB);
 	}
