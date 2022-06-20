@@ -473,10 +473,10 @@ PxRigidDynamic* createDynamicSphere(const PxTransform& t, const PxVec3& v, PxRea
 	shape->setQueryFilterData(collisionGroup);
 	PxRigidDynamic* sceneBox = gPhysics->createRigidDynamic(t.transform(local));
 	sceneBox->attachShape(*shape);
-	sceneBox->setAngularDamping(10.0f);
+	sceneBox->setAngularDamping(1.0f);
 	sceneBox->setLinearVelocity(velocity);
 	sceneBox->setName("");
-	PxRigidBodyExt::updateMassAndInertia(*sceneBox, 1.0f);
+	PxRigidBodyExt::updateMassAndInertia(*sceneBox, 10.0f);
 	gScene->addActor(*sceneBox);
 	return sceneBox;
 }
@@ -512,7 +512,7 @@ void createPendulum(const PxTransform& t, PxVec3 v, float halfExtend, float rod_
 	actor0->userData = pendulum;
 	PxRigidDynamic* actor1 = createDynamicBox(false, pos, PxVec3(0, halfExtend + rod_y - 2.0, 0), rod_x, rod_y, rod_z, pose);
 	actor1->setMass(1.0f);
-	actor1->setLinearVelocity(velocity * 1200);
+	actor1->setLinearVelocity(velocity * 2400);
 	actor1->setAngularDamping(0.f);
 	//actor1->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
 	PxTransform localFrame0(PxVec3(0, halfExtend, 0));

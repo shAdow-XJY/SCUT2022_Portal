@@ -109,9 +109,9 @@ void initGame() {
 
 	role = new Role();
 		//初始位置
-		role->setFootPosition(PxVec3(-50, 20, -250));
+		//role->setFootPosition(PxVec3(-50, 20, -250));
 		//摆锤前位置
-		//role->setFootPosition(t.transform(PxVec3(58, 20, 19)));
+		role->setFootPosition(t.transform(PxVec3(58, 20, 19)));
 		//迷宫前位置
 		//role->setFootPosition(t.transform(PxVec3(183, 20, 64)));
 		//迷宫出口位置
@@ -146,7 +146,7 @@ void initPhysics(bool interactive)
 	//?缩放
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
 	//重力
-	sceneDesc.gravity = PxVec3(0.0f, -9.8f, 0.0f);
+	sceneDesc.gravity = PxVec3(0.0f, -29.4f, 0.0f);
 	gDispatcher = PxDefaultCpuDispatcherCreate(2);
 	sceneDesc.cpuDispatcher = gDispatcher;
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
