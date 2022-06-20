@@ -118,6 +118,7 @@ public:
 	void fall();
 	void changeForward(bool);
 
+
 	//об╤в
 	void roleCrouch();
 	void roleNoCrouch();

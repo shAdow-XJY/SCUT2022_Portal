@@ -26,7 +26,6 @@
 // Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
-
 // ****************************************************************************
 // This snippet illustrates simple use of physx
 //
@@ -222,8 +221,6 @@ PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir)
 	//std::cout << "rayHit is not hit" << std::endl;
 	return NULL;
 }
-
-
 
 
 

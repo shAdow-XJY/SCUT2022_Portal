@@ -36,6 +36,7 @@
 #include "../Role/Role.h"
 #include <Render/RenderBox.h>
 #include <Render/DynamicCircle.h>
+#include <Sound/SoundTools.h>
 using namespace physx;
 extern void initPhysics(bool interactive);
 extern void stepPhysics(bool interactive);	
@@ -61,6 +62,8 @@ PxVec3 dir = PxVec3(0, 0, 0);
 bool beginGame = true;
 //天空图
 RenderBox skyBox;
+//音频类
+extern SoundTool soundtool;
 //动态渲染圈
 PxVec3 roleWorldPosition = PxVec3(0);
 DynamicCircle dynamicCircle = DynamicCircle(true);
@@ -110,8 +113,14 @@ void idleCallback()
 	glutPostRedisplay();
 }
 
+
+
 void renderCallback()
 {
+	if (soundtool.getSoundResult()!= FMOD_OK) {
+		soundtool.SoundUpdate();
+	}
+
 	stepPhysics(true);
 
 		
@@ -170,7 +179,7 @@ void renderCallback()
 		calculateElapsedClocksFromLastFrame();
 	}
 
-	void exitCallback(void)
+void exitCallback(void)
 	{
 		delete sCamera;
 		cleanupPhysics(true);
@@ -198,10 +207,12 @@ void renderLoop()
 	sCamera = new Snippets::Camera(PxVec3(50.0f, 50.0f, 50.0f), PxVec3(-0.6f, -0.2f, -0.7f));
 
 	Snippets::setupDefaultWindow("PhysX Demo");
+
 	Snippets::setupDefaultRenderState();
 
 	/** 初始化天空 */
 	skyBox.Init(true);
+
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
