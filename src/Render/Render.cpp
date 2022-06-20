@@ -33,7 +33,7 @@
 #include <string>
 #include <map>
 #include <Block/Block.h>
-#include <Render/DynamicCircle.h>
+#include <Render/DynamicBall.h>
 using namespace std;
 using namespace physx;
 
@@ -72,7 +72,7 @@ extern int textX, textY;
 //材质贴图ID数组
 extern std::map<string, unsigned int> textureMap;
 unsigned int textureID;
-extern DynamicCircle dynamicCircle;
+extern DynamicBall dynamicBall;
 static void drawBox(GLfloat x, GLfloat y, GLfloat z,bool shadow)
 {
 	static GLfloat n[6][3] =
@@ -444,7 +444,7 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 		/*这里以后会用到来判断每一杆的行动机会，sleeping则可以行动，不是sleeping状态说明还在运动*/
 
 		PxVec3 actorWorldPosition = actors[i]->getGlobalPose().p;
-		if (nbShapes>0 && !dynamicCircle.isInCircle(actorWorldPosition.x, actorWorldPosition.z)) {
+		if (nbShapes>0 && !dynamicBall.isInCircle(actorWorldPosition.x, actorWorldPosition.z)) {
 			continue;
 		}
 		
