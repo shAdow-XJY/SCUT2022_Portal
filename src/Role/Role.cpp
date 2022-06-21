@@ -10,8 +10,8 @@ Role::Role() {
 	desc.radius = roleRadius;
 	desc.height = roleHeight;
 	desc.material = gMaterial;
-	desc.climbingMode = PxCapsuleClimbingMode::eLAST;
-	desc.stepOffset = 0.1f;
+	desc.climbingMode = PxCapsuleClimbingMode::eCONSTRAINED;
+	desc.stepOffset = 0.5f;
 	desc.contactOffset = 0.1;
 	desc.upDirection = PxVec3(0.0, 1.0, 0.0);
 	
@@ -176,7 +176,7 @@ void Role::move(GLint key, bool status, bool free) {
 		if (this->isJump || this->isFall) return;
 		PxVec3 lastPosition = this->getPosition();
 		this->roleController->move(this->speed, 0.0001, 1.0f / 120.0f, NULL);
-		//this->updatePosition();
+		this->updatePosition();
 		//更新距离
 		if (gameSceneBasic.getType() == OrganType::prismaticRoad) {
 			dis -= (lastPosition - this->getPosition());
@@ -439,7 +439,11 @@ bool Role::getAliveStatus() {
 **/
 void Role::gameOver() {
 	this->isAlive = false;
+	if (this->stimulateObj) {
+		this->stimulateObj->release();			
+	}
 	this->stimulateObj = NULL;
+	
 }
 
 /**
@@ -482,7 +486,7 @@ void Role::simulationGravity() {
 		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;		
 		this->sliceDir = PxVec3(0, 0, 0);
 		if (basic != NULL) {
-			//cout << block->getType() << endl;
+			//cout << basic->getType() << endl;
 			if (basic->getType() == OrganType::road) {
 				//std::cout << role->standingBlock.getName()<<std::endl;
 			}
@@ -558,7 +562,7 @@ void Role::pickUpObj() {
 * @brief 角色道具放置
 **/
 void Role::layDownObj() {
-	PxVec3 origin = this->getPosition();
+	PxVec3 origin = this->getPosition() -PxVec3(0, 0.2f, 0);
 	//确定role的前方方向
 	PxVec3 forwardDir = PxVec3(this->getFaceDir().x * 1.5f, -3, this->getFaceDir().z * 1.5f);
 	PxRigidActor* actor = NULL;
@@ -586,7 +590,7 @@ void Role::layDownObj() {
 
 //向四周发送射线
 void Role::rayAround() {
-	PxVec3 origin = this->getPosition();
+	PxVec3 origin = this->getPosition() - PxVec3(0,-0.2f,0);
 	PxRigidActor* actor = NULL;
 	for (int i = -1; i < 2; i++) {
 		for (int j = -1; j < 2; j++) {
@@ -595,25 +599,32 @@ void Role::rayAround() {
 			 actor = RayCast(origin, dir);
 			 if (actor) {				 
 				 GameSceneBasic* gsb = (GameSceneBasic*)actor->userData;
-				 //摆锤
-				 if (gsb && gsb->getType() == OrganType::pendulum) {
-					 //cout << "撞到了" << endl;
-					 Pendulum* pendulem = (Pendulum*)gsb;
-					 //extern void printPxVecFun(const PxVec3 & vec);
-					 int flag = pendulem->getPendulumActor()->getAngularVelocity().x > 0 ? 1 : -1;
-					 if (!this->stimulateObj) {
-						 PxShape* shape = gPhysics->createShape(PxCapsuleGeometry(0.05,0.5), *gMaterial);
-						 //偏移值为测试计算出来，该值的准确值有待商榷
-						 PxVec3 pos = this->getPosition() + PxVec3(0,0,2) * flag;
-						 PxRigidDynamic* sceneBox = gPhysics->createRigidDynamic(PxTransform(pos));			 
-						 sceneBox->attachShape(*shape);
-						 sceneBox->setName("");
-						 PxRigidBodyExt::updateMassAndInertia(*sceneBox, 0.00001f);
-						 gScene->addActor(*sceneBox);
-						 this->stimulateObj = sceneBox;
+				 if (gsb) {
+					 //摆锤
+					 if (gsb->getType() == OrganType::pendulum) {
+						 //cout << "撞到了" << endl;
+						 Pendulum* pendulem = (Pendulum*)gsb;
+						 //extern void printPxVecFun(const PxVec3 & vec);
+						 int flag = pendulem->getPendulumActor()->getAngularVelocity().x > 0 ? 1 : -1;
+						 if (!this->stimulateObj) {
+							 PxShape* shape = gPhysics->createShape(PxCapsuleGeometry(0.05, 0.5), *gMaterial);
+							 //偏移值为测试计算出来，该值的准确值有待商榷
+							 PxVec3 pos = this->getPosition() + PxVec3(0, 0, 2) * flag;
+							 PxRigidDynamic* sceneBox = gPhysics->createRigidDynamic(PxTransform(pos));
+							 sceneBox->attachShape(*shape);
+							 sceneBox->setName("");
+							 PxRigidBodyExt::updateMassAndInertia(*sceneBox, 0.00001f);
+							 gScene->addActor(*sceneBox);
+							 this->stimulateObj = sceneBox;
+						 }
+						 return;
+
 					 }
-					
-					 
+					 else if (gsb->getType() == OrganType::rotateRod) {
+						 RotateRod* rotateRod = (RotateRod*)gsb;
+						 this->roleController->move(PxVec3(0, 1.5f, 0), 0.0001, 1.0f / 120.0f, NULL);
+						 return;
+					 }
 				 }
 			}
 		}

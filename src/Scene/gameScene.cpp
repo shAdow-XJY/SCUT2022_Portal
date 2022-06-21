@@ -644,10 +644,12 @@ abgularVelocity 风扇旋转角速度，这里扇面水平，通过角速度PxVec3(0,y,0)中y的大小控
 void createFan(const PxTransform& t, PxVec3 v, PxVec3 angularVelocity) {
 	PxTransform pos(t.transform(PxTransform(v)));
 	PxRigidDynamic* fan = gPhysics->createRigidDynamic(pos);
-	PxShape* shape0 = PxRigidActorExt::createExclusiveShape(*fan, PxBoxGeometry(1.0, 1.0, 25.0), *gMaterial);
-	PxShape* shape1 = PxRigidActorExt::createExclusiveShape(*fan, PxBoxGeometry(25.0, 1.0, 1.0), *gMaterial);
+	PxShape* shape0 = PxRigidActorExt::createExclusiveShape(*fan, PxBoxGeometry(1.0, 0.5, 25.0), *gMaterial);
+	PxShape* shape1 = PxRigidActorExt::createExclusiveShape(*fan, PxBoxGeometry(25.0, 0.5, 1.0), *gMaterial);
 	shape0->setQueryFilterData(collisionGroup);
+	shape0->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
 	shape1->setQueryFilterData(collisionGroup);
+	shape1->setFlag(PxShapeFlag::eSCENE_QUERY_SHAPE, true);
 	fan->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
 	fan->setAngularVelocity(angularVelocity);
 	fan->setAngularDamping(0.f);
@@ -664,33 +666,33 @@ void createFan(const PxTransform& t, PxVec3 v, PxVec3 angularVelocity) {
 
 
 void createRoTateRodLevel(const PxTransform& t, PxVec3 v,float rod_length,float boxHeight,PxTransform& pose) {
-	createRoad(t, v, rod_length, boxHeight, rod_length, pose);
+	createIceRoad(t, v, rod_length, boxHeight, rod_length, pose);
 	//createRotateRod(t, PxVec3(v.x, v.y + boxHeight + 2.0, v.z), 1.5, pose, PxVec3(1, 0, 0) * 70, PxVec3(0, 0, -1) * 70);
-	createFan(t, PxVec3(v.x, v.y + 2 * boxHeight, v.z), PxVec3(0, 4, 0));
+	createFan(t, PxVec3(v.x, v.y + 2 * boxHeight + 1.7f, v.z), PxVec3(0, 4, 0));
 
 	//旋转杆1中心点
 	float rr1_x = v.x - 2 * rod_length;
 	float rr1_y = v.y;
 	float rr1_z = v.z + rod_length + 0.5;
 	//中间路段
-	createRoad(t, PxVec3(rr1_x, rr1_y, v.z), rod_length, boxHeight, 2 * rod_length + 1.0, pose);
+	createIceRoad(t, PxVec3(rr1_x, rr1_y, v.z), rod_length, boxHeight, 2 * rod_length + 1.0, pose);
 	//createRotateRod(t, PxVec3(rr1_x, rr1_y + 2 * boxHeight, rr1_z), 1.5, pose, PxVec3(1, 0, 0) * 70, PxVec3(0, 0, -1) * 70);
-	createFan(t, PxVec3(rr1_x, rr1_y + boxHeight + 2.0, rr1_z), PxVec3(0, 4, 0));
+	createFan(t, PxVec3(rr1_x, rr1_y + 2 * boxHeight + 1.7f, rr1_z), PxVec3(0, 4, 0));
 
 	//旋转杆2中心点
 	float rr2_x = rr1_x;
 	float rr2_y = rr1_y;
 	float rr2_z = v.z - rod_length - 0.5;
 	//createRotateRod(t, PxVec3(rr2_x, rr2_y + 2 * boxHeight, rr2_z), 1.5, pose, PxVec3(-1, 0, 0) * 70, PxVec3(0, 0, 1) * 70);
-	createFan(t, PxVec3(rr2_x, rr2_y + boxHeight + 2.0, rr2_z), PxVec3(0, -4, 0));
+	createFan(t, PxVec3(rr2_x, rr2_y + 2 * boxHeight + 1.7f, rr2_z), PxVec3(0, -4, 0));
 
 	//旋转杆3中心点
 	float rr3_x = v.x - 4 * rod_length;
 	float rr3_y = v.y;
 	float rr3_z = v.z;
-	createRoad(t, PxVec3(rr3_x, rr3_y, rr3_z), rod_length, boxHeight, rod_length, pose);
+	createIceRoad(t, PxVec3(rr3_x, rr3_y, rr3_z), rod_length, boxHeight, rod_length, pose);
 	//createRotateRod(t, PxVec3(rr3_x, rr3_y + 2 * boxHeight, rr3_z), 1.5, pose, PxVec3(-1, 0, 0) * 70, PxVec3(0, 0, 1) * 70);
-	createFan(t, PxVec3(rr3_x, rr3_y + boxHeight + 2.0, rr3_z), PxVec3(0, -4, 0));
+	createFan(t, PxVec3(rr3_x, rr3_y + 2 * boxHeight + 1.7f, rr3_z), PxVec3(0, -4, 0));
 }
 
 //创建游戏场景

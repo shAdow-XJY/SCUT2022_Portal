@@ -6,6 +6,7 @@
 #include "../LoadModel/Model.h"
 #include "../Block/Seesaw.h"
 #include "../Block/PrismaticRoad.h"
+#include "../Block/RotateRod.h"
 #include <glut.h>
 using namespace physx;
 
