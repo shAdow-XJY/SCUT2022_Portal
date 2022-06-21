@@ -106,23 +106,24 @@ void loadTexture() {
 void initGame() {
 	extern void createGameScene(const PxTransform & t);
 	createGameScene(t);
-
 	role = new Role();
-		//初始位置
-		//role->setFootPosition(PxVec3(-50, 20, -250));
-		//摆锤前位置
-		//role->setFootPosition(t.transform(PxVec3(58, 20, 19)));
-		//迷宫前位置
-		role->setFootPosition(t.transform(PxVec3(183, 20, 64)));
-		//迷宫出口位置
-		//role->setFootPosition(t.transform(PxVec3(35, 20, 385.8)));
-		//平移路段前位置
-		//role->setFootPosition(t.transform(PxVec3(3, 45, 416.8)));
-		//旋转杆关卡角落位置
-		//role->setFootPosition(t.transform(PxVec3(-17, 45, 406.8)));
-		//role->attachModel("../../models/paimon/paimon.obj");
-		role->attachModel("../../models/human.obj");
-		role->fall();
+
+	//初始位置
+	//role->setFootPosition(PxVec3(-50, 20, -250));
+	//摆锤前位置
+	//role->setFootPosition(t.transform(PxVec3(58, 20, 19)));
+	//迷宫前位置
+	//role->setFootPosition(t.transform(PxVec3(183, 20, 64)));
+	//迷宫出口位置
+	//role->setFootPosition(t.transform(PxVec3(35, 20, 385.8)));
+	//平移路段前位置
+	//role->setFootPosition(t.transform(PxVec3(3, 45, 416.8)));
+	//旋转杆关卡角落位置
+	role->setFootPosition(t.transform(PxVec3(-17, 45, 406.8)));
+	//role->attachModel("../../models/paimon/paimon.obj");
+	role->attachModel("../../models/human.obj");
+	role->fall();
+
 }
 
 ///实例化物理

@@ -7,6 +7,7 @@
 #include "../Block/Seesaw.h"
 #include "../Sound/SoundTools.h"
 #include "../Block/PrismaticRoad.h"
+#include "../Block/RotateRod.h"
 #include <glut.h>
 using namespace physx;
 
