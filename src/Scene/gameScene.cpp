@@ -342,7 +342,7 @@ float createSeesawLevel(const PxTransform& t, PxVec3 v,float sx, float sy, float
  }
 
 /* creates particles in the PhysX SDK */
-void createParticles(PxVec3 positions,PxVec3 velocities,PxF32 restOffsets, PxU32 maxParticles,PxU32 numParticles)
+void createParticles(PxVec3 v)
 {
 	// set immutable properties.
 	PxU32 maxParticles = 2048;
@@ -351,9 +351,6 @@ void createParticles(PxVec3 positions,PxVec3 velocities,PxF32 restOffsets, PxU32
 	// create particle system in PhysX SDK
 	PxParticleSystem* ps = gPhysics->createParticleSystem(maxParticles, perParticleRestOffset);
 
-	// declare particle descriptor for creating new particles
-// based on numNewAppParticles count and newAppParticleIndices,
-// newAppParticlePositions arrays and newAppParticleVelocity
 	PxParticleExt::IndexPool* indexPool = PxParticleExt::createIndexPool(maxParticles);
 	
 
@@ -361,7 +358,7 @@ void createParticles(PxVec3 positions,PxVec3 velocities,PxF32 restOffsets, PxU32
 	particleCreationData.numParticles = 1024;
 	PxU32 numAllocated = indexPool->allocateIndices(2048, PxStrideIterator<PxU32>(&particleCreationData.numParticles));
 	particleCreationData.indexBuffer = PxStrideIterator<const PxU32>(&numAllocated);
-	particleCreationData.positionBuffer = PxStrideIterator<const PxVec3>(newAppParticlePositions);
+	particleCreationData.positionBuffer = PxStrideIterator<const PxVec3>(&v);
 
 	// create particles in *PxParticleSystem* ps
 	bool success = ps->createParticles(particleCreationData);
@@ -381,6 +378,7 @@ void createParticles(PxVec3 positions,PxVec3 velocities,PxF32 restOffsets, PxU32
 			{
 				// access particle position
 				const PxVec3& position = *positionIt;
+				std::cout <<"Á£×ÓµÄÎ»ÖÃ£º"<< position.x << std::endl;
 			}
 		}
 
