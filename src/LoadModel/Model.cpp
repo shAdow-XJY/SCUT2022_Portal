@@ -16,6 +16,12 @@ void Model::loadModel(const char* path) {
 		std::cout << "FAILED to load model: " << path << std::endl;
 		return;
 	}
+	// 分别提取路径和文件名
+	m_path = path;
+	string::size_type found = m_path.find_last_of("/\\");
+	m_modelName = m_path.substr(found + 1);
+	m_path = m_path.substr(0, found);
+	
 	// 模型成功导入之后，整体数据是一棵树，每个node下面可能有数个单独的mesh
 	processNode(scene->mRootNode, scene);
 }
@@ -36,23 +42,24 @@ void Model::processNode(aiNode* node, const aiScene* scene) {
 		}
 		nodeQueue.pop();
 	}
+
 }
 
 void Model::processSingleMesh(aiMesh* mesh, const aiScene* scene) {
-
+	Mesh currMesh;
 	// 处理顶点坐标、法向量以及贴图坐标
 	for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
 		PxVec3 currVertex;
 		currVertex.x = mesh->mVertices[i].x;
 		currVertex.y = mesh->mVertices[i].y;
 		currVertex.z = mesh->mVertices[i].z;
-		m_vertices.push_back(currVertex);
+		currMesh.m_vertices.push_back(currVertex);
 
 		PxVec3 currNormal;
 		currNormal.x = mesh->mNormals[i].x;
 		currNormal.y = mesh->mNormals[i].y;
 		currNormal.z = mesh->mNormals[i].z;
-		m_normals.push_back(currNormal);
+		currMesh.m_normals.push_back(currNormal);
 
 		PxVec2 currTexCoord;
 		if (mesh->mTextureCoords[0]) {
@@ -62,14 +69,14 @@ void Model::processSingleMesh(aiMesh* mesh, const aiScene* scene) {
 		else {
 			currTexCoord.x = currTexCoord.y = 0.0;
 		}
-		m_texCoords.push_back(currTexCoord);
+		currMesh.m_texCoords.push_back(currTexCoord);
 	}
 
 	// 处理索引
 	for (unsigned i = 0; i < mesh->mNumFaces; ++i) {
 		aiFace face = mesh->mFaces[i];
 		for (unsigned j = 0; j < face.mNumIndices; ++j) {
-			m_indices.push_back(face.mIndices[j]);
+			currMesh.m_indices.push_back(face.mIndices[j]);
 			//m_indices[i * 3 + j] = face.mIndices[j];
 		}
 	}
@@ -78,13 +85,37 @@ void Model::processSingleMesh(aiMesh* mesh, const aiScene* scene) {
 	if (mesh->mMaterialIndex >= 0) {
 		auto material = scene->mMaterials[mesh->mMaterialIndex];
 		for (unsigned i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); ++i) {
+			Texture tex;
 			aiString as;
 			material->GetTexture(aiTextureType_DIFFUSE, 0, &as);
 			// TODO：真正导入纹理文件的实现
 			// 已经include了BMPLoader，剩下就是创建一个实例然后导入
+			CBMPLoader loader;
+			tex.filename = as.C_Str();
+			string::size_type pos = tex.filename.find_first_of('\\');
+			if (pos != -1) {
+				tex.filename[pos] = '/';
+			}
+			tex.filename = m_path + '/' + tex.filename;
+			bool isDuplicate = false;
+			// 检查纹理是否重复使用
+			for (const auto& t : m_textures) {
+				if (t.filename == tex.filename) {
+					isDuplicate = true;
+					tex.m_texID = t.m_texID;
+					break;
+				}
+			}
+			if (!isDuplicate) {
+				tex.m_texID = loader.generateID(tex.filename.c_str());
+			}
+			isDuplicate = false;
+			currMesh.m_texture = tex;
+			m_textures.push_back(tex);
 		}
 	}
 
+	m_meshes.push_back(currMesh);
 }
 
 
@@ -124,5 +155,9 @@ void Model::attachMeshes(const PxTransform& trans,PxRigidActor* actor) {
 
 size_t Model::getNbTriangles() const
 {
-	return m_vertices.size() / 3;
+	size_t ret = 0;
+	for (auto i : m_meshes) {
+		ret += i.m_vertices.size();
+	}
+	return ret / 3;
 }

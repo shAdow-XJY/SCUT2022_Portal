@@ -23,24 +23,31 @@ extern PxMaterial* gMaterial;
 
 struct Texture {
 	unsigned m_texID;
-	char* filename;
+	string filename;
 };
 
+struct Mesh {
+	vector<PxVec3> m_vertices;
+	vector<PxU32> m_indices;
+	vector<PxVec3> m_normals;
+	vector<PxVec2> m_texCoords;
+	Texture m_texture;
+};
 
 class Model {
 public:
 	Model(const char* path);
 	void attachMeshes(const PxTransform& trans, PxRigidActor* actor);
 	void transformModel(const PxTransform& trans);
-	vector<PxVec3> m_vertices;
-	vector<PxU32> m_indices;
-	vector<PxVec3> m_normals;
-	vector<PxVec2> m_texCoords;
+	
+	vector<Mesh> m_meshes;
 	vector<Texture> m_textures;
 private:
 	vector<PxTriangleMesh*> m_triangleMesh;
 	vector<PxShape*> m_shapes;
-	
+	string m_path;
+	string m_modelName;
+
 	void loadModel(const char* path);
 	void processNode(aiNode* node, const aiScene* scene);
 	void processSingleMesh(aiMesh* mesh, const aiScene* scene);

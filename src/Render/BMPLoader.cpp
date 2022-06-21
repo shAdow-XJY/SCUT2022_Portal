@@ -65,7 +65,7 @@ bool CBMPLoader::LoadBitmap(const char* file)
     fseek(pFile, header.bfOffBits, SEEK_SET);
 
     /** 分配内存 */
-    image = new unsigned char[bitmapInfoHeader.biSizeImage];
+    image = new unsigned char[bitmapInfoHeader.biSizeImage * 2];
 
     /** 检查内存分配是否成功 */
     if (!image)                        /**< 若分配内存失败则返回 */
@@ -97,6 +97,7 @@ unsigned int CBMPLoader::generateID(const char* file) {
     {
         std::cout << "error load image in Init" << std::endl;
     }
+    std::cout << file << std::endl;
 
     glGenTextures(1, &ID);                        /**< 生成一个纹理对象名称 */
 
@@ -112,6 +113,8 @@ unsigned int CBMPLoader::generateID(const char* file) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     /** 创建纹理 */
+    //glTexImage2D(GL_TEXTURE_2D, 0, 3, imageWidth, imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+
     gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, imageWidth,
         imageHeight, GL_RGB, GL_UNSIGNED_BYTE,
         image);
