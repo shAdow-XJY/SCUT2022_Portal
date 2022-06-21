@@ -6,7 +6,8 @@ private:
 	PxRigidDynamic* door = NULL;
 	bool open = true;
 	PxRevoluteJoint* joint;
-
+	//可以开的门是开还是关的状态
+	bool doorStatus = false;
 public:
 	Door() {
 
@@ -28,4 +29,8 @@ public:
 	PxRevoluteJoint* getJoint();
 
 	void addPForce(PxVec3 force);
+
+	//可以开的门的当前状态
+	void setDoorStatus(bool doorstatus);
+	bool getDoorStauts();
 };

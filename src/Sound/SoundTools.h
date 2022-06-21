@@ -1,3 +1,4 @@
+#pragma once
 #include "fmod.hpp"
 #include <string>
 #include <map>
@@ -33,7 +34,7 @@ public:
 	void SoundUpdate();
 
 	//≤•∑≈/«–ªª“Ù∆µ
-	FMOD_RESULT playSound(string filename);
+	FMOD_RESULT playSound(string filename,bool interrupt = false);
 
 	//Õ£÷π“Ù∆µ≤•∑≈
 	FMOD_RESULT pauseSound();

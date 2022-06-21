@@ -5,6 +5,8 @@
 #include "../Block/Door.h"
 #include "../LoadModel/Model.h"
 #include "../Block/Seesaw.h"
+#include "../Sound/SoundTools.h"
+#include "../Block/PrismaticRoad.h"
 #include <glut.h>
 using namespace physx;
 
@@ -17,17 +19,19 @@ extern PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir);
 extern void renderGameOver();
 const int primaryJumpHeight = 4.0f;
 
+extern SoundTool soundtool;
+
 class Role {
 private:
+
+	Model* model;
 	PxRigidBody* role;
 	PxController* roleController;
-	Model* model;
-
 	/// <summary>
 	/// 角色属性
 	/// </summary>
 	PxF32 roleRadius = 1.0f;
-	PxF32 roleHeight = 2.0f;
+	PxF32 roleHeight = 3.0f;
 	//人物速度
 	PxVec3 speed = PxVec3(0, 0, 0);
 	//最后一次按下方向键的方向
@@ -67,6 +71,12 @@ private:
 	bool slide = false;
 	//边缘滑动
 	PxVec3 sliceDir = PxVec3(0, 0, 0);
+
+	//碰撞模拟
+	PxRigidBody* stimulateObj = NULL;
+	
+	//
+	PxVec3 dis = PxVec3(0, 0, 0);
 
 public:
 	Role();
@@ -137,6 +147,9 @@ public:
 	void roleSlide();
 	void edgeSliding();
 
+	void rayAround();
+	void stimulate();
+
 };
 
 class RoleHitCallback :public PxUserControllerHitReport {
@@ -167,16 +180,24 @@ public:
 			Door* door = (Door*)actor.userData;
 			float scale = 9000.0f;
 			door->addPForce(role->getFaceDir() * scale);
+
+			if (door->canOpen()) {
+				if (!door->getDoorStauts()) {
+					soundtool.playSound("openDoorSlowly.wav", true);
+					door->setDoorStatus(true);
+				}
+			}
+			
 		}
 		else if (name == "Seesaw") {
 		}
 		else if (name == "Pendulum") {
+		}
+		else if (name == "PrismaticRoad") {		
+			
 
 		}
-		else if (name == "PrismaticRoad") {
-
-		}
-		else if (name == "over") {
+		else if (name == "Over") {
 			this->role->gameOver();
 			const char* msg = "游戏结束";
 			//渲染游戏结束
