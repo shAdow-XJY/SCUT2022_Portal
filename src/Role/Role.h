@@ -5,6 +5,7 @@
 #include "../Block/Door.h"
 #include "../LoadModel/Model.h"
 #include "../Block/Seesaw.h"
+#include "../Sound/SoundTools.h"
 #include "../Block/PrismaticRoad.h"
 #include <glut.h>
 using namespace physx;
@@ -17,6 +18,8 @@ extern PxVec3 ScenetoWorld(int xCord, int yCord);
 extern PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir);
 extern void renderGameOver();
 const int primaryJumpHeight = 4.0f;
+
+extern SoundTool soundtool;
 
 class Role {
 private:
@@ -177,6 +180,14 @@ public:
 			Door* door = (Door*)actor.userData;
 			float scale = 9000.0f;
 			door->addPForce(role->getFaceDir() * scale);
+
+			if (door->canOpen()) {
+				if (!door->getDoorStauts()) {
+					soundtool.playSound("openDoorSlowly.wav", true);
+					door->setDoorStatus(true);
+				}
+			}
+			
 		}
 		else if (name == "Seesaw") {
 		}

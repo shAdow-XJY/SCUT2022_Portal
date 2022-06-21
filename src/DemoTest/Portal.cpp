@@ -113,7 +113,7 @@ void initGame() {
 		//摆锤前位置
 		//role->setFootPosition(t.transform(PxVec3(58, 20, 19)));
 		//迷宫前位置
-		//role->setFootPosition(t.transform(PxVec3(183, 20, 64)));
+		role->setFootPosition(t.transform(PxVec3(183, 20, 64)));
 		//迷宫出口位置
 		//role->setFootPosition(t.transform(PxVec3(35, 20, 385.8)));
 		//平移路段前位置

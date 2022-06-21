@@ -22,3 +22,16 @@ void Door::addPForce(PxVec3 force) {
 		joint->setLimit(limits);
 	}
 }
+
+//可以开的门的当前状态
+void Door::setDoorStatus(bool doorstatus)
+{
+	this->doorStatus = doorstatus;
+}
+bool Door::getDoorStauts()
+{
+	if (this->open) {
+		return this->doorStatus;
+	}
+	return false;
+}
