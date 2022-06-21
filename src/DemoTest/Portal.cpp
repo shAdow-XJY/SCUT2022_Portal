@@ -117,7 +117,7 @@ void initGame() {
 		//迷宫出口位置
 		//role->setFootPosition(t.transform(PxVec3(35, 20, 385.8)));
 		//平移路段前位置
-		role->setFootPosition(t.transform(PxVec3(3, 45, 416.8)));
+		//role->setFootPosition(t.transform(PxVec3(3, 45, 416.8)));
 		//旋转杆关卡角落位置
 		//role->setFootPosition(t.transform(PxVec3(-17, 45, 406.8)));
 		//role->attachModel("../../models/paimon/paimon.obj");
