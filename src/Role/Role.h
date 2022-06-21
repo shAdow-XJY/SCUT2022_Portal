@@ -5,6 +5,7 @@
 #include "../Block/Door.h"
 #include "../LoadModel/Model.h"
 #include "../Block/Seesaw.h"
+#include "../Block/PrismaticRoad.h"
 #include <glut.h>
 using namespace physx;
 
@@ -68,8 +69,11 @@ private:
 	//±ßÔµ»¬¶¯
 	PxVec3 sliceDir = PxVec3(0, 0, 0);
 
-	//
+	//Åö×²Ä£Äâ
 	PxRigidBody* stimulateObj = NULL;
+	
+	//
+	PxVec3 dis = PxVec3(0, 0, 0);
 
 public:
 	Role();

@@ -174,8 +174,13 @@ void Role::move(GLint key, bool status, bool free) {
 		}
 		this->lastPressDir = dir.getNormalized();
 		if (this->isJump || this->isFall) return;
+		PxVec3 lastPosition = this->getPosition();
 		this->roleController->move(this->speed, 0.0001, 1.0f / 120.0f, NULL);
-		this->updatePosition();
+		//this->updatePosition();
+		//更新距离
+		if (gameSceneBasic.getType() == OrganType::prismaticRoad) {
+			dis -= (lastPosition - this->getPosition());
+		}
 	}
 	//弹起
 	else
@@ -230,7 +235,7 @@ void Role::setFootPosition(PxVec3 position) {
 }
 
 /**
-* @brief 更新同步角色坐标信息
+* @brief （自动移动）更新同步角色坐标信息
 **/
 void Role::updatePosition() {
 	PxExtendedVec3 position = this->roleController->getFootPosition();
@@ -489,6 +494,15 @@ void Role::simulationGravity() {
 				if (!this->isJump && !this->isFall) {
 					this->roleController->move(speed + PxVec3(0, -0.3, 0), 0.0001, 1.0f / 120.0f, NULL);
 				}
+				
+			}
+			else if (basic->getType() == OrganType::prismaticRoad) {
+				PrismaticRoad* prismaticRoad = (PrismaticRoad*)basic;
+				if (!this->dis.isZero() && !this->isJump && !this->isFall) {
+					this->setFootPosition(dis + prismaticRoad->getPrismaticRoadActor()->getGlobalPose().p);
+				}
+				dis = this->getFootPosition() - prismaticRoad->getPrismaticRoadActor()->getGlobalPose().p;
+
 				
 			}
 			//std::cout << "yes" << std::endl;
