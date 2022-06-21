@@ -523,8 +523,8 @@ void createPendulum(const PxTransform& t, PxVec3 v, float halfExtend, float rod_
 	PxTransform localFrame2(PxVec3(0, rod_y + rod_x - 1.0, 0));
 	PxTransform localFrame3(PxVec3(0, 0, 0));
 	PxSphericalJoint* spherical = PxSphericalJointCreate(*gPhysics, actor1, localFrame2, actor2, localFrame3);
-	/*spherical->setLimitCone(PxJointLimitCone(PxPi / 4, PxPi / 4, 0.05f));
-	spherical->setSphericalJointFlag(PxSphericalJointFlag::eLIMIT_ENABLED, true);*/
+	spherical->setLimitCone(PxJointLimitCone(PxPi / 4, PxPi / 4, 0.05f));
+	spherical->setSphericalJointFlag(PxSphericalJointFlag::eLIMIT_ENABLED, true);
 }
 
 //创建平移路面 属于动态刚体(区别于road静态刚体)
@@ -693,6 +693,21 @@ void createRoTateRodLevel(const PxTransform& t, PxVec3 v,float rod_length,float 
 	createFan(t, PxVec3(rr3_x, rr3_y + boxHeight + 2.0, rr3_z), PxVec3(0, -4, 0));
 }
 
+//创建水池
+void createPool(const PxTransform& t, PxVec3 bottom, float poolLength, float poolHeight,float poolWidth, PxTransform& pose) {
+	PxTransform pos(t.transform(PxTransform(bottom)));
+	//底部
+	createStaticBox(pos, PxVec3(0, 0, 0), poolLength + 2.0, 1.0, poolWidth + 2.0, pose);
+	//左侧
+	createStaticBox(pos, PxVec3(1.0 + poolLength, 1.0 + poolHeight, 0), 1.0, poolHeight, poolWidth + 2.0, pose);
+	//右侧
+	createStaticBox(pos, PxVec3(- 1.0 - poolLength,  1.0 + poolHeight, 0), 1.0, poolHeight, poolWidth + 2.0, pose);
+	//前侧
+	createStaticBox(pos, PxVec3(0,  1.0 + poolHeight, - 1.0 - poolWidth), poolLength, poolHeight, 1.0, pose);
+	//后侧
+	createStaticBox(pos, PxVec3(0,  1.0 + poolHeight, 1.0 + poolWidth), poolLength, poolHeight, 1.0, pose);
+}
+
 //创建游戏场景
 void createGameScene(const PxTransform& t) {
 	time_t startTime = time(NULL);
@@ -739,10 +754,10 @@ void createGameScene(const PxTransform& t) {
 		createRoad(t, PxVec3(rb_x, rb_y, rb_z), roadblock_length, boxHeight, roadblock_width, defaultPose);
 		if (i % 2 == 0) {
 			//摆锤坐标y为 地下所有盒子高+halfExtend+0.5（间隔）
-			createPendulum(t, PxVec3(rb_x, rb_y + boxHeight + 5.5, rb_z), 5.0, 0.8, 12.0, 0.8, defaultPose, PxVec3(0, 0, -1));
+			createPendulum(t, PxVec3(rb_x, rb_y + boxHeight + 5.5, rb_z), 5.0, 0.6, 10.0, 0.6, defaultPose, PxVec3(0, 0, -1));
 		}
 		else {
-			createPendulum(t, PxVec3(rb_x, rb_y + boxHeight + 5.5, rb_z), 5.0, 0.8, 12.0, 0.8, defaultPose, PxVec3(0, 0, 1));
+			createPendulum(t, PxVec3(rb_x, rb_y + boxHeight + 5.5, rb_z), 5.0, 0.6, 10.0, 0.6, defaultPose, PxVec3(0, 0, 1));
 		}
 		rb_x = rb_x + 2 * roadblock_length + dx;
 	}
@@ -829,9 +844,29 @@ void createGameScene(const PxTransform& t) {
 	float c_6_y = c_5_y;
 	float c_6_z = c_5_z - roadblock_width - dz - rod_length;
 	createRoTateRodLevel(t, PxVec3(c_6_x, c_6_y, c_6_z), rod_length, boxHeight, defaultPose);
-
 	std::cout << "旋转杆关卡角落位置相对于场景原点的坐标为" << c_6_x + rod_length << "," << c_6_y << "," << c_6_z + rod_length << endl;
 
+	//风扇关卡与水池连接路段
+	float r_7_l = 20.0;
+	float r_7_w = 5.0;
+	float c_7_x = c_6_x - 5 * rod_length - r_7_l;
+	float c_7_y = c_6_y;
+	float c_7_z = c_6_z;
+	createRoad(t, PxVec3(c_7_x, c_7_y, c_7_z), r_7_l, boxHeight, r_7_w, defaultPose);
+
+	//水池
+	float poolLength = 50.0;
+	float poolHeight = 10.0;
+	float poolWidth = 25.0;
+	/*float bottom_x = c_6_x - 5 * rod_length - poolLength - 2.0;
+	float bottom_y = c_6_y + boxHeight - 2 * poolHeight - 1.0;
+	float bottom_z = c_6_z;*/
+	float bottom_x = c_7_x - r_7_l - poolLength - 2.0;
+	float bottom_y = c_7_y + boxHeight - 2 * poolHeight - 1.0;
+	float bottom_z = c_7_z;
+	createPool(t, PxVec3(bottom_x, bottom_y, bottom_z), poolLength, poolHeight, poolWidth, defaultPose);
+	//水池底部的相对于场景原点t的位置 PxVec3 localPose(bottom_x,bottom_y,bottom_z)
+	//全局位置 t.transform(PxTransform(localPose)).p
 
 	createFan(t, PxVec3(-50, 40, 20), PxVec3(0, 5, 0));
 	createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
