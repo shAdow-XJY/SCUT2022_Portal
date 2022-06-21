@@ -693,7 +693,22 @@ void createRoTateRodLevel(const PxTransform& t, PxVec3 v,float rod_length,float 
 	createFan(t, PxVec3(rr3_x, rr3_y + boxHeight + 2.0, rr3_z), PxVec3(0, -4, 0));
 }
 
-/* creates particles in the PhysX SDK */
+//创建水池
+void createPool(const PxTransform& t, PxVec3 bottom, float poolLength, float poolHeight, float poolWidth, PxTransform& pose) {
+	PxTransform pos(t.transform(PxTransform(bottom)));
+	//底部
+	createStaticBox(pos, PxVec3(0, 0, 0), poolLength + 2.0, 1.0, poolWidth + 2.0, pose);
+	//左侧
+	createStaticBox(pos, PxVec3(1.0 + poolLength, 1.0 + poolHeight, 0), 1.0, poolHeight, poolWidth + 2.0, pose);
+	//右侧
+	createStaticBox(pos, PxVec3(-1.0 - poolLength, 1.0 + poolHeight, 0), 1.0, poolHeight, poolWidth + 2.0, pose);
+	//前侧
+	createStaticBox(pos, PxVec3(0, 1.0 + poolHeight, -1.0 - poolWidth), poolLength, poolHeight, 1.0, pose);
+	//后侧
+	createStaticBox(pos, PxVec3(0, 1.0 + poolHeight, 1.0 + poolWidth), poolLength, poolHeight, 1.0, pose);
+}
+
+//创建粒子
 void createParticles(PxVec3 v)
 {
 	// set immutable properties.
@@ -905,7 +920,7 @@ void createGameScene(const PxTransform& t) {
 	createPool(t, PxVec3(bottom_x, bottom_y, bottom_z), poolLength, poolHeight, poolWidth, defaultPose);
 	//水池底部的相对于场景原点t的位置 PxVec3 localPose(bottom_x,bottom_y,bottom_z)
 	//全局位置 t.transform(PxTransform(localPose)).p
-
+	createParticles(t.transform(PxTransform(PxVec3(bottom_x, bottom_y, bottom_z))).p);
 	createFan(t, PxVec3(-50, 40, 20), PxVec3(0, 5, 0));
 	createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
 
