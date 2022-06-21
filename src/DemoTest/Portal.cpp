@@ -26,7 +26,6 @@
 // Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
 // Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
-
 // ****************************************************************************
 // This snippet illustrates simple use of physx
 //
@@ -43,6 +42,7 @@
 #include "../Role/Role.h"
 #include "../LoadModel/Model.h"
 #include "../Render/BMPLoader.h"
+#include "../Sound/SoundTools.h"
 #include<vector>
 #include<string>
 #include <glut.h>
@@ -71,93 +71,59 @@ PxPvd*                  gPvd        = NULL;
 PxReal stackZ = 10.0f;
 
 
-std::vector<PxRigidDynamic*>			ballToDispear;
-std::vector<PxRigidDynamic*>			ballBirdList;
-std::vector<PxRigidDynamic*>			ballPigList;
-PxRigidDynamic*                         ballBird;
-PxRigidDynamic*                         ballPig;
-
-
-const char* BirdName = "bird";
-const char* PigName = "pig";
-
 
 Role* role = NULL;
 PxControllerManager* cManager = NULL;
 
 
-// 右键鼠标按下
-bool press = false;
-
-
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
 
-const PxTransform t = PxTransform(PxVec3(-100, 0, -200));
+const PxTransform t = PxTransform(PxVec3(-50, 0, -250));
 extern void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z);
 
-
-// 鼠标点击时的坐标
-int mouseX, mouseY;
-
-// 提示字符的位置（测试用）
-int textX = 0, textY = 0;
-
+//材质贴图ID数组
 std::map<string, unsigned int> textureMap;
+std::string texture[] = { "Door","Wall","Road","SeesawBox","Seesaw","Ice"};
+
+//音频类
+SoundTool soundtool = SoundTool();
 
 
-//创建立方体堆
-void createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
-{
-	/*
-	PxShape 碰撞形状的抽象类;形状是共享的，引用计数的对象。
-	可以通过调用PxRigidActor类的createShape()方法或PxPhysics类的createShape()方法来创建实例。
-	Box,Sphere,Capsule,Plane,ConvexMesh,TriangleMesh,HeightField
-	可以设置Material,offset,flags,name
-	*/
-	//createShape构建形状;(halfExtent x,y,z)
-	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *gMaterial);
-	
 
-
-	for(PxU32 i=0; i<size;i++)
-	{
-		for(PxU32 j=0;j<size;j++)
-		{
-			//指定位置(-10/-7..9,1,0)(-7..,3,0)(-4..,5,0)...
-			PxTransform localTm(PxVec3(PxReal(j*2) - PxReal(size), PxReal(i*2+1), 0) * halfExtent);
-			//createRigidDynamic构建刚体
-			PxRigidDynamic* body = gPhysics->createRigidDynamic(t.transform(localTm));
-			//attachShape绑定形状到刚体上;
-			body->attachShape(*shape);
-			//更新质量和惯性（数值表示密度）
-			PxRigidBodyExt::updateMassAndInertia(*body, 1.0f);
-
-			body->setName(PigName);
-
-			body->userData = body;
-
-			
-			ballPigList.push_back(body);
-
-			gScene->addActor(*body);
-		}
+//加载纹理
+void loadTexture() {	
+	for (auto name : texture) {
+		string baseUrl = "../../texture/";
+		CBMPLoader* BMPLoader = new CBMPLoader();
+		unsigned int id = BMPLoader->generateID((baseUrl + name + ".bmp").c_str());
+		textureMap.insert(std::pair<string, unsigned int>(name, id));
+		std::cout << id << std::endl;
 	}
-	shape->release();
+	textureMap.insert(std::pair<string, unsigned int>("Block", 0));
 }
 
-////创建道路方块
-//void createRoad(const PxTransform& t,PxReal halfExtent,std::string name) {
-//	Block* r = new Block(halfExtent,name);
-//	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *gMaterial);
-//	shape->setQueryFilterData(collisionGroup);
-//	PxRigidDynamic* body = gPhysics->createRigidDynamic(t);
-//	body->attachShape(*shape);
-//	//更新质量和惯性（数值表示密度）
-//	PxRigidBodyExt::updateMassAndInertia(*body, 1.0f);
-//	body->setName("Ground");
-//	body->userData = r;
-//	gScene->addActor(*body);
-//}
+//初始化游戏场景和人物
+void initGame() {
+	extern void createGameScene(const PxTransform & t);
+	createGameScene(t);
+
+	role = new Role();
+		//初始位置
+		//role->setFootPosition(PxVec3(-50, 20, -250));
+		//摆锤前位置
+		//role->setFootPosition(t.transform(PxVec3(58, 20, 19)));
+		//迷宫前位置
+		role->setFootPosition(t.transform(PxVec3(183, 20, 64)));
+		//迷宫出口位置
+		//role->setFootPosition(t.transform(PxVec3(35, 20, 385.8)));
+		//平移路段前位置
+		//role->setFootPosition(t.transform(PxVec3(3, 45, 416.8)));
+		//旋转杆关卡角落位置
+		//role->setFootPosition(t.transform(PxVec3(-17, 45, 406.8)));
+		//role->attachModel("../../models/paimon/paimon.obj");
+		role->attachModel("../../models/human.obj");
+		role->fall();
+}
 
 ///实例化物理
 void initPhysics(bool interactive)
@@ -180,7 +146,7 @@ void initPhysics(bool interactive)
 	//?缩放
 	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
 	//重力
-	sceneDesc.gravity = PxVec3(0.0f, -9.8f, 0.0f);
+	sceneDesc.gravity = PxVec3(0.0f, -29.4f, 0.0f);
 	gDispatcher = PxDefaultCpuDispatcherCreate(2);
 	sceneDesc.cpuDispatcher = gDispatcher;
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
@@ -199,8 +165,9 @@ void initPhysics(bool interactive)
 	cManager->setOverlapRecoveryModule(true);
 	//静摩擦，动摩擦，restitution恢复原状(弹性)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
-	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 
+	
+	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	groundPlane->setName("Over");
 	gScene->addActor(*groundPlane);
 
@@ -209,27 +176,6 @@ void initPhysics(bool interactive)
 	//testModel.attachMeshes((PxTransform(PxVec3(20, 30, 30))).transform(PxTransform(PxQuat(-PxHalfPi,PxVec3(1.0f,0.0f,0.0f)))));
 	//testModel.createMeshActor(PxTransform(20, 30, 30));
 	// end
-	std::string texture[] = { "Door","Wall","Road","SeesawBox","Seesaw"};
-	for (auto name : texture) {
-		string baseUrl = "../../texture/";
-		CBMPLoader* BMPLoader = new CBMPLoader();
-		unsigned int id = BMPLoader->generateID((baseUrl + name + ".bmp").c_str());
-		textureMap.insert(std::pair<string, unsigned int>(name, id));
-		std::cout << id << std::endl;
-	}
-	textureMap.insert(std::pair<string, unsigned int>("Block", 0));
-	extern void createGameScene(const PxTransform & t);
-	createGameScene(t);
-
-	role = new Role();
-	//初始位置
-	//role->setFootPosition(PxVec3(-100, 20, -210));
-	//迷宫前位置
-	role->setFootPosition(PxVec3(83, 20, -136));
-
-	//role->attachModel("../../models/paimon/paimon.obj");
-	role->attachModel("../../models/human.obj");
-	role->fall();
 
 }
 
@@ -278,8 +224,6 @@ PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir)
 
 
 
-
-
 //（在render中调用）
 void stepPhysics(bool interactive)
 {
@@ -302,116 +246,9 @@ void cleanupPhysics(bool interactive)
 	transport->release();
 
 	gFoundation->release();
-
-	printf("HelloWorld done.\n");
 }
 
-//按键设置
-void keyPress(unsigned char key, const PxTransform& camera)
-{
-	switch (toupper(key))
-	{
-	case 'B':	createStack(PxTransform(PxVec3(-100, 0, 0)).transform(PxTransform(PxVec3(-30, 10 + 2 * boxHeight, 0))), 10, 2.0f); break;
-	//case 'B':	createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 2.0f); break;
-		//PxSphereGeometry Transform,geometry,velocity（速度）t.transform(PxTransform(PxVec3(-20, 10+2*boxHeight, 0)))
-	case ' ':
-	{
-		role->tryJump(false);
-		break;
-	}
-	case 'Z':
-	{
-		role->roleCrouch();
-		break;
-	}
-	case 'E':
-	{
-		if (role->getEquiped()) {
-			role->layDownObj();
 
-		}
-		else {
-			role->pickUpObj();
-
-		}
-
-		break;
-	}
-	default:
-		break;
-	}
-}
-
-void keyRelease(unsigned char key)
-{
-	switch (toupper(key))
-	{
-	case ' ':
-	{
-		role->tryJump(true);
-		break;
-	}
-	case 'Z':
-	{
-		role->roleNoCrouch();
-		break;
-	}
-	default:
-		break;
-	}
-}
-
-//特殊键设置
-void specialKeyPress(GLint key) {
-	switch (key) {
-	default: {
-		return;
-	}
-	}
-}
-
-void specialKeyRelease(GLint key) {
-
-}
-
-//鼠标点击
-void mousePress(int button, int state, int x, int y) {
-	switch (button)
-	{
-		//点击右键
-	case 0: {
-		//右键抬起
-		if (state == 1) {
-			//if (role->getMovingStatus())return;
-			////role->roleMoveByMouse(x, y);
-			//PxVec3 position = ScenetoWorld(x, y);
-			//Block road;
-			//if (RayCast(position, PxVec3(0, 5, 0), road))
-			//{
-			//	PxVec3 blockPosition = road.getPosition();
-			//	//role->roleMoveByMouse(PxVec3(blockPosition.x, role->getFootPosition().y, blockPosition.z));
-			//	role->roleMoveByMouse(position);
-			//}
-			//else {
-			//	std::cout << "不可点击";
-			//}
-		}
-		break;
-	}
-	case 2: {
-		if (state == 1) {
-			press = true;
-			mouseX = x;
-			mouseY = y;
-			std::cout << "mouseX: " << x << std::endl;
-			std::cout << "mouseY: " << y << std::endl;
-		}
-		break;
-	}
-	default:
-		break;
-	}
-}
 
 #define RENDER_SNIPPET 1
 //main

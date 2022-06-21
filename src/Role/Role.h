@@ -1,9 +1,12 @@
 #include <ctype.h>
 #include <iostream>
 #include "PxPhysicsAPI.h"
+#include "../Sphere/Pendulum.h"
 #include "../Block/Door.h"
 #include "../LoadModel/Model.h"
 #include "../Block/Seesaw.h"
+#include "../Sound/SoundTools.h"
+#include "../Block/PrismaticRoad.h"
 #include <glut.h>
 using namespace physx;
 
@@ -13,20 +16,22 @@ extern PxPhysics* gPhysics;
 extern PxControllerManager* cManager;
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
 extern PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir);
+extern void renderGameOver();
+const int primaryJumpHeight = 4.0f;
 
-const int primaryJumpHeight = 8.0f;
+extern SoundTool soundtool;
 
 class Role {
 private:
+
+	Model* model;
 	PxRigidBody* role;
 	PxController* roleController;
-	Model* model;
-
 	/// <summary>
 	/// 角色属性
 	/// </summary>
 	PxF32 roleRadius = 1.0f;
-	PxF32 roleHeight = 2.0f;
+	PxF32 roleHeight = 3.0f;
 	//人物速度
 	PxVec3 speed = PxVec3(0, 0, 0);
 	//最后一次按下方向键的方向
@@ -40,15 +45,15 @@ private:
 	//人物上一次位置
 	PxVec3 lastPostion;	
 	//角色重力
-	float mass = 2000.0f;
+	float mass = 8000.0f;
 	//重力加速度
-	float midFallSpeed = 0.1;
+	float midFallSpeed = 0.5;
 	//跳跃相关
-	float littleJumpSpeed = 0.08;
-	float bigJumpSpeed = 0.1;
+	float littleJumpSpeed = 0.4;
+	float bigJumpSpeed = 0.5;
 	float nowJumpHeight = 0.0;
 	float wantJumpHeight = primaryJumpHeight;
-	float maxJumpHeight = 14.0;
+	float maxJumpHeight = 10.0;
 
 	/// <summary>
 	/// 状态量
@@ -62,6 +67,16 @@ private:
 	//本次跳跃是否能够向前
 	bool canForward = true;
 	bool standingOnBlock = true;
+	//冰面滑动
+	bool slide = false;
+	//边缘滑动
+	PxVec3 sliceDir = PxVec3(0, 0, 0);
+
+	//碰撞模拟
+	PxRigidBody* stimulateObj = NULL;
+	
+	//
+	PxVec3 dis = PxVec3(0, 0, 0);
 
 public:
 	Role();
@@ -79,9 +94,11 @@ public:
 	PxVec3 getFootPosition();
 	PxVec3 getPosition();
 	void updatePosition();
+	PxVec3 getRoleWorldPosition();
 
 	//速度相关
 	PxVec3 getSpeed();
+	bool isSpeedZero();
 	void setSpeed(PxVec3 speed);
 
 	//相机朝向
@@ -98,18 +115,19 @@ public:
 	void stopMoving();
 
 	//人物站立的方块基类
-	Block standingBlock;
+	GameSceneBasic gameSceneBasic;
 
 	//放置物体
 	void setEquiped(bool equip = true);
 	bool getEquiped();
 
 	//跳跃
-	void tryJump(bool release);
+	bool tryJump(bool release);
 	void roleJump();
 	void roleFall();
 	void fall();
 	void changeForward(bool);
+
 
 	//下蹲
 	void roleCrouch();
@@ -124,6 +142,13 @@ public:
 	void pickUpObj();
 	//放置物体
 	void layDownObj();
+
+	//角色滑动
+	void roleSlide();
+	void edgeSliding();
+
+	void rayAround();
+	void stimulate();
 
 };
 
@@ -153,19 +178,31 @@ public:
 		string name(actor.getName());
 		if (name == "Door") {
 			Door* door = (Door*)actor.userData;
+			float scale = 9000.0f;
+			door->addPForce(role->getFaceDir() * scale);
+
 			if (door->canOpen()) {
-				PxRigidBody* doorActor = door->getDoorActor();
-				float scale = 9000.0f;
-				doorActor->addForce(role->getFaceDir() * scale);
-				PxRevoluteJoint* revoluteJoint = door->getJoint();
-				PxJointAngularLimitPair limits(-PxPi / 2, PxPi / 2, 0.01f);
-				revoluteJoint->setLimit(limits);
+				if (!door->getDoorStauts()) {
+					soundtool.playSound("openDoorSlowly.wav", true);
+					door->setDoorStatus(true);
+				}
 			}
+			
 		}
 		else if (name == "Seesaw") {
 		}
-		else if (name == "over") {
+		else if (name == "Pendulum") {
+		}
+		else if (name == "PrismaticRoad") {		
+			
+
+		}
+		else if (name == "Over") {
 			this->role->gameOver();
+			const char* msg = "游戏结束";
+			//渲染游戏结束
+			renderGameOver();
+
 		}
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
 	}

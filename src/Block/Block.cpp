@@ -1,4 +1,4 @@
-#include "../Block/Block.h"
+#include "Block.h"
 
 PxReal Block::getHalfExtent() {
 	return this->halfExtent;

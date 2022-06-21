@@ -11,8 +11,8 @@ Role::Role() {
 	desc.height = roleHeight;
 	desc.material = gMaterial;
 	desc.climbingMode = PxCapsuleClimbingMode::eLAST;
-	desc.stepOffset = 0.0f;
-	desc.contactOffset = 0.001;
+	desc.stepOffset = 0.1f;
+	desc.contactOffset = 0.1;
 	desc.upDirection = PxVec3(0.0, 1.0, 0.0);
 	
 
@@ -27,7 +27,7 @@ Role::Role() {
 	this->roleController->setUserData(this);
 	this->nowPostion = this->role->getGlobalPose().p;
 	this->lastPostion = this->role->getGlobalPose().p;
-	
+	this->role->setName("Role");
 }
 
 /**
@@ -142,6 +142,7 @@ void Role::move(GLint key, bool status, bool free) {
 		PxVec3 dir;
 		if (!free) dir = this->faceDir; //非自由镜头以人物朝向为前进方向
 		else dir = this->dir; //自由镜头以摄像机正前方为前进方向
+		//移动方向计算
 		switch (key) {
 		case GLUT_KEY_UP: {
 			//dir = PxVec3(0, 0, 1);
@@ -166,22 +167,38 @@ void Role::move(GLint key, bool status, bool free) {
 			return;
 		}
 		}
-		this->speed = dir * 0.12f;
+		this->slide = false;
+		this->speed = dir * 0.6f;
+		if (gameSceneBasic.getType() == OrganType::iceroad) {
+			this->speed = dir * 0.86f;
+		}
 		this->lastPressDir = dir.getNormalized();
 		if (this->isJump || this->isFall) return;
-		this->roleController->move(this->speed * 4, 0.0001, 1.0f / 120.0f, NULL);
-		this->updatePosition();
+		PxVec3 lastPosition = this->getPosition();
+		this->roleController->move(this->speed, 0.0001, 1.0f / 120.0f, NULL);
+		//this->updatePosition();
+		//更新距离
+		if (gameSceneBasic.getType() == OrganType::prismaticRoad) {
+			dis -= (lastPosition - this->getPosition());
+		}
 	}
 	//弹起
 	else
 	{
 		if (!this->isJump && !this->isFall) {
-			this->faceDir = this->lastPressDir; //获取最后一次移动的面朝方向
+			this->faceDir = this->lastPressDir; //更新为最后一次移动的面朝方向
 			if (!free) {
 				this->dir = this->faceDir;//抬起的时候才更新角色朝向，确保持续移动
 			}
-			this->speed = PxVec3(0, 0, 0);
-
+			if (gameSceneBasic.getType() == OrganType::iceroad) {
+				std::cout << "in the ice" << std::endl;
+				//this->setSpeed(this->speed);
+				this->slide = true;
+			}
+			else {
+				std::cout << "SET ZERO" << std::endl;
+				this->speed = PxVec3(0, 0, 0);
+			}
 		}
 		else
 		{
@@ -190,7 +207,6 @@ void Role::move(GLint key, bool status, bool free) {
 
 	}
 }
-
 
 /**
 * @brief 获取角色controller的底部坐标
@@ -219,7 +235,7 @@ void Role::setFootPosition(PxVec3 position) {
 }
 
 /**
-* @brief 更新同步角色坐标信息
+* @brief （自动移动）更新同步角色坐标信息
 **/
 void Role::updatePosition() {
 	PxExtendedVec3 position = this->roleController->getFootPosition();
@@ -228,10 +244,17 @@ void Role::updatePosition() {
 }
 
 /**
+* @brief 获取角色世界坐标信息
+**/
+PxVec3 Role::getRoleWorldPosition() {
+	return this->role->getGlobalPose().p;
+}
+
+/**
 * @brief 角色跳跃条件判断
 **/
-void Role::tryJump(bool release) {
-	if (!this->isAlive) return;
+bool Role::tryJump(bool release) {
+	if (!this->isAlive) return false;
 	if (!isJump && !isFall) {
 		if (!release) {
 			//std::cout << "wantJumpHeight" << wantJumpHeight << std::endl;
@@ -241,7 +264,9 @@ void Role::tryJump(bool release) {
 		{
 			isJump = true;
 		}
+		return true;
 	}
+	return false;
 }
 extern clock_t deltaClock;
 /**
@@ -251,11 +276,11 @@ void Role::roleJump() {
 	if (isJump) {
 		float speed = 0.0;
 		if (nowJumpHeight <= wantJumpHeight / 2) {
-			speed = bigJumpSpeed ;
+			speed = bigJumpSpeed * 0.5 ;
 		}
 		else
 		{
-			speed = littleJumpSpeed;
+			speed = littleJumpSpeed * 0.5;
 		}
 		PxVec3 jumpSpeed = PxVec3(0.0, speed, 0.0);
 		if (canForward && canMove) {
@@ -306,6 +331,33 @@ void Role::roleFall() {
 }
 
 /**
+* @brief 角色冰面滑动函数
+* @return void
+**/
+void Role::roleSlide() {
+	if (this->speed.isZero()) {
+		this->slide = false;
+	}
+	else if (slide) {
+		//std::cout << this->speed.x << "  " <<  this->speed.y << "  " << this->speed.z << std::endl;
+		this->setSpeed(this->speed * 0.96f);
+		std::cout << "  " << this->speed.abs().x << "  " << this->speed.abs().y << "  " << this->speed.abs().z << std::endl;
+		//std::cout << "  " << this->speed.abs().minElement() << "  " << this->speed.abs().minElement() << "  " << this->speed.abs().minElement() << std::endl;
+		if (this->speed.abs().x > 0.001f || this->speed.abs().y > 0.001f || this->speed.abs().z > 0.001f) {
+			PxControllerCollisionFlags flag = this->roleController->move(this->speed, 0.0001, 1.0f / 120.0f, NULL);
+			if (flag == PxControllerCollisionFlag::eCOLLISION_SIDES) {
+				this->setSpeed(PxVec3(0, 0, 0));
+			}
+		}
+		else
+		{
+			this->speed = PxVec3(0, 0, 0);
+		}
+
+	}
+}
+
+/**
 * @brief 角色下蹲
 **/
 void Role::roleCrouch() {
@@ -323,7 +375,6 @@ void Role::fall() {
 	}
 	
 }
-
 
 /**
 * @brief 角色下蹲恢复阶段
@@ -365,8 +416,8 @@ PxVec3 Role::getDir() {
 **/
 PxVec3 Role::getFaceDir() {
 	PxVec3 dir = this->speed.getNormalized();
-	if (!this->speed.x || !this->speed.y || !this->speed.z) return this->faceDir;
-	return this->speed.getNormalized();
+	if (isSpeedZero()) return this->faceDir;
+	return dir;
 }
 
 /**
@@ -388,6 +439,7 @@ bool Role::getAliveStatus() {
 **/
 void Role::gameOver() {
 	this->isAlive = false;
+	this->stimulateObj = NULL;
 }
 
 /**
@@ -397,10 +449,22 @@ void Role::changeCanMove(bool flag) {
 	this->canMove = flag;
 }
 
-void Role::changeForward(bool flag) {
-	this->canForward = flag;
+bool Role::isSpeedZero() {
+	if (!this->speed.x && !this->speed.y && !this->speed.z) return true;
+	return false;
 }
 
+
+void Role::edgeSliding() {
+	if (this->gameSceneBasic.getType() == OrganType::seesaw) {
+		PxVec3 spliceSpeed = isSpeedZero() ? this->sliceDir : this->getFaceDir();
+		this->setFootPosition(this->getFootPosition() + spliceSpeed * 2.0f);
+	}
+	else
+	{
+		this->setFootPosition(this->getFootPosition() + this->getFaceDir() * 3.0f); //边缘滑动
+	}
+}
 
 /**
 * @brief 角色底部发送射线
@@ -408,40 +472,57 @@ void Role::changeForward(bool flag) {
 **/
 void Role::simulationGravity() {
 	PxVec3 origin = this->getFootPosition();
-	PxVec3 unitDir = PxVec3(0, -1.0f, 0);
+	PxVec3 unitDir = PxVec3(0, -0.8f, 0);
 	PxRigidActor* actor = NULL;
 	if (actor = RayCast(origin, unitDir)) {
 		//碰撞到物体
 		//std::cout << "碰到地面" << std::endl;
 		//cout << role->standingBlock.getName() << endl;
 		this->standingOnBlock = true;
-		Block* block = (Block*)actor->userData;
-		if (block != NULL) {
+		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;		
+		this->sliceDir = PxVec3(0, 0, 0);
+		if (basic != NULL) {
 			//cout << block->getType() << endl;
-			if (block->getType() == BlockType::road) {
+			if (basic->getType() == OrganType::road) {
 				//std::cout << role->standingBlock.getName()<<std::endl;
-
 			}
-			else if (block->getType() == BlockType::seesaw) {
-				cout << "施加重力" << endl;
-				Seesaw* seesaw = (Seesaw*)block;
-				PxRigidBody* seesawBody = seesaw->getSeesawActor();
+			else if (basic->getType() == OrganType::seesaw) {
+				Seesaw* seesaw = (Seesaw*)basic;
 				PxVec3 force = PxVec3(0, -1, 0) * this->mass;
-				PxRigidBodyExt::addForceAtPos(*seesawBody, force, this->getFootPosition());
-				//seesawBody->addForce()
+				PxVec3 speed = seesaw->addGForce(this->getFootPosition(), force);
+				this->sliceDir = speed.getNormalized();
+				if (!this->isJump && !this->isFall) {
+					this->roleController->move(speed + PxVec3(0, -0.3, 0), 0.0001, 1.0f / 120.0f, NULL);
+				}
+				
 			}
-			this->standingBlock = *block;
+			else if (basic->getType() == OrganType::prismaticRoad) {
+				PrismaticRoad* prismaticRoad = (PrismaticRoad*)basic;
+				if (!this->dis.isZero() && !this->isJump && !this->isFall) {
+					this->setFootPosition(dis + prismaticRoad->getPrismaticRoadActor()->getGlobalPose().p);
+				}
+				dis = this->getFootPosition() - prismaticRoad->getPrismaticRoadActor()->getGlobalPose().p;
+
+				
+			}
+			//std::cout << "yes" << std::endl;
+			this->gameSceneBasic = *basic;
 		}
 	}
 	else {
-		if (this->standingBlock.getType() != BlockType::error) {
-			this->setFootPosition(this->getFootPosition() + this->getSpeed() * 5.0f); //边缘滑动
-		}
-		this->standingBlock = Block();
-		this->standingOnBlock = false;
-		//std::cout << "未碰到地面" << std::endl;	
-		//role->gameOver();
-		this->fall();
+		if (!this->isJump && !this->isFall) {
+			if (this->gameSceneBasic.getType() != OrganType::error) {
+				//再次检测避免出现更新延迟
+				if (!RayCast(origin, PxVec3(0, -5.0f, 0))) {
+					std::cout << "边缘滑动" << endl;
+					this->edgeSliding();
+				}
+			}
+			this->gameSceneBasic = GameSceneBasic();
+			this->standingOnBlock = false;
+			this->fall();
+		}	
+		
 	}
 }
 
@@ -456,8 +537,8 @@ void Role::pickUpObj() {
 	PxVec3 forwardDir = this->getFaceDir() * 2;
 	PxRigidActor* actor = NULL;
 	if (actor = RayCast(origin, forwardDir)) {
-		Block* block = (Block*)actor->userData;
-		if (block->getType() == BlockType::prop) {
+		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
+		if (basic->getType() == OrganType::prop) {
 			actor->release();
 			this->equiped = true;
 			std::cout << "拾取道具成功" << std::endl;
@@ -482,8 +563,8 @@ void Role::layDownObj() {
 	PxVec3 forwardDir = PxVec3(this->getFaceDir().x * 1.5f, -3, this->getFaceDir().z * 1.5f);
 	PxRigidActor* actor = NULL;
 	if (actor = RayCast(origin, forwardDir)) {
-		Block* block = (Block*)actor->userData;
-		if (block->getType() == BlockType::road) {
+		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
+		if (basic->getType() == OrganType::road) {
 			this->equiped = false;
 			extern void createPorp(const PxTransform & t, const PxVec3 & v, PxReal x, PxReal y, PxReal z);
 			//cout << role->getPosition().x << " " << role->getPosition().y << " " << role->getPosition().z << endl;
@@ -499,5 +580,50 @@ void Role::layDownObj() {
 	else
 	{
 		std::cout << "射线没有找到目标" << std::endl;
+	}
+}
+
+
+//向四周发送射线
+void Role::rayAround() {
+	PxVec3 origin = this->getPosition();
+	PxRigidActor* actor = NULL;
+	for (int i = -1; i < 2; i++) {
+		for (int j = -1; j < 2; j++) {
+			 if (i == 0 && j == 0) continue;
+			 PxVec3 dir = PxVec3(i, 0, j).getNormalized() * 2.0f;
+			 actor = RayCast(origin, dir);
+			 if (actor) {				 
+				 GameSceneBasic* gsb = (GameSceneBasic*)actor->userData;
+				 //摆锤
+				 if (gsb && gsb->getType() == OrganType::pendulum) {
+					 //cout << "撞到了" << endl;
+					 Pendulum* pendulem = (Pendulum*)gsb;
+					 //extern void printPxVecFun(const PxVec3 & vec);
+					 int flag = pendulem->getPendulumActor()->getAngularVelocity().x > 0 ? 1 : -1;
+					 if (!this->stimulateObj) {
+						 PxShape* shape = gPhysics->createShape(PxCapsuleGeometry(0.05,0.5), *gMaterial);
+						 //偏移值为测试计算出来，该值的准确值有待商榷
+						 PxVec3 pos = this->getPosition() + PxVec3(0,0,2) * flag;
+						 PxRigidDynamic* sceneBox = gPhysics->createRigidDynamic(PxTransform(pos));			 
+						 sceneBox->attachShape(*shape);
+						 sceneBox->setName("");
+						 PxRigidBodyExt::updateMassAndInertia(*sceneBox, 0.00001f);
+						 gScene->addActor(*sceneBox);
+						 this->stimulateObj = sceneBox;
+					 }
+					
+					 
+				 }
+			}
+		}
+	}
+}
+
+//模拟
+void Role::stimulate() {
+	if (this->stimulateObj) {
+		const PxVec3 pos = this->stimulateObj->getGlobalPose().p;
+		this->roleController->setPosition(PxExtendedVec3(pos.x,pos.y,pos.z));
 	}
 }

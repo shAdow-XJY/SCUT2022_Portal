@@ -1,49 +1,24 @@
 #pragma once
-#include <ctype.h>
-#include <string>
-#include "PxPhysicsAPI.h"
-using namespace physx;
-using namespace std;
-
-//用于过滤的属性
-const PxFilterData collisionGroupIgnore(0, 0, 0, 1);  //忽略碰撞的
-const PxFilterData collisionGroup(1, 0, 0, 0); // 检测碰撞的
+#include "../Scene/SceneBasic.h"
 
 //盒子的高度
 extern float boxHeight;
 
-enum BlockType
-{
-	error = -1,
-	block = 0, //普通方块
-	wall = 1,
-	road = 2, //道路
-	prop = 3,
-	door = 4, //门
-	seesaw =5,
-	seesawbox = 6
-};
-
 
 //方块基类，后续可拓展实现
-class Block {
+class Block:public GameSceneBasic {
 protected:
-	PxVec3 position;
 	PxReal halfX = 0;
 	PxReal halfY = 0;
 	PxReal halfZ = 0;
-	BlockType type = BlockType::error;
-	string name = "";
 public:
 	Block() {};
-	Block(string name, PxVec3 position, PxReal halfX, PxReal halfY, PxReal halfZ, BlockType type = BlockType::block)
-	:name(name),position(position), halfX(halfX), halfY(halfY), halfZ(halfZ), type(type) {}
-
-
-	PxVec3 getPosition() {
-		return this->position;
+	Block(string name, PxVec3 position, PxReal halfX, PxReal halfY, PxReal halfZ, OrganType type = OrganType::block)
+	:GameSceneBasic(name,position,type){
+		this->halfX = halfX;
+		this->halfY = halfY;
+		this->halfZ = halfZ;
 	}
-
 	PxReal getHalfX(){
 		return this->halfX;
 	}
@@ -54,17 +29,6 @@ public:
 		return this->halfZ;
 	}
 
-	BlockType getType() {
-		return this->type;
-	}
-
-	string getName() {
-		return this->name;
-	}
-
-	void setPosition(PxVec3 position) {
-		this->position = position;
-	}
 
 	void setHalfX(PxReal halfX) {
 		this->halfX = halfX;
@@ -76,13 +40,5 @@ public:
 
 	void setHalfZ(PxReal halfZ) {
 		this->halfZ = halfZ;
-	}
-
-	void setType(BlockType type) {
-		this->type = type;
-	}
-
-	void setName(string name) {
-		this->name = name;
 	}
 };

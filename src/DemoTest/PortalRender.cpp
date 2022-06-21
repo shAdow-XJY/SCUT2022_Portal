@@ -28,18 +28,15 @@
 // Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 #define RENDER_SNIPPET 1
 #ifdef RENDER_SNIPPET
-
 #include <vector>
 
 #include "PxPhysicsAPI.h"
-
 #include "../Render/Render.h"
 #include "../Render/Camera.h"
 #include "../Role/Role.h"
 #include <Render/RenderBox.h>
-
-
-
+#include <Render/DynamicBall.h>
+#include <Sound/SoundTools.h>
 using namespace physx;
 extern void initPhysics(bool interactive);
 extern void stepPhysics(bool interactive);	
@@ -49,20 +46,32 @@ extern void keyRelease(unsigned char key);
 extern void mousePress(int button, int state, int x, int y);
 extern void specialKeyPress(GLint key);
 extern void specialKeyRelease(GLint key);
-extern Role* role;
-extern void RayCastByRole();
 extern void calculateElapsedClocksFromLastFrame();
+extern void loadTexture();
+extern void initGame();
 
+extern Role* role;
 
+//角色背后照相机默认位置
+PxVec3 roleBackPosition = PxVec3(0, 0, 0);
+
+//看向角色的视线
+PxVec3 dir = PxVec3(0, 0, 0);
 
 
 bool beginGame = true;
+//天空图
 RenderBox skyBox;
+//音频类
+extern SoundTool soundtool;
+//动态渲染圈
+PxVec3 roleWorldPosition = PxVec3(0);
+
+DynamicBall dynamicBall = DynamicBall(false);
+
 namespace
 {
 	Snippets::Camera*	sCamera;
-
-	
 
 	void motionCallback(int x, int y)
 	{
@@ -106,48 +115,57 @@ void idleCallback()
 	glutPostRedisplay();
 }
 
+
+
 void renderCallback()
 {
+	if (soundtool.getSoundResult()!= FMOD_OK) {
+		soundtool.SoundUpdate();
+	}
+
 	stepPhysics(true);
 
-	
+		
 		if (!sCamera->isFree() || beginGame) {
 			if (beginGame) {
 				sCamera->isChangeImmediate = true;
 				beginGame = false;
 			}
-			PxVec3 position = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getFaceDir() * -50);
+			roleBackPosition = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getFaceDir() * -50);
 			if (!sCamera->isMoving) {
-				sCamera->setEye(position);
+				sCamera->setEye(roleBackPosition);
 				role->changeCanMove(true);
 			}
 			else {
 				role->changeCanMove(false);
 			}
-			PxVec3 dir = role->getPosition() - position;
+			dir = role->getPosition() - roleBackPosition;
 			sCamera->targetDir = dir;
 			sCamera->updateDir(role->getPosition());
 			
 		}
+		else
+		{
+			dir = role->getPosition() - roleBackPosition;
+			roleBackPosition = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getDir() * -50);
+		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 
-		if (sCamera->isFree())
+		/*if (sCamera->isFree())
 		{
-			if (role)
-			{
-				role->move();
-				role->roleJump();
-				role->roleFall();
-			}
+			role->move();
+		}*/
+		if (role) {
+			role->roleJump();
+			role->roleFall();
+			role->roleSlide();	
+			role->rayAround();
+			role->simulationGravity();
+			role->stimulate();
+			
+			roleWorldPosition = role->getRoleWorldPosition();
+			dynamicBall.setCircleCenterPosition_XZ(roleWorldPosition.x, roleWorldPosition.z);
 		}
-		else {
-			if (role)
-			{
-				role->roleJump();
-				role->roleFall();
-			}
-		}
-		role->simulationGravity();
 
 		PxScene* scene;
 		PxGetPhysics().getScenes(&scene,1);
@@ -165,7 +183,7 @@ void renderCallback()
 		calculateElapsedClocksFromLastFrame();
 	}
 
-	void exitCallback(void)
+void exitCallback(void)
 	{
 		delete sCamera;
 		cleanupPhysics(true);
@@ -173,15 +191,32 @@ void renderCallback()
 
 }
 
+/**
+* @brief 窗口大小重置函数
+**/
+void reshape(int width, int height)
+{
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0, GLUT_WINDOW_WIDTH, 0, GLUT_WINDOW_HEIGHT);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+}
+
+
 void renderLoop()
 {
 	sCamera = new Snippets::Camera(PxVec3(50.0f, 50.0f, 50.0f), PxVec3(-0.6f, -0.2f, -0.7f));
 
 	Snippets::setupDefaultWindow("PhysX Demo");
+
 	Snippets::setupDefaultRenderState();
 
 	/** 初始化天空 */
 	skyBox.Init(true);
+
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -200,10 +235,14 @@ void renderLoop()
 	glutSpecialUpFunc(specialKeyUpCallback);
 	glutMouseFunc(mouseCallback);
 	glutMotionFunc(motionCallback);
+	glutReshapeFunc(reshape);
 	motionCallback(0,0);
 	atexit(exitCallback);
 	
+
 	initPhysics(true);
+	loadTexture();
+	initGame();
 	glutMainLoop();
 
 	ImGui_ImplOpenGL2_Shutdown();
