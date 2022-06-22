@@ -4,7 +4,7 @@ class PrismaticRoad :public Block {
 
 private:
 	PxRigidDynamic* prismaticRoad = NULL;
-
+	PxVec3 distance = PxVec3(0, 0, 0);
 public:
 	PrismaticRoad() {
 
@@ -19,4 +19,8 @@ public:
 
 	void attachPrismaticRoadActor(PxRigidDynamic* prismaticRoad);
 	PxRigidDynamic* getPrismaticRoadActor();
+
+	void updateDistance(PxVec3 pos);
+	PxVec3 getStaticPosition();
+	void resetDistance();
 };

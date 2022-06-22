@@ -25,7 +25,7 @@ public:
 	~SoundTool();
 
 	void SoundInit();
-	void addSound(string filename,bool loop);
+	void addSound(string filename, bool loop);
 
 	//∑µªÿresult Ù–‘
 	FMOD_RESULT getSoundResult();
@@ -34,7 +34,8 @@ public:
 	void SoundUpdate();
 
 	//≤•∑≈/«–ªª“Ù∆µ
-	FMOD_RESULT playSound(string filename,bool interrupt = false);
+
+	FMOD_RESULT playSound(string filename, bool interrupt = false);
 
 	//Õ£÷π“Ù∆µ≤•∑≈
 	FMOD_RESULT pauseSound();

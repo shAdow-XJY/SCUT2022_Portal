@@ -1,7 +1,7 @@
 #include "../Block/Block.h"
 
-class Door:public Block{
-	
+class Door :public Block {
+
 private:
 	PxRigidDynamic* door = NULL;
 	bool open = true;
@@ -13,7 +13,7 @@ public:
 
 	}
 	Door(string name, PxVec3 position, PxReal halfX, PxReal halfY, PxReal halfZ, bool canOpen)
-		:Block(name, position, halfX, halfY, halfZ,OrganType::door) {
+		:Block(name, position, halfX, halfY, halfZ, OrganType::door) {
 		this->open = canOpen;
 	}
 	Door(std::string name, PxVec3 position, PxReal halfX, PxReal halfY, PxReal halfZ, PxRigidDynamic* door, bool canOpen, PxRevoluteJoint* revolute)
