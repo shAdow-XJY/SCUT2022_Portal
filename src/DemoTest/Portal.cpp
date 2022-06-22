@@ -43,6 +43,7 @@
 #include "../LoadModel/Model.h"
 #include "../Render/BMPLoader.h"
 #include "../Sound/SoundTools.h"
+#include "../Animation/Animation.h"
 #include<vector>
 #include<string>
 #include <glut.h>
@@ -88,6 +89,8 @@ std::string texture[] = { "Door","Wall","Road","SeesawBox","Seesaw","Ice"};
 //音频类
 SoundTool soundtool = SoundTool();
 
+// 带动画的人物模型
+Animation animation;
 
 
 //加载纹理
@@ -120,10 +123,11 @@ void initGame() {
 	//role->setFootPosition(t.transform(PxVec3(3, 45, 416.8)));
 	//旋转杆关卡角落位置
 	//role->setFootPosition(t.transform(PxVec3(-17, 45, 406.8)));
-	role->attachModel("../../models/paimon/paimon.obj");
+	//role->attachModel("../../models/paimon/paimon.obj");
 	//role->attachModel("../../models/human.obj");
 	role->fall();
 
+	animation.attachRole(*role);
 }
 
 ///实例化物理
@@ -172,11 +176,8 @@ void initPhysics(bool interactive)
 	groundPlane->setName("Over");
 	gScene->addActor(*groundPlane);
 
-	//// 测试代码
-	//Model testModel("../../models/paimon/paimon.obj");
-	//testModel.attachMeshes((PxTransform(PxVec3(20, 30, 30))).transform(PxTransform(PxQuat(-PxHalfPi,PxVec3(1.0f,0.0f,0.0f)))));
-	//testModel.createMeshActor(PxTransform(20, 30, 30));
-	// end
+	
+
 
 }
 

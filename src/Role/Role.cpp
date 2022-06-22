@@ -1,8 +1,11 @@
 #include "Role.h"
 #include "cmath"
 #include <iostream>
+#include"../Animation/Animation.h"
 
 #define MAX_NUM_ACTOR_SHAPES 128
+
+
 
 Role::Role() {
 	PxCapsuleControllerDesc desc;
@@ -39,10 +42,13 @@ bool Role::attachModel(const char* path) {
 	// 设为false就能只作为碰撞体而不渲染出来
 	cap->setFlag(PxShapeFlag::eVISUALIZATION, false);
 	this->model = new Model(path);
+	this->staticAttached = true;
 	//this->model->attachMeshes(PxTransform(PxQuat(-PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f))).transform(PxTransform(PxVec3(0.0f,-0.4f,0.0f))), this->role);
 	//this->role->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 	return true;
 }
+
+
 
 
 /**
@@ -120,6 +126,9 @@ void Role::stopMoving() {
 	this->nowPostion = PxVec3(this->roleController->getFootPosition().x, this->roleController->getFootPosition().y, this->roleController->getFootPosition().z);
 }
 
+extern int animationTick;
+extern Animation animation;
+
 /**
 * @brief 键盘输入控制角色移动
 * @desc	 锁定视角以角色面朝方向为前进方向，自由视角以摄像机朝向为前进方向
@@ -144,20 +153,32 @@ void Role::move(GLint key, bool status, bool free) {
 		switch (key) {
 		case GLUT_KEY_UP: {
 			//dir = PxVec3(0, 0, 1);
+			animation.changeOrientation(PxQuat(0, PxVec3(0, 1, 0)));
+			animation.update(1000 * animationTick);
+			animationTick++;
 			break;
 		}
 		case GLUT_KEY_DOWN: {
 			dir *= -1;
+			animation.changeOrientation(PxQuat(PxPi, PxVec3(0, 1, 0)));
+			animation.update(1000 * animationTick);
+			animationTick++;
 			break;
 
 		}case GLUT_KEY_LEFT: {
 			PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
 			dir = rotate.rotate(dir);
+			animation.changeOrientation(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
+			animation.update(1000 * animationTick);
+			animationTick++;
 			break;
 
 		}case GLUT_KEY_RIGHT: {
 			PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
 			dir = rotate.rotate(-dir);
+			animation.changeOrientation(PxQuat(-PxHalfPi, PxVec3(0, 1, 0)));
+			animation.update(1000 * animationTick);
+			animationTick++;
 			break;
 
 		}
@@ -279,7 +300,7 @@ void Role::roleJump() {
 		float speed_y = 0.0;
 
 		if (isHanging == false) {
-			speed_y = 0.10f;
+			speed_y = 1.f;
 			isHanging = true;
 		}
 

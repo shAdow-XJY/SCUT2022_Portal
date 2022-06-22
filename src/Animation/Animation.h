@@ -3,6 +3,7 @@
 #define ANIMATION_H
 
 #include <Animation/MeshUtils.h>
+#include"../../src/Role/Role.h"
 
 class Animation
 {
@@ -14,7 +15,10 @@ private:
     aiVector3D scene_max;
     aiVector3D rootPosition;
     std::vector<FBXMesh> initial_state;
+    Role* attachedRole;
 
+    // 改变模型朝向的矩阵
+    PxMat44 yRotate;
 public:
     void init();
 
@@ -25,6 +29,9 @@ public:
     void keyboard(unsigned char key);
 
     void cleanup();
+
+    void attachRole(Role&);
+    void changeOrientation(const PxQuat& orientation);
 };
 
 #endif

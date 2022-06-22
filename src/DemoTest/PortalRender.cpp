@@ -68,9 +68,13 @@ RenderBox skyBox;
 extern SoundTool soundtool;
 //动态渲染圈
 PxVec3 roleWorldPosition = PxVec3(0);
-DynamicBall dynamicBall = DynamicBall(false);
+DynamicBall dynamicBall = DynamicBall(true);
 
-Animation animation;
+extern Animation animation;
+
+// 全局的动画计数器
+int animationTick = 0;
+
 namespace
 {
 	Snippets::Camera*	sCamera;
@@ -79,7 +83,7 @@ namespace
 	{
 		sCamera->handleMotion(x, y);
 	}
-	int animationTick = 0;
+	
 void keyboardDownCallback(unsigned char key, int x, int y)
 {
 	if(key==27)
@@ -87,8 +91,7 @@ void keyboardDownCallback(unsigned char key, int x, int y)
 	if(!sCamera->handleKey(key, x, y))
 		keyPress(key, sCamera->getTransform());
 
-	animation.update(1000*animationTick);
-	animationTick++;
+	
 }
 void keyboardUpCallback(unsigned char key, int x, int y)
 {
@@ -180,7 +183,7 @@ void renderCallback()
 		}
 		
 		// 渲染模型
-		if (role) {
+		if (role->isStaticAttached()) {
 			renderVisible(*role);
 		}
 		
