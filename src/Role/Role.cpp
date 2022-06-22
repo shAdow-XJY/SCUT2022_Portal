@@ -669,10 +669,12 @@ void Role::updateScore() {
 	PxRigidActor* actor = NULL;
 	if (actor = RayCast(origin, unitDir)) {
 		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
-		int checkpoint = basic->getCheckpoint();
-		if (this->arrivedCheckpoint < checkpoint) {
-			this->arrivedCheckpoint = checkpoint;
-			this->score += 100;
+		if (basic) {
+			int checkpoint = basic->getCheckpoint();
+			if (this->arrivedCheckpoint < checkpoint) {
+				this->arrivedCheckpoint = checkpoint;
+				this->score += 100;
+			}
 		}
 	}
 }
