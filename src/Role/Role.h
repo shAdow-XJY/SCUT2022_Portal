@@ -21,6 +21,7 @@ extern void renderGameOver();
 const int primaryJumpHeight = 4.0f;
 
 extern SoundTool soundtool;
+extern vector<PxVec3> checkpoints;
 static GameSceneBasic* errorGameSceneBasic = new GameSceneBasic();
 
 
@@ -79,8 +80,14 @@ private:
 	PxRigidBody* stimulateObj = NULL;
 	PxReal stimulateMassScale = 0.00001f;
 
-	//
-	PxVec3 dis = PxVec3(0, 0, 0);
+	//当前已到达的最远检查点
+	int arrivedCheckpoint = 1;
+	//生命值
+	int life = 5;
+	//得分
+	int score = 0;
+	//是否处于重生状态
+	bool isRebirthing = false;
 
 public:
 	Role();
@@ -91,7 +98,7 @@ public:
 
 	bool attachModel(const char*);
 	bool getAliveStatus();
-	void gameOver();
+	bool gameOver();
 
 	//角色位置信息
 	void setFootPosition(PxVec3 position);
@@ -155,6 +162,12 @@ public:
 	//人物模拟动态刚体功能
 	void stimulate();
 
+	//传送
+	void protal();
+	//更新角色得分
+	void updateScore();
+	bool getRebirthing();
+
 };
 
 class RoleHitCallback :public PxUserControllerHitReport {
@@ -202,11 +215,11 @@ public:
 
 		}
 		else if (name == "Over") {
-			this->role->gameOver();
-			const char* msg = "游戏结束";
-			//渲染游戏结束
-			renderGameOver();
-
+			if (this->role->gameOver()) {
+				const char* msg = "游戏结束";
+				//渲染游戏结束
+				renderGameOver();
+			}
 		}
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
 	}

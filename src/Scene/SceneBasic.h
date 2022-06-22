@@ -26,8 +26,7 @@ enum OrganType
 	pendulum = 11, //摆锤
 };
 
-
-
+static int totalCheckpoint = 1;
 
 //方块基类，后续可拓展实现
 class GameSceneBasic {
@@ -35,10 +34,12 @@ protected:
 	PxVec3 position;
 	OrganType type = OrganType::error;
 	string name = "";
+	int checkpoint = 0;
 
 public:
 	GameSceneBasic() {};
 	GameSceneBasic(string name,PxVec3 position, OrganType type):position(position),type(type),name(name){
+		this->checkpoint = totalCheckpoint;
 	}
 
 	PxVec3 getPosition() {
@@ -63,6 +64,10 @@ public:
 
 	void setName(string name) {
 		this->name = name;
+	}
+
+	int getCheckpoint() {
+		return this->checkpoint;
 	}
 };
 

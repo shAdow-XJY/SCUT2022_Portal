@@ -88,7 +88,14 @@ std::string texture[] = { "Door","Wall","Road","SeesawBox","Seesaw","Ice"};
 //音频类
 SoundTool soundtool = SoundTool();
 
-
+//可读取的存档点
+vector<PxVec3> checkpoints = {
+	PxVec3(-50, 20, -250),
+	t.transform(PxVec3(58, 20, 19)),
+	t.transform(PxVec3(183, 20, 64)),
+	t.transform(PxVec3(35, 20, 385.8)),
+	t.transform(PxVec3(-17, 45, 406.8))
+};
 
 //加载纹理
 void loadTexture() {	

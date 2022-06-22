@@ -176,7 +176,7 @@ void Role::move(GLint key, bool status, bool free) {
 		if (this->isJump || this->isFall) return;
 		PxVec3 lastPosition = this->getFootPosition();
 		this->roleController->move(this->speed, 0.0001, 1.0f / 120.0f, NULL);
-		this->updatePosition();
+		//this->updatePosition();
 		//¸üÐÂ¾àÀë
 		if (standingBlock->getType() == OrganType::prismaticRoad) {
 			PrismaticRoad* primaticRoad = (PrismaticRoad*)standingBlock;
@@ -326,7 +326,7 @@ void Role::roleFall() {
 			this->setSpeed(PxVec3(0, 0, 0));
 			isFall = false;
 			if (!this->isAutoMoving) {
-				this->updatePosition();
+				//this->updatePosition();
 			};
 		}
 		
@@ -440,12 +440,19 @@ bool Role::getAliveStatus() {
 /**
 * @brief ½ÇÉ«ËÀÍö
 **/
-void Role::gameOver() {
-	this->isAlive = false;
+bool Role::gameOver() {
 	if (this->stimulateObj) {
-		this->stimulateObj->release();			
+		this->stimulateObj->release();
 	}
+	if (this->life > 0) {
+		this->isRebirthing = true;
+	}
+	else {
+		this->isAlive = false;
+		return true;
+	}	
 	this->stimulateObj = NULL;
+	return false;
 	
 }
 
@@ -642,4 +649,34 @@ void Role::stimulate() {
 		const PxVec3 pos = this->stimulateObj->getGlobalPose().p;
 		this->roleController->setPosition(PxExtendedVec3(pos.x,pos.y,pos.z));
 	}
+}
+
+//
+void Role::protal() {
+	if (this->isRebirthing) {
+		srand((int)time(0));
+		int protalCheckpoint = rand() % this->arrivedCheckpoint;
+		this->setFootPosition(checkpoints[protalCheckpoint]);
+		this->life--;
+		this->isRebirthing = false;
+	}
+}
+
+
+void Role::updateScore() {
+	PxVec3 origin = this->getFootPosition();
+	PxVec3 unitDir = PxVec3(0, -99.0f, 0);
+	PxRigidActor* actor = NULL;
+	if (actor = RayCast(origin, unitDir)) {
+		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
+		int checkpoint = basic->getCheckpoint();
+		if (this->arrivedCheckpoint < checkpoint) {
+			this->arrivedCheckpoint = checkpoint;
+			this->score += 100;
+		}
+	}
+}
+
+bool Role::getRebirthing() {
+	return this->isRebirthing;
 }
