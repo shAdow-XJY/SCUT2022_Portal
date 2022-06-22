@@ -381,7 +381,7 @@ PxRevoluteJoint* createSeesaw(const PxTransform& t,PxVec3 v,float x, float y, fl
 	PxVec3 position = PxVec3(actor0->getGlobalPose().p.x, actor0->getGlobalPose().p.y, actor0->getGlobalPose().p.z);
 	Seesaw* seesaw = new Seesaw("翘板",position,x,y,z,actor0);
 	actor0->userData = seesaw;
-	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(-(x+y+0.5), 0, 0), y, y, y, pose, OrganType::seesawbox);
+	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(-(x + y + 0.5), 0, 0), y, y, y, pose, OrganType::seesawbox);
 	createStaticBox(pos, PxVec3(x+y+0.5, 0, 0), y, y, y, pose, OrganType::seesawbox);
 	PxTransform localFrame0(PxVec3(0, 0, 0));
 	PxTransform localFrame1(PxVec3(x+y+0.5, 0, 0));
@@ -389,6 +389,23 @@ PxRevoluteJoint* createSeesaw(const PxTransform& t,PxVec3 v,float x, float y, fl
 	//revolute->setLocalPose(PxJointActorIndex::Enum::eACTOR0, PxTransform(PxVec3(0, 0, 0), PxQuat(1.75 * PxHalfPi, PxVec3(1, 0, 0))));
 	seesaw->attachRevolute(revolute);
 	return revolute;
+}
+
+void createSideSeesaw(const PxTransform& t, PxVec3 v, float x, float y, float z, PxTransform& pose) {
+	PxTransform pos(t.transform(v));
+	PxRigidStatic* actor0 = createStaticBox(pos, PxVec3(0, 0, 0), y, y, y, pose, OrganType::seesawbox);
+	PxRigidDynamic* actor1 = createDynamicBox(false, pos, PxVec3(x, 0, -y - 0.5), x, y, z, pose, OrganType::seesaw);
+	PxTransform localFrame0(PxVec3(0, 0, -y - 0.5));
+	PxTransform localFrame1(PxVec3(-x, 0, 0));
+	PxRevoluteJoint* revolute = PxRevoluteJointCreate(*gPhysics, actor0, localFrame0, actor1, localFrame1);
+	revolute->setLocalPose(PxJointActorIndex::eACTOR0, PxTransform(PxVec3(0, 0, -y - 0.5), PxQuat(PxHalfPi, PxVec3(0, 1, 0))));
+	createStaticBox(pos, PxVec3(0, 0, -2 * y - 2 * x - 1.0), y, y, y, pose, OrganType::seesawbox);
+	PxVec3 position = actor1->getGlobalPose().p;
+	Seesaw* seesaw = new Seesaw("跷板", position, x, y, z, actor1);
+	actor1->userData = seesaw;
+	seesaw->attachRevolute(revolute);
+	revolute->setLimit(PxJointAngularLimitPair(-PxPi / 130, 0, 0.01f));
+	revolute->setRevoluteJointFlag(PxRevoluteJointFlag::eLIMIT_ENABLED, true);
 }
 
 /*创建跷跷板关卡
@@ -664,7 +681,7 @@ void createFan(const PxTransform& t, PxVec3 v, PxVec3 angularVelocity) {
 
 
 void createRoTateRodLevel(const PxTransform& t, PxVec3 v,float rod_length,float boxHeight,PxTransform& pose) {
-	createRoad(t, v, rod_length, boxHeight, rod_length, pose);
+	//createRoad(t, v, rod_length, boxHeight, rod_length, pose);
 	//createRotateRod(t, PxVec3(v.x, v.y + boxHeight + 2.0, v.z), 1.5, pose, PxVec3(1, 0, 0) * 70, PxVec3(0, 0, -1) * 70);
 	createFan(t, PxVec3(v.x, v.y + 2 * boxHeight, v.z), PxVec3(0, 4, 0));
 
@@ -708,6 +725,108 @@ void createPool(const PxTransform& t, PxVec3 bottom, float poolLength, float poo
 	createStaticBox(pos, PxVec3(0,  1.0 + poolHeight, 1.0 + poolWidth), poolLength, poolHeight, 1.0, pose);
 }
 
+void createGear(const PxTransform& t, PxVec3 v, float x, float y, float z, PxVec3 angularVelocity) {
+	PxTransform pos(t.transform(v));
+	PxRigidDynamic* gear = gPhysics->createRigidDynamic(pos);
+	PxShape* shape0 = PxRigidActorExt::createExclusiveShape(*gear, PxBoxGeometry(x, y, z), *gMaterial);
+	PxShape* shape1 = PxRigidActorExt::createExclusiveShape(*gear, PxBoxGeometry(x, y, z), *gMaterial);
+	//PxShape* shape2 = PxRigidActorExt::createExclusiveShape(*ferrisWheel, PxBoxGeometry(x, y, z), *gMaterial);
+	shape1->setLocalPose(PxTransform(PxQuat(PxPi / 2, PxVec3(0, 0, 1))));
+	//shape2->setLocalPose(PxTransform(PxQuat(2 * PxPi / 3, PxVec3(0, 0, 1))));
+	shape0->setQueryFilterData(collisionGroup);
+	shape1->setQueryFilterData(collisionGroup);
+	//shape2->setQueryFilterData(collisionGroup);
+	gear->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+	gear->setAngularVelocity(angularVelocity);
+	gear->setAngularDamping(0.f);
+	gScene->addActor(*gear);
+	gear->setMass(0.f);
+	gear->setMassSpaceInertiaTensor(PxVec3(0.f));
+	/*RotateRod* rotateRod = new RotateRod("转杆", fan->getGlobalPose().p, 25.0, 1.0, 1.0, fan);
+	fan->setName("RotateRod");
+	fan->userData = rotateRod;*/
+}
+
+void createFerrisWheel(const PxTransform& t, PxVec3 v, float x, float y, float z, PxVec3 angularVelocity) {
+	PxTransform pos(t.transform(v));
+	PxRigidDynamic* ferrisWheel = gPhysics->createRigidDynamic(pos);
+	PxShape* shape0 = PxRigidActorExt::createExclusiveShape(*ferrisWheel, PxBoxGeometry(x, y, z), *gMaterial);
+	PxShape* shape1 = PxRigidActorExt::createExclusiveShape(*ferrisWheel, PxBoxGeometry(x, y, z), *gMaterial);
+	PxShape* shape2 = PxRigidActorExt::createExclusiveShape(*ferrisWheel, PxBoxGeometry(x, y, z), *gMaterial);
+	shape1->setLocalPose(PxTransform(PxQuat(PxPi / 3, PxVec3(0, 0, 1))));
+	shape2->setLocalPose(PxTransform(PxQuat(2 * PxPi / 3, PxVec3(0, 0, 1))));
+	shape0->setQueryFilterData(collisionGroup);
+	shape1->setQueryFilterData(collisionGroup);
+	shape2->setQueryFilterData(collisionGroup);
+	ferrisWheel->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+	ferrisWheel->setAngularVelocity(angularVelocity);
+	ferrisWheel->setAngularDamping(0.f);
+	gScene->addActor(*ferrisWheel);
+	ferrisWheel->setMass(0.f);
+	ferrisWheel->setMassSpaceInertiaTensor(PxVec3(0.f));
+	float seatLength = 2.5;
+	float seatWidth = 1.5;
+	PxTransform pose(PxVec3(0));
+	//seat0左
+	PxRigidDynamic* seat0 = createDynamicBox(false, pos, PxVec3(0.9 * x, -2.0, -z - seatWidth - 0.1), seatLength, 0.4, seatWidth, pose, OrganType::prismaticRoad);
+	seat0->setMass(1.0);
+	seat0->setMassSpaceInertiaTensor(PxVec3(0.f));
+	PxTransform fw0(PxVec3(0.9 * x, 0, -z - seatWidth - 0.1));
+	PxTransform s0(PxVec3(0, 2.0, 0));
+	PxDistanceJoint* d0 = PxDistanceJointCreate(*gPhysics, ferrisWheel, fw0, seat0, s0);
+	/*d0->setMaxDistance(2.0f);
+	d0->setDistanceJointFlag(PxDistanceJointFlag::eMAX_DISTANCE_ENABLED, true);*/
+	//seat1右
+	PxRigidDynamic* seat1 = createDynamicBox(false, pos, PxVec3(-0.9 * x, -2.0, -z - seatWidth - 0.1), seatLength, 0.4, seatWidth, pose, OrganType::prismaticRoad);
+	seat1->setMass(1.0);
+	seat1->setMassSpaceInertiaTensor(PxVec3(0.f));
+	PxTransform fw1(PxVec3(-0.9 * x, 0, -z - seatWidth - 0.1));
+	PxTransform s1(PxVec3(0, 2.0, 0));
+	PxDistanceJoint* d1 = PxDistanceJointCreate(*gPhysics, ferrisWheel, fw1, seat1, s1);
+	/*d1->setMaxDistance(2.0f);
+	d1->setDistanceJointFlag(PxDistanceJointFlag::eMAX_DISTANCE_ENABLED, true);*/
+	//seat2左上
+	PxRigidDynamic* seat2 = createDynamicBox(false, pos, PxVec3(0.9 * x * cos(PxPi / 3), 0.9 * x * sin(PxPi / 3) - 2.0, -z - seatWidth - 0.1),seatLength, 0.4, seatWidth, pose, OrganType::prismaticRoad);
+	seat2->setMass(1.0);
+	seat2->setMassSpaceInertiaTensor(PxVec3(0.f));
+	PxTransform fw2(PxVec3(0.9 * x * cos(PxPi / 3), 0.9 * x * sin(PxPi / 3), -z - seatWidth - 0.1));
+	PxTransform s2(PxVec3(0, 2.0, 0));
+	PxDistanceJoint* d2 = PxDistanceJointCreate(*gPhysics, ferrisWheel, fw2, seat2, s2);
+	/*d2->setMaxDistance(2.0f);
+	d2->setDistanceJointFlag(PxDistanceJointFlag::eMAX_DISTANCE_ENABLED, true);*/
+	//seat3右上
+	PxRigidDynamic* seat3 = createDynamicBox(false, pos, PxVec3(-0.9 * x * cos(PxPi / 3), 0.9 * x * sin(PxPi / 3) - 2.0, -z - seatWidth - 0.1), seatLength, 0.4, seatWidth, pose, OrganType::prismaticRoad);
+	seat3->setMass(1.0);
+	seat3->setMassSpaceInertiaTensor(PxVec3(0.f));
+	PxTransform fw3(PxVec3(-0.9 * x * cos(PxPi / 3), 0.9 * x * sin(PxPi / 3), -z - seatWidth - 0.1));
+	PxTransform s3(PxVec3(0, 2.0, 0));
+	PxDistanceJoint* d3 = PxDistanceJointCreate(*gPhysics, ferrisWheel, fw3, seat3, s3);
+	/*d3->setMaxDistance(2.0f);
+	d3->setDistanceJointFlag(PxDistanceJointFlag::eMAX_DISTANCE_ENABLED, true);*/
+	//seat4左下
+	PxRigidDynamic* seat4 = createDynamicBox(false, pos, PxVec3(0.9 * x * cos(PxPi / 3), -0.9 * x * sin(PxPi / 3) - 2.0, -z - seatWidth - 0.1), seatLength, 0.4, seatWidth, pose, OrganType::prismaticRoad);
+	seat4->setMass(1.0);
+	seat4->setMassSpaceInertiaTensor(PxVec3(0.f));
+	PxTransform fw4(PxVec3(0.9 * x * cos(PxPi / 3), -0.9 * x * sin(PxPi / 3), -z - seatWidth - 0.1));
+	PxTransform s4(PxVec3(0, 2.0, 0));
+	PxDistanceJoint* d4 = PxDistanceJointCreate(*gPhysics, ferrisWheel, fw4, seat4, s4);
+	/*d4->setMaxDistance(2.0f);
+	d4->setDistanceJointFlag(PxDistanceJointFlag::eMAX_DISTANCE_ENABLED, true);*/
+	//seat5右下
+	PxRigidDynamic* seat5 = createDynamicBox(false, pos, PxVec3(-0.9 * x * cos(PxPi / 3), -0.9 * x * sin(PxPi / 3) - 2.0, -z - seatWidth - 0.1), seatLength, 0.4, seatWidth, pose, OrganType::prismaticRoad);
+	seat5->setMass(1.0);
+	seat5->setMassSpaceInertiaTensor(PxVec3(0.f));
+	PxTransform fw5(PxVec3(-0.9 * x * cos(PxPi / 3), -0.9 * x * sin(PxPi / 3), -z - seatWidth - 0.1));
+	PxTransform s5(PxVec3(0, 2.0, 0));
+	PxDistanceJoint* d5 = PxDistanceJointCreate(*gPhysics, ferrisWheel, fw5, seat5, s5);
+	/*d5->setMaxDistance(2.0f);
+	d5->setDistanceJointFlag(PxDistanceJointFlag::eMAX_DISTANCE_ENABLED, true);*/
+	//中心球体
+	PxRigidDynamic* sphere = createDynamicSphere(pos, PxVec3(0, 0, 0), 2 * y);
+	PxTransform center(PxVec3(0));
+	PxFixedJointCreate(*gPhysics, ferrisWheel, center, sphere, center);
+}
+
 //创建游戏场景
 void createGameScene(const PxTransform& t) {
 	time_t startTime = time(NULL);
@@ -717,7 +836,8 @@ void createGameScene(const PxTransform& t) {
 	float r_1_w = 15.0;  //road_1_width 8 100
 	float c_1_y = boxHeight;  //the position of the center of road_1
 	// create road_1
-	createIceRoad(t, PxVec3(0, c_1_y, 0), r_1_l, boxHeight, r_1_w, defaultPose);
+	//createRoad(t, PxVec3(0, c_1_y, 0), r_1_l, boxHeight, r_1_w, defaultPose);
+	createRoad(t, PxVec3(0, c_1_y, 0), 100, boxHeight, 100, defaultPose);
 
 	float r_2_w = 4.0;
 	float r_2_l = 20.0;
@@ -846,29 +966,31 @@ void createGameScene(const PxTransform& t) {
 	createRoTateRodLevel(t, PxVec3(c_6_x, c_6_y, c_6_z), rod_length, boxHeight, defaultPose);
 	std::cout << "旋转杆关卡角落位置相对于场景原点的坐标为" << c_6_x + rod_length << "," << c_6_y << "," << c_6_z + rod_length << endl;
 
-	//风扇关卡与水池连接路段
-	float r_7_l = 20.0;
-	float r_7_w = 5.0;
-	float c_7_x = c_6_x - 5 * rod_length - r_7_l;
-	float c_7_y = c_6_y;
-	float c_7_z = c_6_z;
-	createRoad(t, PxVec3(c_7_x, c_7_y, c_7_z), r_7_l, boxHeight, r_7_w, defaultPose);
+	//风扇关卡与水池连接齿轮
+	float gearLength = 5.0;
+	float gearHeight = 0.4;
+	float gearWidth = 10.0;
+	float gear0_x = c_6_x - 5 * rod_length - dx * 0.8 - gearLength;
+	float gear0_y = c_6_y;
+	float gear0_z = c_6_z;
+	createGear(t, PxVec3(gear0_x, gear0_y, gear0_z), gearLength, gearHeight, gearWidth, PxVec3(0, 0, 4));
+	float gear1_x = gear0_x - 2 * gearLength - dx * 0.8;
+	createGear(t, PxVec3(gear1_x, gear0_y, gear0_z), gearLength, gearHeight, gearWidth, PxVec3(0, 0, 4));
 
 	//水池
 	float poolLength = 50.0;
 	float poolHeight = 10.0;
 	float poolWidth = 25.0;
-	/*float bottom_x = c_6_x - 5 * rod_length - poolLength - 2.0;
-	float bottom_y = c_6_y + boxHeight - 2 * poolHeight - 1.0;
-	float bottom_z = c_6_z;*/
-	float bottom_x = c_7_x - r_7_l - poolLength - 2.0;
-	float bottom_y = c_7_y + boxHeight - 2 * poolHeight - 1.0;
-	float bottom_z = c_7_z;
+	float bottom_x = gear1_x - gearLength - dx * 0.8 - poolLength - 2.0;
+	float bottom_y = gear0_y + boxHeight - 2 * poolHeight - 1.0;
+	float bottom_z = gear0_z;
 	createPool(t, PxVec3(bottom_x, bottom_y, bottom_z), poolLength, poolHeight, poolWidth, defaultPose);
 	//水池底部的相对于场景原点t的位置 PxVec3 localPose(bottom_x,bottom_y,bottom_z)
 	//全局位置 t.transform(PxTransform(localPose)).p
 
-	createFan(t, PxVec3(-50, 40, 20), PxVec3(0, 5, 0));
+	//createRoad(t, PxVec3(-4, 20, -6), 4.0, 1.0, 2.0, defaultPose);
+	createFerrisWheel(t, PxVec3(center_x-12.0, centerHeight, center_z+10.0), 15.0, 0.4, 0.4, PxVec3(0, 0,0.5));
+	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
 	createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
 
 }

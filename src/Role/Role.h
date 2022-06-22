@@ -175,35 +175,35 @@ public:
 		//if (actor.getName() != "Ground") {
 		//	this->role->stopMoving();
 		//}
-		string name(actor.getName());
-		if (name == "Door") {
-			Door* door = (Door*)actor.userData;
-			float scale = 9000.0f;
-			door->addPForce(role->getFaceDir() * scale);
+		//string name(actor.getName());
+		//if (name == "Door") {
+		//	Door* door = (Door*)actor.userData;
+		//	float scale = 9000.0f;
+		//	door->addPForce(role->getFaceDir() * scale);
 
-			if (door->canOpen()) {
-				if (!door->getDoorStauts()) {
-					soundtool.playSound("openDoorSlowly.wav", true);
-					door->setDoorStatus(true);
-				}
-			}
-			
-		}
-		else if (name == "Seesaw") {
-		}
-		else if (name == "Pendulum") {
-		}
-		else if (name == "PrismaticRoad") {		
-			
+		//	if (door->canOpen()) {
+		//		if (!door->getDoorStauts()) {
+		//			soundtool.playSound("openDoorSlowly.wav", true);
+		//			door->setDoorStatus(true);
+		//		}
+		//	}
+		//	
+		//}
+		//else if (name == "Seesaw") {
+		//}
+		//else if (name == "Pendulum") {
+		//}
+		//else if (name == "PrismaticRoad") {		
+		//	
 
-		}
-		else if (name == "Over") {
-			this->role->gameOver();
-			const char* msg = "游戏结束";
-			//渲染游戏结束
-			renderGameOver();
+		//}
+		//else if (name == "Over") {
+		//	this->role->gameOver();
+		//	const char* msg = "游戏结束";
+		//	//渲染游戏结束
+		//	renderGameOver();
 
-		}
+		//}
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
 	}
 	PxControllerBehaviorFlags getBehaviorFlags(const PxController& controller) {

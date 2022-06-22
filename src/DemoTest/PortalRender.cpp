@@ -67,7 +67,7 @@ extern SoundTool soundtool;
 //¶¯Ì¬äÖÈ¾È¦
 PxVec3 roleWorldPosition = PxVec3(0);
 
-DynamicBall dynamicBall = DynamicBall(false);
+DynamicBall dynamicBall = DynamicBall(true);
 
 namespace
 {
@@ -159,7 +159,7 @@ void renderCallback()
 			role->roleJump();
 			role->roleFall();
 			role->roleSlide();	
-			role->rayAround();
+			//role->rayAround();
 			role->simulationGravity();
 			role->stimulate();
 			
