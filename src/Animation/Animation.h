@@ -13,7 +13,7 @@ private:
     aiVector3D scene_min;
     aiVector3D scene_max;
     aiVector3D rootPosition;
-    std::vector<Mesh> initial_state;
+    std::vector<FBXMesh> initial_state;
 
 public:
     void init();

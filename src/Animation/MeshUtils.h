@@ -9,12 +9,12 @@
 
 using namespace std;
 
-class Mesh
+class FBXMesh
 {
   public:
 	std::vector<aiVector3D> vertices;
 	std::vector<aiVector3D> normals;
-	Mesh(std::vector<aiVector3D> vertices, std::vector<aiVector3D> normals) : vertices(vertices), normals(normals) {}
+	FBXMesh(std::vector<aiVector3D> vertices, std::vector<aiVector3D> normals) : vertices(vertices), normals(normals) {}
 };
 
 // Find the keyframes that the animation is currently between, and produce an interpolated rotation.
@@ -26,5 +26,7 @@ void loadGLTextures(const aiScene* scene, std::map<int, int>& texIdMap);
 
 // ------A recursive function to traverse scene graph and render each mesh----------
 void render(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap);
-
+// ------A non-recursive function to traverse scene graph and render each mesh----------
+void renderDisplay(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap);
+void tempDisplay(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap);
 #endif
