@@ -4,10 +4,10 @@
 void Animation::init()
 {
     //"D:/Microsoft Visual Studio Projects/PhysX-Tutorial-master/PhysX_3.4/SCUT2022_Portal/src/Animation/models/Model2_FBX/mannequin.fbx"
-    scene = aiImportFile("D:/Microsoft Visual Studio Projects/PhysX-Tutorial-master/PhysX_3.4/SCUT2022_Portal/src/Animation/models/Model2_FBX/mannequin.fbx", aiProcessPreset_TargetRealtime_MaxQuality);
-    animations.push_back(aiImportFile("D:/Microsoft Visual Studio Projects/PhysX-Tutorial-master/PhysX_3.4/SCUT2022_Portal/src/Animation/models/Model2_FBX/walk.fbx", aiProcessPreset_TargetRealtime_MaxQuality));
-    animations.push_back(aiImportFile("D:/Microsoft Visual Studio Projects/PhysX-Tutorial-master/PhysX_3.4/SCUT2022_Portal/src/Animation/models/Model2_FBX/jump.fbx", aiProcessPreset_TargetRealtime_MaxQuality));
-    animations.push_back(aiImportFile("D:/Microsoft Visual Studio Projects/PhysX-Tutorial-master/PhysX_3.4/SCUT2022_Portal/src/Animation/models/Model2_FBX/run.fbx", aiProcessPreset_TargetRealtime_MaxQuality));
+    scene = aiImportFile("../../src/Animation/models/Model2_FBX/mannequin.fbx", aiProcessPreset_TargetRealtime_MaxQuality);
+    animations.push_back(aiImportFile("../../src/Animation/models/Model2_FBX/walk.fbx", aiProcessPreset_TargetRealtime_MaxQuality));
+    animations.push_back(aiImportFile("../../src/Animation/models/Model2_FBX/jump.fbx", aiProcessPreset_TargetRealtime_MaxQuality));
+    animations.push_back(aiImportFile("../../src/Animation/models/Model2_FBX/run.fbx", aiProcessPreset_TargetRealtime_MaxQuality));
 
     if (scene == nullptr)
     {
