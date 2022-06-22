@@ -107,7 +107,7 @@ void Model::processSingleMesh(aiMesh* mesh, const aiScene* scene) {
 				}
 			}
 			if (!isDuplicate) {
-				tex.m_texID = loader.generateID(tex.filename.c_str());
+				tex.m_texID = loader.generateModelID(tex.filename.c_str());
 			}
 			isDuplicate = false;
 			currMesh.m_texture = tex;
