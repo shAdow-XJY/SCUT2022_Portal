@@ -81,6 +81,7 @@ extern PxVec3 ScenetoWorld(int xCord, int yCord);
 const PxTransform t = PxTransform(PxVec3(-50, 0, -250));
 extern void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z);
 
+
 //²ÄÖÊÌùÍ¼IDÊý×é
 std::map<string, unsigned int> textureMap;
 std::string texture[] = { "Door","Wall","Road","SeesawBox","Seesaw","Ice"};

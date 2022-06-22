@@ -710,6 +710,46 @@ void createPool(const PxTransform& t, PxVec3 bottom, float poolLength, float poo
 	createStaticBox(pos, PxVec3(0, 1.0 + poolHeight, 1.0 + poolWidth), poolLength, poolHeight, 1.0, pose);
 }
 
+
+//为每一个粒子生成坐标信息
+PxVec3* createPositions(PxVec3 &p)
+{
+	int t = 0;
+	PxVec3 positions[1000];
+	for (int x = 0; x < 1000; x++)
+	{
+		positions[x] = p;
+	}
+	while(t<1000)
+	for (float l = -0.05; l <= 0.04; l+=0.01)
+	{
+		for (float m = -0.05; m <= 0.04; m+=0.01)
+		{
+			for (float n = -0.05; n <= 0.04; n+=0.01)
+			{
+				positions[t].x += n;
+				positions[t].y += m;
+				positions[t].z += l;
+				t++;
+			}
+
+		}
+	}
+	return positions;
+}
+
+
+//为每一个粒子生成索引
+PxU32* createParticleIndices(PxU32 num)
+{
+	PxU32 indices[1000];
+	for (PxU32 k = 0; k < num; k++)
+	{
+		indices[k] = k;
+	}
+	return indices;
+}
+
 //创建粒子
 void createParticles(PxVec3 v)
 {
@@ -724,10 +764,12 @@ void createParticles(PxVec3 v)
 
 
 	PxParticleCreationData particleCreationData;
-	particleCreationData.numParticles = 1024;
-	PxU32 numAllocated = indexPool->allocateIndices(2048, PxStrideIterator<PxU32>(&particleCreationData.numParticles));
-	particleCreationData.indexBuffer = PxStrideIterator<const PxU32>(&numAllocated);
-	particleCreationData.positionBuffer = PxStrideIterator<const PxVec3>(&v);
+	particleCreationData.numParticles = 1000;
+	PxVec3* p = createPositions(v);
+	PxU32* indic = createParticleIndices(particleCreationData.numParticles);
+	particleCreationData.indexBuffer = PxStrideIterator<const PxU32>(indic);
+	//PxU32 numAllocated = indexPool->allocateIndices(particleCreationData.numParticles, PxStrideIterator<PxU32>(particleCreationData.indexBuffer));
+	particleCreationData.positionBuffer = PxStrideIterator<const PxVec3>(p);
 
 	// create particles in *PxParticleSystem* ps
 	bool success = ps->createParticles(particleCreationData);
@@ -747,7 +789,9 @@ void createParticles(PxVec3 v)
 			{
 				// access particle position
 				const PxVec3& position = *positionIt;
-				std::cout << "粒子的位置：" << position.x << std::endl;
+				glBegin(GL_POINTS);
+				glVertex3f(position.x, position.y, position.z);
+				glEnd();
 			}
 		}
 
@@ -922,7 +966,8 @@ void createGameScene(const PxTransform& t) {
 	createPool(t, PxVec3(bottom_x, bottom_y, bottom_z), poolLength, poolHeight, poolWidth, defaultPose);
 	//水池底部的相对于场景原点t的位置 PxVec3 localPose(bottom_x,bottom_y,bottom_z)
 	//全局位置 t.transform(PxTransform(localPose)).p
-	createParticles(t.transform(PxTransform(PxVec3(bottom_x, bottom_y, bottom_z))).p);
+	PxVec3 pool = t.transform(PxTransform(PxVec3(bottom_x, bottom_y + 2.0, bottom_z))).p;
+	createParticles(pool);
 	createFan(t, PxVec3(-50, 40, 20), PxVec3(0, 5, 0));
 	createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
 
