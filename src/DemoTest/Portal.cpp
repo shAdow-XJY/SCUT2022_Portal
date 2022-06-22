@@ -109,7 +109,7 @@ void initGame() {
 	role = new Role();
 
 	//初始位置
-	//role->setFootPosition(PxVec3(-50, 20, -250));
+	role->setFootPosition(PxVec3(-50, 20, -250));
 	//摆锤前位置
 	//role->setFootPosition(t.transform(PxVec3(58, 20, 19)));
 	//迷宫前位置
@@ -119,7 +119,7 @@ void initGame() {
 	//平移路段前位置
 	//role->setFootPosition(t.transform(PxVec3(3, 45, 416.8)));
 	//旋转杆关卡角落位置
-	role->setFootPosition(t.transform(PxVec3(-17, 45, 406.8)));
+	//role->setFootPosition(t.transform(PxVec3(-17, 45, 406.8)));
 	//role->attachModel("../../models/paimon/paimon.obj");
 	role->attachModel("../../models/human.obj");
 	role->fall();

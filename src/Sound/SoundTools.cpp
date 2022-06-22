@@ -19,8 +19,8 @@ SoundTool::~SoundTool() {
 }
 
 void SoundTool::SoundInit() {
-	addSound("jumpLoading.wav",true);
-	addSound("jump.wav",false);
+	addSound("jumpLoading.wav", true);
+	addSound("jump.wav", false);
 	addSound("rain.wav", false);
 	addSound("openDoorSlowly.wav", false);
 	addSound("openDoorQuickly.wav", false);
@@ -29,14 +29,14 @@ void SoundTool::SoundInit() {
 }
 
 //添加音效
-void SoundTool::addSound(string filename,bool loop) {
+void SoundTool::addSound(string filename, bool loop) {
 	string tempPath = "../../sounds/" + filename;
 	FMOD::Sound* newSound;
 
 	if (loop) {
 		result = systemA->createSound(tempPath.c_str(), FMOD_LOOP_NORMAL, 0, &newSound);
 	}
-	else{
+	else {
 		result = systemA->createSound(tempPath.c_str(), FMOD_LOOP_OFF, 0, &newSound);
 	}
 
@@ -61,12 +61,13 @@ void SoundTool::SoundUpdate()
 * @brief 播放/切换音频
 * @param interrupt 是否立刻中断原有音效并播放音效
 **/
-FMOD_RESULT SoundTool::playSound(string filename, bool interrupt) 
+
+FMOD_RESULT SoundTool::playSound(string filename, bool interrupt)
 {
 	FMOD::Sound* currentsound = 0;
 	channelB->getCurrentSound(&currentsound);
 
-	if (currentsound != soundMap[filename] || interrupt) 
+	if (currentsound != soundMap[filename] || interrupt)
 	{
 		pauseSound();
 		result = systemA->playSound(soundMap[filename], 0, 0, &channelB);

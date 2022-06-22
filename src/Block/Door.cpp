@@ -1,4 +1,4 @@
-#include "Door.h"
+ï»¿#include "Door.h"
 void Door::attachDoorActor(PxRigidDynamic* door) {
 	this->door = door;
 }
@@ -23,7 +23,8 @@ void Door::addPForce(PxVec3 force) {
 	}
 }
 
-//¿ÉÒÔ¿ªµÄÃÅµÄµ±Ç°×´Ì¬
+
+//å¼€å…³é—¨é€»è¾‘
 void Door::setDoorStatus(bool doorstatus)
 {
 	this->doorStatus = doorstatus;

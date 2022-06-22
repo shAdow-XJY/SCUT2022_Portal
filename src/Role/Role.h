@@ -21,6 +21,8 @@ extern void renderGameOver();
 const int primaryJumpHeight = 4.0f;
 
 extern SoundTool soundtool;
+static GameSceneBasic* errorGameSceneBasic = new GameSceneBasic();
+
 
 class Role {
 private:
@@ -40,11 +42,11 @@ private:
 	//自由相机人物前进方向
 	PxVec3 dir = PxVec3(0, 0, 1);
 	//人物面朝方向
-	PxVec3 faceDir = PxVec3(0,0,1);
+	PxVec3 faceDir = PxVec3(0, 0, 1);
 	//人物当前位置
 	PxVec3 nowPostion;
 	//人物上一次位置
-	PxVec3 lastPostion;	
+	PxVec3 lastPostion;
 	//角色重力
 	float mass = 8000.0f;
 	//重力加速度
@@ -75,7 +77,8 @@ private:
 
 	//碰撞模拟
 	PxRigidBody* stimulateObj = NULL;
-	
+	PxReal stimulateMassScale = 0.00001f;
+
 	//
 	PxVec3 dis = PxVec3(0, 0, 0);
 
@@ -111,12 +114,12 @@ public:
 	void roleMoveByMouse(int x, int y);
 	void roleMoveByMouse(PxVec3 position);
 	void move();
-	void move(GLint key, bool status,bool free);
+	void move(GLint key, bool status, bool free);
 	bool getMovingStatus();
 	void stopMoving();
 
 	//人物站立的方块基类
-	GameSceneBasic gameSceneBasic;
+	GameSceneBasic* standingBlock = errorGameSceneBasic;
 
 	//放置物体
 	void setEquiped(bool equip = true);
@@ -147,8 +150,9 @@ public:
 	//角色滑动
 	void roleSlide();
 	void edgeSliding();
-
+	//人物发射四周射线
 	void rayAround();
+	//人物模拟动态刚体功能
 	void stimulate();
 
 };
@@ -171,7 +175,7 @@ private:
 	Role* role = NULL;
 public:
 	RoleHitBehaviorCallback(Role* role) :role(role) {};
-	PxControllerBehaviorFlags getBehaviorFlags(const PxShape& shape, const PxActor& actor){	
+	PxControllerBehaviorFlags getBehaviorFlags(const PxShape& shape, const PxActor& actor) {
 		////是否接触到地面
 		//if (actor.getName() != "Ground") {
 		//	this->role->stopMoving();
@@ -188,14 +192,13 @@ public:
 					door->setDoorStatus(true);
 				}
 			}
-			
 		}
 		else if (name == "Seesaw") {
 		}
 		else if (name == "Pendulum") {
 		}
-		else if (name == "PrismaticRoad") {		
-			
+		else if (name == "PrismaticRoad") {
+
 
 		}
 		else if (name == "Over") {
