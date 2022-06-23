@@ -12,15 +12,21 @@ class Animation
 {
 private:
     const aiScene* scene;
-    //std::vector<const aiScene*> animations;
+    //储存动画数组
     map<string, const aiScene*> animations;
     string current_animation = "walk";
     aiVector3D scene_min;
     aiVector3D scene_max;
+
     aiVector3D rootPosition;
     std::vector<FBXMesh> initial_state;
-    Role* attachedRole;
 
+    //动画播放毫秒数
+    int millisSinceStart = 0.0;
+    void updating(aiAnimation* anim, double tick);
+
+    //角色位置绑定
+    Role* attachedRole;
     // 改变模型朝向的矩阵
     PxMat44 yRotate;
 public:
@@ -33,11 +39,11 @@ public:
     string getCurrentAnimation();
 
     //动画更新函数
-    bool update(int millisSinceStart,bool autoDisplay = false);
-    void updating(aiAnimation* anim, double tick);
+    bool update(double playSpeed,bool once = false);
 
     //模型绘制显示函数
     void display();
+
     //切换动画状态机
     void setAnimation(string animationName);
 

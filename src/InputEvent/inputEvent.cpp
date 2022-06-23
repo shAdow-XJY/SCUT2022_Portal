@@ -9,7 +9,6 @@ using namespace physx;
 extern Role* role;
 extern SoundTool soundtool;
 extern Animation animation;
-extern int animationTick;
 
 // 右键鼠标按下
 bool press = false;
@@ -21,7 +20,11 @@ int mouseX, mouseY;
 // 提示字符的位置（测试用）
 int textX = 0, textY = 0;
 
-int timeAnim = 0;
+int animationTick = 0;
+
+//计算由于角色旋转需要的附加旋转角度
+void getAdditionalAngleRadians();
+
 //按键设置
 void keyPress(unsigned char key, const PxTransform& camera)
 {
@@ -59,8 +62,8 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	case 'Q':
 	{
 		//animation.
-		animation.update(1000*timeAnim);
-		timeAnim++;
+		animation.update(1.0);
+		animationTick++;
 		break;
 	}
 	default:
@@ -94,34 +97,14 @@ void keyRelease(unsigned char key)
 //特殊键设置
 void specialKeyPress(GLint key) {
 	switch (key) {
-	case GLUT_KEY_UP: {
-		animation.changeOrientation(PxQuat(0, PxVec3(0, 1, 0)));
-		animation.update(1000 * animationTick);
-		animationTick++;
+	case GLUT_KEY_UP:
+	case GLUT_KEY_DOWN:
+	case GLUT_KEY_LEFT:
+	case GLUT_KEY_RIGHT:
+		animation.setAnimation("walk");
+		getAdditionalAngleRadians();
+		animation.update(1.0);
 		break;
-	}
-	case GLUT_KEY_DOWN: {
-		animation.changeOrientation(PxQuat(PxPi, PxVec3(0, 1, 0)));
-		animation.update(1000 * animationTick);
-		animationTick++;
-		break;
-
-	}case GLUT_KEY_LEFT: {
-		PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
-		animation.changeOrientation(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
-		animation.update(1000 * animationTick);
-		animationTick++;
-		break;
-
-	}case GLUT_KEY_RIGHT: {
-		PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
-		animation.changeOrientation(PxQuat(-PxHalfPi, PxVec3(0, 1, 0)));
-		animation.update(1000 * animationTick);
-		animationTick++;
-		break;
-
-	}
-
 	default: {
 		return;
 	}
@@ -129,7 +112,18 @@ void specialKeyPress(GLint key) {
 }
 
 void specialKeyRelease(GLint key) {
-
+	switch (key) {
+	case GLUT_KEY_UP: 
+	case GLUT_KEY_DOWN:
+	case GLUT_KEY_LEFT:
+	case GLUT_KEY_RIGHT: 
+		//getAdditionalAngleRadians();
+		animation.setAnimation("idle");
+		break;
+	default: {
+		return;
+	}
+	}
 }
 
 //鼠标点击
@@ -168,5 +162,28 @@ void mousePress(int button, int state, int x, int y) {
 	}
 	default:
 		break;
+	}
+}
+
+void getAdditionalAngleRadians() {
+	//cout << role->getFaceDir().x << "？？" << role->getFaceDir().y << "!!" << role->getFaceDir().z << endl;
+	
+	if (role->getFaceDir().z == 1) //前方
+	{
+		animation.changeOrientation(PxQuat(0, PxVec3(0, 1, 0)));
+	}
+	else if (role->getFaceDir().z == -1) //后方
+	{
+		animation.changeOrientation(PxQuat(PxPi, PxVec3(0, 1, 0)));
+	}
+	else if (role->getFaceDir().x == 1) //左方
+	{
+		PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
+		animation.changeOrientation(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
+	}
+	else if (role->getFaceDir().x == -1) //右方
+	{
+		PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
+		animation.changeOrientation(PxQuat(-PxHalfPi, PxVec3(0, 1, 0)));
 	}
 }

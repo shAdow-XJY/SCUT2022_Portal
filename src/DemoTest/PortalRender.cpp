@@ -44,9 +44,6 @@ DynamicBall dynamicBall = DynamicBall(false);
 
 extern Animation animation;
 
-// 全局的动画计数器
-int animationTick = 0;
-
 namespace
 {
 	Snippets::Camera*	sCamera;
@@ -97,17 +94,28 @@ int timeAlways = 0;
 int timeOnce = 0;
 void animationRenderCallback() {
 	animation.display();
-	if (animation.getCurrentAnimation() == "idle") {
-		animation.update(500 * timeAlways);
+
+	string currentAnimation = animation.getCurrentAnimation();
+
+	if ((currentAnimation == "idle")) 
+	{
+		animation.update(0.5);
 		timeAlways++;
 	}
-	if (animation.getCurrentAnimation() == "jump") {
-		if (animation.update(2000 * timeOnce)) {
+	/*else if (currentAnimation == "walk")
+	{
+		animation.update(1000 * timeAlways);
+		timeAlways++;
+	}*/
+	else if(currentAnimation == "jump")
+	{
+		if (animation.update(2.0,true)) {
 			animation.setAnimation("idle");
 			timeOnce = 0;
 		}
 		timeOnce++;
 	}
+	
 }
 
 void renderCallback()
