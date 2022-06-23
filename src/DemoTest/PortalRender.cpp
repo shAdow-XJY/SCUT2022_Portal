@@ -90,8 +90,6 @@ void idleCallback()
 	glutPostRedisplay();
 }
 
-int timeAlways = 0;
-int timeOnce = 0;
 void animationRenderCallback() {
 	animation.display();
 
@@ -100,7 +98,6 @@ void animationRenderCallback() {
 	if ((currentAnimation == "idle")) 
 	{
 		animation.update(0.5);
-		timeAlways++;
 	}
 	/*else if (currentAnimation == "walk")
 	{
@@ -111,9 +108,7 @@ void animationRenderCallback() {
 	{
 		if (animation.update(2.0,true)) {
 			animation.setAnimation("idle");
-			timeOnce = 0;
 		}
-		timeOnce++;
 	}
 	
 }
