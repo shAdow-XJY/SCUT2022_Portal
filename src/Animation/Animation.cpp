@@ -61,17 +61,25 @@ string Animation::getCurrentAnimation()
 }
 
 //返回true表示动画播放一个循环结束
-bool Animation::update(int millisSinceStart, bool autoDisplay)
+bool Animation::update(double playSpeed, bool once)
 {
     aiAnimation* anim = animations[current_animation]->mAnimations[0];
 
     double mTicksPerSecond = anim->mTicksPerSecond;
     double mDuration = anim->mDuration;
+    double tick = fmod((this->millisSinceStart * mTicksPerSecond) / 1000.0, mDuration);
 
-    double tick = fmod((millisSinceStart * mTicksPerSecond) / 1000.0, mDuration);
+    if (this->millisSinceStart >= mDuration * mTicksPerSecond) {
+        this->millisSinceStart = 0;
+        if (once)
+        {
+            return true;
+        }
+    }
+    
     updating(anim, tick);
-
-    return millisSinceStart >= mDuration * mTicksPerSecond;
+    this->millisSinceStart += 1000 * playSpeed;
+    return false;
 }
 
 void Animation::updating(aiAnimation* anim, double tick)
@@ -139,11 +147,10 @@ void Animation::display()
     /*PxMat44 yRotate(PxQuat(-PxHalfPi, PxVec3(0.0f, 1.0f, 0.0f)));*/
     
     PxMat44 modelMatrix(PxShapeExt::getGlobalPose(*attachedRole->getShape(), *attachedRole->getActor()));
+    
     PxMat44 rotate(PxQuat(-PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
-    PxMat44 translate(PxTransform(PxVec3(0.0f, 3.0f, 0.0f)));
-
-   
-    renderDisplay(this->scene, this->scene->mRootNode, std::map<int, int>(), modelMatrix * rotate * translate * yRotate);
+    PxMat44 translate(PxTransform(PxVec3(0.0f, -1.0f, 0.0f)));
+    renderDisplay(this->scene, this->scene->mRootNode, std::map<int, int>(), modelMatrix * rotate * translate *yRotate);
 
 }
 

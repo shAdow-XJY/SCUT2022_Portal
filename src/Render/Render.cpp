@@ -41,7 +41,7 @@ extern bool press;
 extern int mouseX;
 extern int mouseY;
 extern int textX, textY;
-
+extern Role* role;
 //材质贴图ID数组
 extern std::map<string, unsigned int> textureMap;
 unsigned int textureID;
@@ -298,6 +298,8 @@ const unsigned int SCR_HEIGHT = 600;
 
 //extern void reshape(int width, int height);
 
+
+
 namespace Snippets
 {
     void setupDefaultWindow(const char *name)
@@ -341,7 +343,7 @@ namespace Snippets
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 }
-
+	
 	void renderImGui() {
 
 	{
@@ -351,13 +353,13 @@ namespace Snippets
 		//ImGui::ShowDemoWindow(&demo);
 		ImGui::Begin("Monitoring");                         
 
-		ImGui::Text("ImGui successfully deployed.");           
+		//ImGui::Text("ImGui successfully deployed.");           
 
 		//ImGui::SameLine();
-		ImGui::Text("clickX = %d", textX);
-		ImGui::Text("clickY = %d", textY);
-
-		ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+		ImGui::Text("Checkpoint: %d", role->getCheckpoint());
+		ImGui::Text("Life: %d", role->getHealth());
+		ImGui::Text("Score: %d", role->getScore());
+		ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
 		ImGui::End();
 	}
 	
@@ -427,11 +429,9 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 		if (nbShapes>0 && !dynamicBall.isInCircle(actorWorldPosition.x, actorWorldPosition.z)) {
 			continue;
 		}
-		
 
 		for(PxU32 j=0;j<nbShapes;j++)
 		{
-
 			const PxMat44 shapePose(PxShapeExt::getGlobalPose(*shapes[j], *actors[i]));
 			PxGeometryHolder h = shapes[j]->getGeometry();
 
@@ -463,7 +463,7 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 			}
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-			if (shapes[j]->getFlags() & PxShapeFlag::eVISUALIZATION &&shadows)/*阴影*/
+			if (shapes[j]->getFlags() & PxShapeFlag::eVISUALIZATION && shadows)/*阴影*/
 			{
 				const PxVec3 shadowDir(0.0f, -0.7071067f, -0.7071067f);
 				const PxReal shadowMat[] = { 1,0,0,0, -shadowDir.x / shadowDir.y,0,-shadowDir.z / shadowDir.y,0, 0,0,1,0, 0,0,0,1 };

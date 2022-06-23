@@ -44,9 +44,6 @@ DynamicBall dynamicBall = DynamicBall(true);
 
 extern Animation animation;
 
-// 全局的动画计数器
-int animationTick = 0;
-
 namespace
 {
 	Snippets::Camera*	sCamera;
@@ -98,17 +95,28 @@ int timeAlways = 0;
 int timeOnce = 0;
 void animationRenderCallback() {
 	animation.display();
-	if (animation.getCurrentAnimation() == "idle") {
-		animation.update(500 * timeAlways);
+
+	string currentAnimation = animation.getCurrentAnimation();
+
+	if ((currentAnimation == "idle")) 
+	{
+		animation.update(0.5);
 		timeAlways++;
 	}
-	if (animation.getCurrentAnimation() == "jump") {
-		if (animation.update(2000 * timeOnce)) {
+	/*else if (currentAnimation == "walk")
+	{
+		animation.update(1000 * timeAlways);
+		timeAlways++;
+	}*/
+	else if(currentAnimation == "jump")
+	{
+		if (animation.update(2.0,true)) {
 			animation.setAnimation("idle");
 			timeOnce = 0;
 		}
 		timeOnce++;
 	}
+	
 }
 
 void renderCallback()
@@ -136,27 +144,38 @@ void renderCallback()
 			dir = role->getPosition() - roleBackPosition;
 			sCamera->targetDir = dir;
 			sCamera->updateDir(role->getPosition());
-			
+			//非自由视角动态渲染圈跟人
+			dynamicBall.setCircleCenterPosition_XZ(role->getRoleWorldPosition().x, role->getRoleWorldPosition().z);
 		}
 		else
 		{
 			dir = role->getPosition() - roleBackPosition;
 			roleBackPosition = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getDir() * -50);
+			//自由视角动态渲染圈跟摄像机
+			dynamicBall.setCircleCenterPosition_XZ(sCamera->getEye().x, sCamera->getEye().z);
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 		
 		if (role) {
+			//是否重生传送
+			role->protal();
+			//是否跳跃
+			//是否检测底部是否接触物体
+			role->simulationGravity();
 			role->roleJump();
 			role->roleFall();
-			role->roleSlide();	
+			//是否发生滑动
+			role->roleSlide();
 			role->rayAround();
-			role->simulationGravity();
+			//是否进行物理刚体模拟
 			role->stimulate();
-			
+			//动态刚体渲染
 			roleWorldPosition = role->getRoleWorldPosition();
 			dynamicBall.setCircleCenterPosition_XZ(roleWorldPosition.x, roleWorldPosition.z);
+			role->move();
+			//更新得分
+			role->updateScore();
 		}
-		
 		PxScene* scene;
 		PxGetPhysics().getScenes(&scene,1);
 		PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);

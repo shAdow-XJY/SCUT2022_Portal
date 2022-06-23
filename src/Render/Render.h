@@ -49,6 +49,7 @@
 #include "../ImGui/imgui.h"
 #include "../ImGui/imgui_impl_glut.h"
 #include "../ImGui/imgui_impl_opengl2.h"
+#include "../Role/Role.h"
 namespace Snippets
 {
 void setupDefaultWindow(const char* name);
