@@ -86,6 +86,7 @@ void mouseCallback(int button, int state, int x, int y)
 {
 	sCamera->handleMouse(button, state, x, y);
 	mousePress(button, state, x, y);
+
 }
 
 void idleCallback()
@@ -194,13 +195,15 @@ void exitCallback(void)
 **/
 void reshape(int width, int height)
 {
+	cout << "New width: " << width << " " << "New height: " << height << endl;
+	ImGui_ImplGLUT_ReshapeFunc(width, height);
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluOrtho2D(0, GLUT_WINDOW_WIDTH, 0, GLUT_WINDOW_HEIGHT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-
+	
 }
 
 
@@ -216,14 +219,7 @@ void renderLoop()
 	skyBox.Init(true);
 	animation.init();
 
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	ImGui::StyleColorsDark();
-
-	ImGui_ImplGLUT_Init();
-	ImGui_ImplGLUT_InstallFuncs();
-	ImGui_ImplOpenGL2_Init();
+	
 
 	glutIdleFunc(idleCallback);
 	glutDisplayFunc(renderCallback);
@@ -237,10 +233,21 @@ void renderLoop()
 	motionCallback(0,0);
 	atexit(exitCallback);
 	
-
 	initPhysics(true);
 	loadTexture();
 	initGame();
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	ImGui::StyleColorsDark();
+
+	ImGui_ImplGLUT_Init();
+	//ImGui_ImplGLUT_InstallFuncs();
+	//glutMouseFunc(ImGui_ImplGLUT_MouseFunc);
+	ImGui_ImplOpenGL2_Init();
+
+
 	glutMainLoop();
 
 	ImGui_ImplOpenGL2_Shutdown();

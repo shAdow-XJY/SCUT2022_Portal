@@ -296,7 +296,7 @@ void renderGeometry(const PxGeometryHolder& h, string name,bool shadow)
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-extern void reshape(int width, int height);
+//extern void reshape(int width, int height);
 
 namespace Snippets
 {
@@ -313,8 +313,7 @@ namespace Snippets
 	glutInitDisplayMode(GLUT_RGB|GLUT_DOUBLE|GLUT_DEPTH);
 	int mainHandle = glutCreateWindow(name);
 	glutSetWindow(mainHandle);
-	glutReshapeFunc(reshape);
-	
+
 	delete[] namestr;
 }
 
@@ -348,10 +347,11 @@ namespace Snippets
 	{
 		static float f = 0.0f;
 		static int counter = 0;
-
+		//bool demo = true;
+		//ImGui::ShowDemoWindow(&demo);
 		ImGui::Begin("Monitoring");                         
 
-		//ImGui::Text("ImGui successfully deployed.");           
+		ImGui::Text("ImGui successfully deployed.");           
 
 		//ImGui::SameLine();
 		ImGui::Text("clickX = %d", textX);
@@ -360,10 +360,11 @@ namespace Snippets
 		ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 		ImGui::End();
 	}
-
+	
 	// 3. Show another simple window.
 	if (show_another_window)
 	{
+		
 		ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
 		ImGui::Text("Hello from another window!");
 		if (ImGui::Button("Close Me"))
@@ -378,8 +379,9 @@ namespace Snippets
 
 	void startRender(const PxVec3& cameraEye, const PxVec3& cameraDir, PxReal clipNear, PxReal clipFar)
 {
-	/*ImGui_ImplOpenGL2_NewFrame();
-	ImGui_ImplGLUT_NewFrame();*/
+	
+	ImGui_ImplOpenGL2_NewFrame();
+	ImGui_ImplGLUT_NewFrame();
 	lastTime = currTime;
 	currTime = clock();
 	 
@@ -461,7 +463,7 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 			}
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-			if (shadows)/*阴影*/
+			if (shapes[j]->getFlags() & PxShapeFlag::eVISUALIZATION &&shadows)/*阴影*/
 			{
 				const PxVec3 shadowDir(0.0f, -0.7071067f, -0.7071067f);
 				const PxReal shadowMat[] = { 1,0,0,0, -shadowDir.x / shadowDir.y,0,-shadowDir.z / shadowDir.y,0, 0,0,1,0, 0,0,0,1 };
@@ -485,7 +487,7 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 void finishRender()
 {
 	 //把ui渲染放在这里 是为了其能显示在最上层
-	//renderImGui();
+	renderImGui();
 	if (textShouldRaster == true) {
 		rasterTime += double(currTime - lastTime)/CLOCKS_PER_SEC;
 		if (rasterTime >= 3) {
