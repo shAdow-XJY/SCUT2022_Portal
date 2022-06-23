@@ -156,14 +156,25 @@ void renderCallback()
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 		
 		if (role) {
+			//是否重生传送
+			role->protal();
+			//是否跳跃
+			//是否检测底部是否接触物体
+			role->simulationGravity();
 			role->roleJump();
 			role->roleFall();
-			role->roleSlide();	
+			//是否发生滑动
+			role->roleSlide();
 			role->rayAround();
-			role->simulationGravity();
+			//是否进行物理刚体模拟
 			role->stimulate();
+			//动态刚体渲染
+			roleWorldPosition = role->getRoleWorldPosition();
+			dynamicBall.setCircleCenterPosition_XZ(roleWorldPosition.x, roleWorldPosition.z);
+			role->move();
+			//更新得分
+			role->updateScore();
 		}
-		
 		PxScene* scene;
 		PxGetPhysics().getScenes(&scene,1);
 		PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);

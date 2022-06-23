@@ -13,7 +13,7 @@ void PrismaticRoad::updateDistance(PxVec3 pos) {
 }
 
 PxVec3 PrismaticRoad::getStaticPosition() {
-	if (this->distance.isZero()) return PxVec3(0, 0, 0);
+	if (this->distance.isZero()) return this->prismaticRoad->getGlobalPose().p;
 	return this->distance + this->prismaticRoad->getGlobalPose().p;
 }
 

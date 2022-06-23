@@ -136,19 +136,7 @@ void mousePress(int button, int state, int x, int y) {
 	case 0: {
 		//右键抬起
 		if (state == 1) {
-			//if (role->getMovingStatus())return;
-			////role->roleMoveByMouse(x, y);
-			//PxVec3 position = ScenetoWorld(x, y);
-			//Block road;
-			//if (RayCast(position, PxVec3(0, 5, 0), road))
-			//{
-			//	PxVec3 blockPosition = road.getPosition();
-			//	//role->roleMoveByMouse(PxVec3(blockPosition.x, role->getFootPosition().y, blockPosition.z));
-			//	role->roleMoveByMouse(position);
-			//}
-			//else {
-			//	std::cout << "不可点击";
-			//}
+
 		}
 		break;
 	}
