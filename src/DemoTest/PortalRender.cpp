@@ -40,7 +40,7 @@ RenderBox skyBox;
 extern SoundTool soundtool;
 //∂ØÃ¨‰÷»æ»¶
 PxVec3 roleWorldPosition = PxVec3(0);
-DynamicBall dynamicBall = DynamicBall(true);
+DynamicBall dynamicBall = DynamicBall(false);
 
 extern Animation animation;
 
@@ -96,7 +96,7 @@ void idleCallback()
 int a = 0;
 void animationRenderCallback() {
 	animation.display();
-	if (animation.getCurrentAnimation() == "jump") {
+	if (animation.getCurrentAnimation() == "idle") {
 		animation.update(500 * a);
 		a++;
 	}

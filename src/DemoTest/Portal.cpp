@@ -94,6 +94,7 @@ void initGame() {
 	role->fall();
 
 	animation.attachRole(*role);
+	animation.setAnimation("idle");
 }
 
 ///实例化物理
