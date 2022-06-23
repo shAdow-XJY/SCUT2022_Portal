@@ -59,11 +59,18 @@ string Animation::getCurrentAnimation()
     return this->current_animation;
 }
 
-void Animation::update(int millisSinceStart, bool autoDisplay)
+//返回true表示动画播放一个循环结束
+bool Animation::update(int millisSinceStart, bool autoDisplay)
 {
     aiAnimation* anim = animations[current_animation]->mAnimations[0];
-    double tick = fmod((millisSinceStart * anim->mTicksPerSecond) / 1000.0, anim->mDuration);   
+
+    double mTicksPerSecond = anim->mTicksPerSecond;
+    double mDuration = anim->mDuration;
+
+    double tick = fmod((millisSinceStart * mTicksPerSecond) / 1000.0, mDuration);
     updating(anim, tick);
+
+    return millisSinceStart >= mDuration * mTicksPerSecond;
 }
 
 void Animation::updating(aiAnimation* anim, double tick)

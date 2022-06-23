@@ -33,7 +33,7 @@ public:
     string getCurrentAnimation();
 
     //动画更新函数
-    void update(int millisSinceStart,bool autoDisplay = false);
+    bool update(int millisSinceStart,bool autoDisplay = false);
     void updating(aiAnimation* anim, double tick);
 
     //模型绘制显示函数

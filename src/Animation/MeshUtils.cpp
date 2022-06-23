@@ -303,7 +303,7 @@ void tempDisplay(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap,
 	glPushMatrix();
 	glMultMatrixf(reinterpret_cast<const float*>(&transform));
 	glMultMatrixf((float*)&m); //Multiply by the transformation matrix for this node
-	glScalef(0.01f, 0.01f, 0.01f);
+	glScalef(0.06f, 0.06f, 0.06f);
 	glTranslatef(0.0f,0.5f,0.0f);
 	// Draw all meshes assigned to this node
 	glBegin(GL_TRIANGLES);

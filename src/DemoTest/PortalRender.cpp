@@ -93,12 +93,20 @@ void idleCallback()
 	glutPostRedisplay();
 }
 
-int a = 0;
+int timeAlways = 0;
+int timeOnce = 0;
 void animationRenderCallback() {
 	animation.display();
 	if (animation.getCurrentAnimation() == "idle") {
-		animation.update(500 * a);
-		a++;
+		animation.update(500 * timeAlways);
+		timeAlways++;
+	}
+	if (animation.getCurrentAnimation() == "jump") {
+		if (animation.update(2000 * timeOnce)) {
+			animation.setAnimation("idle");
+			timeOnce = 0;
+		}
+		timeOnce++;
 	}
 }
 
