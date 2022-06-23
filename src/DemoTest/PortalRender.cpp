@@ -40,7 +40,7 @@ RenderBox skyBox;
 extern SoundTool soundtool;
 //动态渲染圈
 PxVec3 roleWorldPosition = PxVec3(0);
-DynamicBall dynamicBall = DynamicBall(false);
+DynamicBall dynamicBall = DynamicBall(true);
 
 extern Animation animation;
 
@@ -143,12 +143,15 @@ void renderCallback()
 			dir = role->getPosition() - roleBackPosition;
 			sCamera->targetDir = dir;
 			sCamera->updateDir(role->getPosition());
-			
+			//非自由视角动态渲染圈跟人
+			dynamicBall.setCircleCenterPosition_XZ(role->getRoleWorldPosition().x, role->getRoleWorldPosition().z);
 		}
 		else
 		{
 			dir = role->getPosition() - roleBackPosition;
 			roleBackPosition = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getDir() * -50);
+			//自由视角动态渲染圈跟摄像机
+			dynamicBall.setCircleCenterPosition_XZ(sCamera->getEye().x, sCamera->getEye().z);
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 		
@@ -159,9 +162,6 @@ void renderCallback()
 			role->rayAround();
 			role->simulationGravity();
 			role->stimulate();
-			
-			roleWorldPosition = role->getRoleWorldPosition();
-			dynamicBall.setCircleCenterPosition_XZ(roleWorldPosition.x, roleWorldPosition.z);
 		}
 		
 		PxScene* scene;

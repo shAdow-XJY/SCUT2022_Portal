@@ -425,11 +425,9 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 		if (nbShapes>0 && !dynamicBall.isInCircle(actorWorldPosition.x, actorWorldPosition.z)) {
 			continue;
 		}
-		
 
 		for(PxU32 j=0;j<nbShapes;j++)
 		{
-
 			const PxMat44 shapePose(PxShapeExt::getGlobalPose(*shapes[j], *actors[i]));
 			PxGeometryHolder h = shapes[j]->getGeometry();
 

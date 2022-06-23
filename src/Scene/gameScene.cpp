@@ -797,9 +797,15 @@ void createGameScene(const PxTransform& t) {
 	float mazePos_z = c_3_z + r_3_w + 4 * sideLength;
 	PxVec3 maze_v(mazePos_x, mazePos_y, mazePos_z);
 	//迷宫地板边长
-	float mazeLength = 4 * sideLength+1;
+	//float mazeLength = 4 * sideLength+1;
+	float mazeLength =  2 * sideLength;
 	//创建迷宫地板
-	createRoad(t, maze_v, mazeLength, boxHeight, mazeLength, defaultPose);
+	//createRoad(t, maze_v, mazeLength, boxHeight, mazeLength, defaultPose);
+	createRoad(t, maze_v+PxVec3(mazeLength,0.0f, mazeLength), mazeLength, boxHeight, mazeLength, defaultPose);
+	createRoad(t, maze_v+ PxVec3(mazeLength, 0.0f, -mazeLength), mazeLength, boxHeight, mazeLength, defaultPose);
+	createRoad(t, maze_v+ PxVec3(-mazeLength, 0.0f, mazeLength), mazeLength, boxHeight, mazeLength, defaultPose);
+	createRoad(t, maze_v+ PxVec3(-mazeLength, 0.0f, -mazeLength), mazeLength, boxHeight, mazeLength, defaultPose);
+
 	createMaze(t, maze_v, scale, defaultPose);
 	//迷宫出口坐标
 	float mazeOut_x = mazePos_x - 3.5 * sideLength;
