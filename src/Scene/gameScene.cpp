@@ -18,15 +18,16 @@ using namespace physx;
 extern PxScene* gScene;
 extern PxMaterial* gMaterial;
 extern PxPhysics* gPhysics;
+extern vector<PxVec3> checkpoints;
 extern int primaryJumpHeight;
 //设定的最大跳跃高度，可调整
-float maxJumpHeight = 3.0;
+float maxJumpHeight = 6.0;
 //场景道路盒子的半高
 float boxHeight = 0.4 * maxJumpHeight;
 //x_distance x轴方向上可跳跃的间隔长度，可根据跳跃跨度调整
-float dx = 6.0;
+float dx = 8.0;
 //z_distance z轴方向上可跳跃的间隔长度，可根据跳跃跨度调整
-float dz = 6.0;
+float dz = 8.0;
 
 //迷宫正门可开属性
 vector<vector<int>> frontDoorCanOpen = {
@@ -616,61 +617,6 @@ void createRotateRod(const PxTransform& t, PxVec3 v, PxReal halfExtend, PxTransf
 	//rod1->setLinearVelocity(velocity1);
 	rod1->setAngularVelocity(PxVec3(0., 5., 0.));
 	PxSphericalJoint* spherical1 = PxSphericalJointCreate(*gPhysics, sphere1, localFrame0, rod1, localFrame0);
-	//上 左 右 下
-	/*PxRigidDynamic* rod0 = createDynamicBox(false, pos, PxVec3(0, 0, 13), 1.0, 1.0, 12.0, pose);
-	rod0->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
-	rod0->setAngularDamping(0.f);
-	rod0->setLinearVelocity(PxVec3(1, 0, 0) * 300);
-	PxTransform localFrame00(PxVec3(0, 0, 1));
-	PxTransform localFrame01(PxVec3(0, 0, -12));
-	PxSphericalJoint* spherical0 = PxSphericalJointCreate(*gPhysics, sphere, localFrame00, rod0, localFrame01);
-	PxRigidDynamic* rod1 = createDynamicBox(false, pos, PxVec3(13, 0, 0), 12.0, 1.0, 1.0, pose);
-	rod1->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
-	rod1->setAngularDamping(0.f);
-	rod1->setLinearVelocity(PxVec3(0, 0, 1) * 300);
-	PxTransform localFrame10(PxVec3(1, 0, 0));
-	PxTransform localFrame11(PxVec3(-12, 0, 0));
-	PxSphericalJoint* spherical1 = PxSphericalJointCreate(*gPhysics, sphere, localFrame10, rod1, localFrame11);
-	PxRigidDynamic* rod2 = createDynamicBox(false, pos, PxVec3(-13, 0, 0), 12.0, 1.0, 1.0, pose);
-	rod2->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
-	rod2->setAngularDamping(0.f);
-	rod2->setLinearVelocity(PxVec3(0, 0, -1) * 300);
-	PxTransform localFrame20(PxVec3(-1, 0, 0));
-	PxTransform localFrame21(PxVec3(12, 0, 0));
-	PxSphericalJoint* spherical2 = PxSphericalJointCreate(*gPhysics, sphere, localFrame20, rod2, localFrame21);
-	PxRigidDynamic* rod3 = createDynamicBox(false, pos, PxVec3(0, 0, -13), 1.0, 1.0, 12.0, pose);
-	rod3->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
-	rod3->setAngularDamping(0.f);
-	rod3->setLinearVelocity(PxVec3(-1, 0, 0) * 300);
-	PxTransform localFrame30(PxVec3(0, 0, -1));
-	PxTransform localFrame31(PxVec3(0, 0, 12));
-	PxSphericalJoint* spherical3 = PxSphericalJointCreate(*gPhysics, sphere, localFrame30, rod3, localFrame31);*/
-
-	//竖 左 右
-	/*PxRigidDynamic* rod0 = createDynamicBox(false, pos, PxVec3(0, 0, 0), 1.0, 1.0, 25.0, pose);
-	rod0->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
-	rod0->setAngularDamping(0.f);
-	rod0->setCMassLocalPose(PxTransform(PxVec3(0, 0, 13)));
-	rod0->setLinearVelocity(PxVec3(-1, 0, 0) * 300);
-	PxTransform localFrame0(PxVec3(0, 0, 0));
-	PxSphericalJoint* spherical = PxSphericalJointCreate(*gPhysics, sphere, localFrame0, rod0, localFrame0);
-	PxRigidDynamic* rod1 = createDynamicBox(false, pos, PxVec3(13, 0, 0), 12.0, 1.0, 1.0, pose);
-	rod1->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
-	rod1->setAngularDamping(0.f);
-	rod1->setLinearVelocity(PxVec3(0, 0, 1) * 300);
-	PxTransform localFrame1(PxVec3(1, 0, 0));
-	PxTransform localFrame2(PxVec3(-12, 0, 0));
-	PxFixedJoint* fixed0 = PxFixedJointCreate(*gPhysics, rod0, localFrame1, rod1, localFrame2);
-	PxRigidDynamic* rod2 = createDynamicBox(false, pos, PxVec3(-13, 0, 0), 12.0, 1.0, 1.0, pose);
-	rod2->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
-	rod2->setAngularDamping(0.f);
-	rod2->setLinearVelocity(PxVec3(0, 0, -1) * 300);
-	PxTransform localFrame3(PxVec3(-1, 0, 0));
-	PxTransform localFrame4(PxVec3(12, 0, 0));
-	PxFixedJoint* fixed1 = PxFixedJointCreate(*gPhysics, rod0, localFrame3, rod2, localFrame4);
-	PxSphericalJoint* spherical0 = PxSphericalJointCreate(*gPhysics, sphere, localFrame0, rod0, localFrame0);
-	PxSphericalJoint* spherical1 = PxSphericalJointCreate(*gPhysics, sphere, localFrame1, rod1, localFrame2);
-	PxSphericalJoint* spherical2 = PxSphericalJointCreate(*gPhysics, sphere, localFrame3, rod2, localFrame4);*/
 }
 
 /*风扇（旋转杆）
@@ -867,26 +813,26 @@ void createGameScene(const PxTransform& t) {
 	//#Checkpoint1
 	totalCheckpoint = 1;
 
-	float r_1_l = 4.0;  //road_1_length 4 100
-	float r_1_w = 15.0;  //road_1_width 8 100
+	float r_1_l = 6.0;  //road_1_length 4
+	float r_1_w = 20.0;  //road_1_width 15
 	float c_1_y = boxHeight;  //the position of the center of road_1
 	// create road_1
 	//createRoad(t, PxVec3(0, c_1_y, 0), r_1_l, boxHeight, r_1_w, defaultPose);
 	createRoad(t, PxVec3(0, c_1_y, 0), 100, boxHeight, 100, defaultPose);
 
-	float r_2_w = 4.0;
-	float r_2_l = 20.0;
+	float r_2_w = 6.0; //4
+	float r_2_l = 25.0; //20
 	float c_2_x = r_2_l - r_1_l;
 	float c_2_y = center_y(c_1_y);
 	float c_2_z = r_1_w + r_2_w;
 	createRoad(t, PxVec3(c_2_x, c_2_y, c_2_z), r_2_l , boxHeight, r_2_w, defaultPose);
 
 	//创建道具类场景
-	createPorp(t, PxVec3(c_2_x, c_2_y + 2.5, c_2_z), boxHeight, 2*boxHeight, boxHeight);
+	createPorp(t, PxVec3(c_2_x, c_2_y + boxHeight + 1.0, c_2_z), 1.0, 1.0, 1.0);
 
 	//stairs
-	float stairsWidth = 4.0;
-	float stairsLength = 2.0;
+	float stairsWidth = 6.0; //4
+	float stairsLength = 4.0; //2
 	float center_x = stairsLength + r_2_l + c_2_x;
 	float centerHeight = center_y(c_2_y);
 	float center_z = c_2_z;
@@ -901,9 +847,11 @@ void createGameScene(const PxTransform& t) {
 	
 	//#Checkpoint2
 	totalCheckpoint++;
+	checkpoints.push_back(t.transform(PxVec3(center_x - 2 * stairsLength, centerHeight - 2 * boxHeight + 7.0, center_z)));
+
 	//悬空路段
 	float roadblock_length = 3.0;
-	float roadblock_width = 4.0;
+	float roadblock_width = 6.0;  //4
 	float rb_x = center_x - 2 * stairsLength + dx + roadblock_length;
 	float rb_y = centerHeight - 2 * boxHeight;
 	float rb_z = center_z;
@@ -936,6 +884,7 @@ void createGameScene(const PxTransform& t) {
 
 	//#Checkpoint3
 	totalCheckpoint++;
+	
 	//连接跷板关卡与迷宫关卡的路段
 	float r_3_l = 5.0;
 	float r_3_w = 50.0;
@@ -944,6 +893,8 @@ void createGameScene(const PxTransform& t) {
 	float c_3_z = seesawpos_z + r_3_w - 5.0;
 	PxRigidStatic* r_3 = createRoad(t, PxVec3(c_3_x, c_3_y, c_3_z), r_3_l, boxHeight, r_3_w, defaultPose);
 	std::cout <<"连接路段相对场景原点的坐标:"<< c_3_x << "," << c_3_y << "," << c_3_z << endl;
+
+	checkpoints.push_back(t.transform(PxVec3(c_3_x, c_3_y + 7.0, c_3_z)));
 
 	//迷宫边长缩放系数
 	float scale = 0.8;
@@ -978,9 +929,11 @@ void createGameScene(const PxTransform& t) {
 	float c_4_z = mazeOut_z + r_4_w;
 	createRoad(t, PxVec3(c_4_x, c_4_y, c_4_z), r_4_l, boxHeight, r_4_w, defaultPose);
 	std::cout << "迷宫出口路段相对场景原点的坐标为:" <<c_4_x << "," << c_4_y << "," << c_4_z << endl;
-
+	
 	//#Checkpoint4
 	totalCheckpoint++;
+	checkpoints.push_back(t.transform(PxVec3(c_4_x, c_4_y + 7.0, c_4_z)));
+
 	//楼梯1
 	//stairsWidth ： 4.0
 	//stairsLength ： 2.0
@@ -1003,11 +956,12 @@ void createGameScene(const PxTransform& t) {
 	PxVec3 pr_v0(-2.5 * roadblock_length, 0, 0);
 	PxJointLinearLimitPair limits0(-30.0, -2.5 * roadblock_length, PxSpring(20.0, 0));
 	PxVec3 velocity0((-1, 0, 0) * 30);
-	createPrismaticRoad(t, PxVec3(c_5_x, c_5_y, c_5_z), roadblock_length, boxHeight, roadblock_width, defaultPose, pr_v0, roadblock_length, boxHeight, roadblock_width, defaultPose, limits0, velocity0);
+	//createPrismaticRoad(t, PxVec3(c_5_x, c_5_y, c_5_z), roadblock_length, boxHeight, roadblock_width, defaultPose, pr_v0, roadblock_length, boxHeight, roadblock_width, defaultPose, limits0, velocity0);
 	std::cout << "平移路段前相对场景原点的坐标为:" << c_5_x << "," << c_5_y << "," << c_5_z << endl;
 
 	//#Race5
 	totalCheckpoint++;
+
 	//旋转杆0中心点
 	float rod_length = 25.0;
 	float c_6_x = c_5_x - 45.0;
@@ -1015,6 +969,8 @@ void createGameScene(const PxTransform& t) {
 	float c_6_z = c_5_z - roadblock_width - dz - rod_length;
 	createRoTateRodLevel(t, PxVec3(c_6_x, c_6_y, c_6_z), rod_length, boxHeight, defaultPose);
 	std::cout << "旋转杆关卡角落位置相对于场景原点的坐标为" << c_6_x + rod_length << "," << c_6_y << "," << c_6_z + rod_length << endl;
+
+	checkpoints.push_back(t.transform(PxVec3(c_6_x + rod_length, c_6_y + 7.0, c_6_z + rod_length)));
 
 	//风扇关卡与水池连接齿轮
 	float gearLength = 5.0;
@@ -1041,8 +997,8 @@ void createGameScene(const PxTransform& t) {
 
 	//createPrismatic(t, PxVec3(-2, 20, 0), defaultPose);
 	//createRoad(t, PxVec3(-4, 20, -6), 4.0, 1.0, 2.0, defaultPose);
-	createFerrisWheel(t, PxVec3(center_x-12.0, centerHeight, center_z+10.0), 15.0, 0.4, 0.4, PxVec3(0, 0, 0.5));
-	createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
+	createFerrisWheel(t, PxVec3(center_x-18.0, centerHeight-3.0, center_z+10.0), 15.0, 0.4, 0.4, PxVec3(0, 0, 0.5));
+	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
 	createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
 
 }
