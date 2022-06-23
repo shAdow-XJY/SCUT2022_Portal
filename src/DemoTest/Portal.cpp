@@ -1,37 +1,3 @@
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions
-// are met:
-//  * Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-//  * Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
-//  * Neither the name of NVIDIA CORPORATION nor the names of its
-//    contributors may be used to endorse or promote products derived
-//    from this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
-// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-// PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
-// Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
-// Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
-// ****************************************************************************
-// This snippet illustrates simple use of physx
-//
-// It creates a number of box stacks on a plane, and if rendering, allows the
-// user to create new stacks and fire a ball from the camera position
-// ****************************************************************************
 
 #include <ctype.h>
 #include "PxPhysicsAPI.h"
@@ -43,6 +9,7 @@
 #include "../LoadModel/Model.h"
 #include "../Render/BMPLoader.h"
 #include "../Sound/SoundTools.h"
+#include "../Animation/Animation.h"
 #include<vector>
 #include<string>
 #include <glut.h>
@@ -83,11 +50,24 @@ extern void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y
 
 //材质贴图ID数组
 std::map<string, unsigned int> textureMap;
-std::string texture[] = { "Door","Wall","Road","SeesawBox","Seesaw","Ice"};
+std::string texture[] = { "Door","Wall","Road","SeesawBox","Seesaw","Ice","man"};
 
 //音频类
 SoundTool soundtool = SoundTool();
 
+
+// 带动画的人物模型
+Animation animation;
+
+
+//可读取的存档点
+vector<PxVec3> checkpoints = {
+	PxVec3(-50, 20, -250),
+	t.transform(PxVec3(58, 20, 19)),
+	t.transform(PxVec3(183, 20, 64)),
+	t.transform(PxVec3(35, 20, 385.8)),
+	t.transform(PxVec3(-17, 45, 406.8))
+};
 
 
 //加载纹理
@@ -106,23 +86,25 @@ void loadTexture() {
 void initGame() {
 	extern void createGameScene(const PxTransform & t);
 	createGameScene(t);
-
 	role = new Role();
-		//初始位置
-		role->setFootPosition(PxVec3(-50, 20, -250));
-		//摆锤前位置
-		//role->setFootPosition(t.transform(PxVec3(58, 20, 19)));
-		//迷宫前位置
-		//role->setFootPosition(t.transform(PxVec3(183, 20, 64)));
-		//迷宫出口位置
-		//role->setFootPosition(t.transform(PxVec3(35, 20, 385.8)));
-		//平移路段前位置
-		//role->setFootPosition(t.transform(PxVec3(3, 45, 416.8)));
-		//旋转杆关卡角落位置
-		//role->setFootPosition(t.transform(PxVec3(-17, 45, 406.8)));
-		//role->attachModel("../../models/paimon/paimon.obj");
-		role->attachModel("../../models/human.obj");
-		role->fall();
+
+	//初始位置
+	role->setFootPosition(PxVec3(-50, 20, -250));
+	//摆锤前位置
+	//role->setFootPosition(t.transform(PxVec3(58, 20, 19)));
+	//迷宫前位置
+	role->setFootPosition(t.transform(PxVec3(183, 20, 64)));
+	//迷宫出口位置
+	//role->setFootPosition(t.transform(PxVec3(35, 20, 385.8)));
+	//平移路段前位置
+	//role->setFootPosition(t.transform(PxVec3(3, 45, 416.8)));
+	//旋转杆关卡角落位置
+	//role->setFootPosition(t.transform(PxVec3(-17, 45, 406.8)));
+	//role->attachModel("../../models/paimon/paimon.obj");
+	role->fall();
+
+	animation.attachRole(*role);
+	animation.setAnimation("idle");
 }
 
 ///实例化物理
@@ -152,7 +134,7 @@ void initPhysics(bool interactive)
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
 	gScene = gPhysics->createScene(sceneDesc);
 
-
+	
 
 	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
 	if (pvdClient)
@@ -166,17 +148,9 @@ void initPhysics(bool interactive)
 	//静摩擦，动摩擦，restitution恢复原状(弹性)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
 
-	
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	groundPlane->setName("Over");
 	gScene->addActor(*groundPlane);
-
-	//// 测试代码
-	//Model testModel("../../models/paimon/paimon.obj");
-	//testModel.attachMeshes((PxTransform(PxVec3(20, 30, 30))).transform(PxTransform(PxQuat(-PxHalfPi,PxVec3(1.0f,0.0f,0.0f)))));
-	//testModel.createMeshActor(PxTransform(20, 30, 30));
-	// end
-
 }
 
 
@@ -221,7 +195,6 @@ PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir)
 	//std::cout << "rayHit is not hit" << std::endl;
 	return NULL;
 }
-
 
 
 //（在render中调用）

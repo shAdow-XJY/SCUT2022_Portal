@@ -19,6 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\Animation\Animation.cpp" />
+    <ClCompile Include="..\..\src\Animation\assimp_extras.cpp" />
+    <ClCompile Include="..\..\src\Animation\MeshUtils.cpp" />
     <ClCompile Include="..\..\src\Block\Door.cpp" />
     <ClCompile Include="..\..\src\Block\PrismaticRoad.cpp" />
     <ClCompile Include="..\..\src\Block\Road.cpp" />
@@ -49,6 +52,9 @@
     <ClCompile Include="..\..\src\Utils\GameUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\Animation\Animation.h" />
+    <ClInclude Include="..\..\src\Animation\assimp_extras.h" />
+    <ClInclude Include="..\..\src\Animation\MeshUtils.h" />
     <ClInclude Include="..\..\src\Block\Block.h" />
     <ClInclude Include="..\..\src\Block\Door.h" />
     <ClInclude Include="..\..\src\Block\PrismaticRoad.h" />
@@ -135,13 +141,13 @@
     <OutDir>./../../../bin/vc16win64\</OutDir>
     <IntDir>./x64/GameDemo/debug\</IntDir>
     <TargetName>$(ProjectName)DEBUG</TargetName>
-    <LibraryPath>./../../../Lib/vc16win64;./../../../Bin/vc16win64;./../../../Snippets/Graphics/lib/win64/glut;./../../../SCUT2022_Portal/src;$(LibraryPath)</LibraryPath>
+    <LibraryPath>./../../../Lib/vc16win64;./../../../Bin/vc16win64;./../../../Snippets/Graphics/lib/win64/glut;./../../../SCUT2022_Portal/src;./../../../SCUT2022_Portal/Graphics/Libs;$(LibraryPath)</LibraryPath>
     <IncludePath>./../../../SCUT2022_Portal/src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>./../../../bin/vc16win64\</OutDir>
     <IntDir>./x64/GameDemo/debug\</IntDir>
-    <LibraryPath>./../../../Lib/vc16win64;./../../../Bin/vc16win64;./../../../Snippets/Graphics/lib/win64/glut;./../../../SCUT2022_Portal/src;$(LibraryPath)</LibraryPath>
+    <LibraryPath>./../../../Lib/vc16win64;./../../../Bin/vc16win64;./../../../Snippets/Graphics/lib/win64/glut;./../../../SCUT2022_Portal/src;./../../../SCUT2022_Portal/Graphics/Libs;$(LibraryPath)</LibraryPath>
     <IncludePath>./../../../SCUT2022_Portal/src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -165,7 +171,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>./../../../Common/lib/vc16win64;./../../lib/vc16win64;./../../../../PxShared/lib/vc16win64;./../../Graphics/lib/win64/glut;./../../FMOD/lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>fmod_vc.lib;fmodL_vc.lib;Winmm.lib;OpenGL32.lib;glut32.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DevIL.lib;ILU.lib;ILUT.lib;fmod_vc.lib;fmodL_vc.lib;Winmm.lib;OpenGL32.lib;glut32.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/LIBPATH:../../../Lib/vc16win64 PhysX3CommonDEBUG_x64.lib PhysX3DEBUG_x64.lib PhysX3CookingDEBUG_x64.lib PhysX3CharacterKinematicDEBUG_x64.lib PhysX3ExtensionsDEBUG.lib PhysX3VehicleDEBUG.lib PxTaskDEBUG_x64.lib PxFoundationDEBUG_x64.lib PsFastXmlDEBUG_x64.lib PxPvdSDKDEBUG_x64.lib /LIBPATH:../../lib/vc16win64 UtilsDEBUG.lib /DEBUG</AdditionalOptions>
     </Link>
     <PostBuildEvent>
@@ -205,7 +211,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>fmod_vc.lib;fmodL_vc.lib;Winmm.lib;OpenGL32.lib;glut32.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DevIL.lib;ILU.lib;ILUT.lib;fmod_vc.lib;fmodL_vc.lib;Winmm.lib;OpenGL32.lib;glut32.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>./../../../Common/lib/vc16win64;./../../lib/vc16win64;./../../../../PxShared/lib/vc16win64;./../../Graphics/lib/win64/glut;./../../FMOD/lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/INCREMENTAL:NO /LIBPATH:../../../Lib/vc16win64 PhysX3Common_x64.lib PhysX3_x64.lib PhysX3Cooking_x64.lib PhysX3CharacterKinematic_x64.lib PhysX3Extensions.lib PhysX3Vehicle.lib PxTask_x64.lib PxFoundation_x64.lib PsFastXml_x64.lib PxPvdSDK_x64.lib /LIBPATH:../../lib/vc16win64 Utils.lib</AdditionalOptions>
     </Link>

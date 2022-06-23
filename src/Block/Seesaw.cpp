@@ -30,7 +30,7 @@ PxVec3 Seesaw::addGForce(PxVec3 position, PxVec3 force) {
 PxVec3 Seesaw::calTilt() {
 	float angle = -this->revorevolute->getAngle();
 	cout << this->revorevolute->getAngle() << endl;
-	if (abs(angle) < 0.1f) return PxVec3(0, 0, 0);
-	float speed = 0.3 * angle * abs(angle);
+	if (abs(angle) < 0.05f) return PxVec3(0, 0, 0);
+	float speed = angle * abs(angle);
 	return this->tiltDir ? PxVec3(speed, 0, 0) : PxVec3(0, 0, speed);
 }
