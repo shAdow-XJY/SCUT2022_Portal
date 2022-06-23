@@ -148,7 +148,7 @@ void Animation::display()
     PxMat44 modelMatrix(PxShapeExt::getGlobalPose(*attachedRole->getShape(), *attachedRole->getActor()));
     
     PxMat44 rotate(PxQuat(-PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
-    PxMat44 translate(PxTransform(PxVec3(0.0f, 3.0f, 0.0f)));
+    PxMat44 translate(PxTransform(PxVec3(0.0f, -1.0f, 0.0f)));
     renderDisplay(this->scene, this->scene->mRootNode, std::map<int, int>(), modelMatrix * rotate * translate *yRotate);
 
 }
@@ -165,6 +165,10 @@ void Animation::cleanup()
 void Animation::attachRole(Role& role) {
     //不要把求变换矩阵写在这里，没法更新位置
     this->attachedRole = &role;
+    PxShape* cap;
+    role.getActor()->getShapes(&cap, 1);
+    cap->setFlag(PxShapeFlag::eVISUALIZATION, false);
+    
 }
 
 void Animation::changeOrientation(const PxQuat& orientation)

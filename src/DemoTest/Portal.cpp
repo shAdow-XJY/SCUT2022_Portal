@@ -55,8 +55,19 @@ std::string texture[] = { "Door","Wall","Road","SeesawBox","Seesaw","Ice","man"}
 //音频类
 SoundTool soundtool = SoundTool();
 
+
 // 带动画的人物模型
 Animation animation;
+
+
+//可读取的存档点
+vector<PxVec3> checkpoints = {
+	PxVec3(-50, 20, -250),
+	t.transform(PxVec3(58, 20, 19)),
+	t.transform(PxVec3(183, 20, 64)),
+	t.transform(PxVec3(35, 20, 385.8)),
+	t.transform(PxVec3(-17, 45, 406.8))
+};
 
 
 //加载纹理
@@ -78,7 +89,7 @@ void initGame() {
 	role = new Role();
 
 	//初始位置
-	//role->setFootPosition(PxVec3(-50, 20, -250));
+	role->setFootPosition(PxVec3(-50, 20, -250));
 	//摆锤前位置
 	//role->setFootPosition(t.transform(PxVec3(58, 20, 19)));
 	//迷宫前位置
@@ -90,7 +101,6 @@ void initGame() {
 	//旋转杆关卡角落位置
 	//role->setFootPosition(t.transform(PxVec3(-17, 45, 406.8)));
 	//role->attachModel("../../models/paimon/paimon.obj");
-	//role->attachModel("../../models/human.obj");
 	role->fall();
 
 	animation.attachRole(*role);
@@ -138,14 +148,9 @@ void initPhysics(bool interactive)
 	//静摩擦，动摩擦，restitution恢复原状(弹性)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
 
-	
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	groundPlane->setName("Over");
 	gScene->addActor(*groundPlane);
-
-	
-
-
 }
 
 
