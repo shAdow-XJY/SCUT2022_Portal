@@ -161,18 +161,19 @@ void renderCallback()
 			//是否重生传送
 			role->protal();
 			//是否跳跃
+			//是否检测底部是否接触物体
+			role->simulationGravity();
 			role->roleJump();
 			role->roleFall();
 			//是否发生滑动
 			role->roleSlide();	
 			role->rayAround();
-			//是否检测底部是否接触物体
-			role->simulationGravity();
 			//是否进行物理刚体模拟
 			role->stimulate();	
 			//动态刚体渲染
 			roleWorldPosition = role->getRoleWorldPosition();
 			dynamicBall.setCircleCenterPosition_XZ(roleWorldPosition.x, roleWorldPosition.z);
+			role->move();
 			//更新得分
 			role->updateScore();
 		}

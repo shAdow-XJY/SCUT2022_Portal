@@ -116,7 +116,7 @@ void initGame() {
 	role = new Role();
 
 	//初始位置
-	role->setFootPosition(PxVec3(-50, 20, -250));
+	//role->setFootPosition(PxVec3(-50, 20, -250));
 	//摆锤前位置
 	//role->setFootPosition(t.transform(PxVec3(58, 20, 19)));
 	//迷宫前位置
@@ -124,11 +124,11 @@ void initGame() {
 	//迷宫出口位置
 	//role->setFootPosition(t.transform(PxVec3(35, 20, 385.8)));
 	//平移路段前位置
-	//role->setFootPosition(t.transform(PxVec3(3, 45, 416.8)));
+	role->setFootPosition(t.transform(PxVec3(3, 45, 416.8)));
 	//旋转杆关卡角落位置
 	//role->setFootPosition(t.transform(PxVec3(-17, 45, 406.8)));
-	role->attachModel("../../models/paimon/paimon.obj");
-	//role->attachModel("../../models/human.obj");
+	//role->attachModel("../../models/paimon/paimon.obj");
+	role->attachModel("../../models/human.obj");
 	role->fall();
 
 }
@@ -174,16 +174,9 @@ void initPhysics(bool interactive)
 	//静摩擦，动摩擦，restitution恢复原状(弹性)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
 
-	
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	groundPlane->setName("Over");
 	gScene->addActor(*groundPlane);
-
-	//// 测试代码
-	//Model testModel("../../models/paimon/paimon.obj");
-	//testModel.attachMeshes((PxTransform(PxVec3(20, 30, 30))).transform(PxTransform(PxQuat(-PxHalfPi,PxVec3(1.0f,0.0f,0.0f)))));
-	//testModel.createMeshActor(PxTransform(20, 30, 30));
-	// end
 
 }
 

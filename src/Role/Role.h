@@ -18,7 +18,7 @@ extern PxControllerManager* cManager;
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
 extern PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir);
 extern void renderGameOver();
-const int primaryJumpHeight = 4.0f;
+const float primaryUpSpeed = 0.10;
 
 extern SoundTool soundtool;
 extern vector<PxVec3> checkpoints;
@@ -38,6 +38,8 @@ private:
 	PxF32 roleHeight = 3.0f;
 	//人物速度
 	PxVec3 speed = PxVec3(0, 0, 0);
+	//人物跳跃惯性速度
+	PxVec3 inertiaSpeed = PxVec3(0, 0, 0);
 	//最后一次按下方向键的方向
 	PxVec3 lastPressDir = PxVec3(0, 0, 1);
 	//自由相机人物前进方向
@@ -49,30 +51,23 @@ private:
 	//人物上一次位置
 	PxVec3 lastPostion;
 	//角色重力
-	float mass = 8000.0f;
-	//重力加速度
-	float midFallSpeed = 0.5;
+	float mass = 10000.0f;
 	//跳跃相关
-	float littleJumpSpeed = 0.4;
-	float bigJumpSpeed = 0.5;
-	float nowJumpHeight = 0.0;
-	float wantJumpHeight = primaryJumpHeight;
-	float maxJumpHeight = 10.0;
-	float gravityAcceleration = 0.0005f;
+	float upSpeed = primaryUpSpeed;
+	float maxUpSpeed = 0.15;
+	float gravityAcceleration = 0.0004f;
 
 	/// <summary>
 	/// 状态量
 	/// </summary>
-	bool isAutoMoving = false;
 	bool canMove = true;
 	bool isJump = false;
 	bool isHanging = false;
 	bool isFall = false;
 	bool isAlive = true;
 	bool equiped = false;
-	//本次跳跃是否能够向前
-	bool canForward = true;
 	bool standingOnBlock = true;
+	bool isRebirthing = false;
 	//冰面滑动
 	bool slide = false;
 	//边缘滑动
@@ -88,8 +83,7 @@ private:
 	int life = 5;
 	//得分
 	int score = 0;
-	//是否处于重生状态
-	bool isRebirthing = false;
+	
 
 public:
 	Role();
@@ -131,11 +125,8 @@ public:
 	PxVec3 getFaceDir();
 
 	//角色移动相关
-	void roleMoveByMouse(int x, int y);
-	void roleMoveByMouse(PxVec3 position);
 	void move();
 	void move(GLint key, bool status, bool free);
-	bool getMovingStatus();
 	void stopMoving();
 
 	//人物站立的方块基类
@@ -150,7 +141,6 @@ public:
 	void roleJump();
 	void roleFall();
 	void fall();
-	void changeForward(bool);
 
 
 	//下蹲
@@ -180,6 +170,14 @@ public:
 	//更新角色得分
 	void updateScore();
 	bool getRebirthing();
+
+
+	//重构部分
+	PxVec3 roleHandleKey(GLint key,bool free);
+	void touchGround();
+	PxVec3 getHorizontalVelocity();
+	void resetStatus();
+	
 
 };
 
@@ -218,14 +216,6 @@ public:
 					door->setDoorStatus(true);
 				}
 			}
-		}
-		else if (name == "Seesaw") {
-		}
-		else if (name == "Pendulum") {
-		}
-		else if (name == "PrismaticRoad") {
-
-
 		}
 		else if (name == "Over") {
 			if (this->role->gameOver()) {
