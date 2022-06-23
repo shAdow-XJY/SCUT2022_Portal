@@ -21,12 +21,13 @@ int mouseX, mouseY;
 // 提示字符的位置（测试用）
 int textX = 0, textY = 0;
 
-
+int timeAnim = 0;
 //按键设置
 void keyPress(unsigned char key, const PxTransform& camera)
 {
 	switch (toupper(key))
 	{
+		//角色跳跃按键：空格
 	case ' ':
 	{
 		if (role->tryJump(false)) {
@@ -34,11 +35,13 @@ void keyPress(unsigned char key, const PxTransform& camera)
 		}
 		break;
 	}
+	//角色下蹲按键：Z
 	case 'Z':
 	{
 		role->roleCrouch();
 		break;
 	}
+	//角色拾取/放置道具：E
 	case 'E':
 	{
 		if (role->getEquiped()) {
@@ -50,6 +53,14 @@ void keyPress(unsigned char key, const PxTransform& camera)
 
 		}
 
+		break;
+	}
+	//角色切换动画；暂时
+	case 'Q':
+	{
+		//animation.
+		animation.update(1000*timeAnim);
+		timeAnim++;
 		break;
 	}
 	default:
@@ -66,7 +77,7 @@ void keyRelease(unsigned char key)
 		//soundtool.pauseSound();
 		if (role->tryJump(true)) {
 			soundtool.playSound("jump.wav");
-			animation.keyboard(key);
+			animation.setAnimation("jump");
 		}
 		break;
 	}
