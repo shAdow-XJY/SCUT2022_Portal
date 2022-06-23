@@ -118,9 +118,11 @@ void Animation::display()
 
 void Animation::keyboard(unsigned char key)
 {
+    // 目前：0 走路，1 跳跃， 2 奔跑
     if (key == ' ')
     {
-        current_animation = (current_animation + 1) % animations.size();
+        //current_animation = (current_animation + 1) % animations.size();
+
     }
 }
 

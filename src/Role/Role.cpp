@@ -126,8 +126,7 @@ void Role::stopMoving() {
 	this->nowPostion = PxVec3(this->roleController->getFootPosition().x, this->roleController->getFootPosition().y, this->roleController->getFootPosition().z);
 }
 
-extern int animationTick;
-extern Animation animation;
+
 
 /**
 * @brief 键盘输入控制角色移动
@@ -153,32 +152,20 @@ void Role::move(GLint key, bool status, bool free) {
 		switch (key) {
 		case GLUT_KEY_UP: {
 			//dir = PxVec3(0, 0, 1);
-			animation.changeOrientation(PxQuat(0, PxVec3(0, 1, 0)));
-			animation.update(1000 * animationTick);
-			animationTick++;
 			break;
 		}
 		case GLUT_KEY_DOWN: {
 			dir *= -1;
-			animation.changeOrientation(PxQuat(PxPi, PxVec3(0, 1, 0)));
-			animation.update(1000 * animationTick);
-			animationTick++;
 			break;
 
 		}case GLUT_KEY_LEFT: {
 			PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
 			dir = rotate.rotate(dir);
-			animation.changeOrientation(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
-			animation.update(1000 * animationTick);
-			animationTick++;
 			break;
 
 		}case GLUT_KEY_RIGHT: {
 			PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
 			dir = rotate.rotate(-dir);
-			animation.changeOrientation(PxQuat(-PxHalfPi, PxVec3(0, 1, 0)));
-			animation.update(1000 * animationTick);
-			animationTick++;
 			break;
 
 		}

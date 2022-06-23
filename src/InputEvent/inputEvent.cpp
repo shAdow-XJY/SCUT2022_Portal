@@ -3,10 +3,13 @@
 #include "../Role/Role.h"
 #include "../Render/Camera.h"
 #include "../Sound/SoundTools.h"
+#include "../Animation/Animation.h"
 using namespace physx;
 
 extern Role* role;
 extern SoundTool soundtool;
+extern Animation animation;
+extern int animationTick;
 
 // 右键鼠标按下
 bool press = false;
@@ -63,6 +66,7 @@ void keyRelease(unsigned char key)
 		//soundtool.pauseSound();
 		if (role->tryJump(true)) {
 			soundtool.playSound("jump.wav");
+			animation.keyboard(key);
 		}
 		break;
 	}
@@ -79,6 +83,34 @@ void keyRelease(unsigned char key)
 //特殊键设置
 void specialKeyPress(GLint key) {
 	switch (key) {
+	case GLUT_KEY_UP: {
+		animation.changeOrientation(PxQuat(0, PxVec3(0, 1, 0)));
+		animation.update(1000 * animationTick);
+		animationTick++;
+		break;
+	}
+	case GLUT_KEY_DOWN: {
+		animation.changeOrientation(PxQuat(PxPi, PxVec3(0, 1, 0)));
+		animation.update(1000 * animationTick);
+		animationTick++;
+		break;
+
+	}case GLUT_KEY_LEFT: {
+		PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
+		animation.changeOrientation(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
+		animation.update(1000 * animationTick);
+		animationTick++;
+		break;
+
+	}case GLUT_KEY_RIGHT: {
+		PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
+		animation.changeOrientation(PxQuat(-PxHalfPi, PxVec3(0, 1, 0)));
+		animation.update(1000 * animationTick);
+		animationTick++;
+		break;
+
+	}
+
 	default: {
 		return;
 	}
