@@ -22,7 +22,7 @@ extern PxPhysics*	gPhysics;
 extern PxMaterial* gMaterial;
 
 struct Texture {
-	unsigned m_texID;
+	unsigned int m_texID;
 	string filename;
 };
 

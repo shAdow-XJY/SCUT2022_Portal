@@ -55,7 +55,7 @@ void printPxVecFun(const PxVec3& vec) {
 }
 
 void renderVisible(const Role& role) {
-	cout << "render model" << endl;
+	//cout << "render model" << endl;
 	size_t indices = 0;
 	glPushMatrix();
 
