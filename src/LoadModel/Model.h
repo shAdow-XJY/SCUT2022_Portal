@@ -1,4 +1,6 @@
-#pragma once
+#ifndef __MODEL_H__
+#define __MODEL_H__
+
 #include<iostream>
 #include<vector>
 #include<queue>
@@ -17,8 +19,8 @@ using std::vector;
 using std::string;
 
 extern PxScene* gScene;
-extern PxCooking*	gCooking;
-extern PxPhysics*	gPhysics;
+extern PxCooking* gCooking;
+extern PxPhysics* gPhysics;
 extern PxMaterial* gMaterial;
 
 struct Texture {
@@ -39,7 +41,7 @@ public:
 	Model(const char* path);
 	void attachMeshes(const PxTransform& trans, PxRigidActor* actor);
 	void transformModel(const PxTransform& trans);
-	
+
 	vector<Mesh> m_meshes;
 	vector<Texture> m_textures;
 private:
@@ -51,7 +53,10 @@ private:
 	void loadModel(const char* path);
 	void processNode(aiNode* node, const aiScene* scene);
 	void processSingleMesh(aiMesh* mesh, const aiScene* scene);
-	
+
 public:
 	size_t getNbTriangles() const;
 };
+
+#endif
+

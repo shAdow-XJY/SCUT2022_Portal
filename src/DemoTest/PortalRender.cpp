@@ -40,9 +40,13 @@ RenderBox skyBox;
 extern SoundTool soundtool;
 //动态渲染圈
 PxVec3 roleWorldPosition = PxVec3(0);
-DynamicBall dynamicBall = DynamicBall(false);
+DynamicBall dynamicBall = DynamicBall(true);
 
-Animation animation;
+extern Animation animation;
+
+// 全局的动画计数器
+int animationTick = 0;
+
 namespace
 {
 	Snippets::Camera*	sCamera;
@@ -155,7 +159,7 @@ void renderCallback()
 		}
 		
 		// 渲染模型
-		if (role) {
+		if (role->isStaticAttached()) {
 			renderVisible(*role);
 		}
 		

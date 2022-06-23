@@ -1,3 +1,6 @@
+#ifndef __ROLE_H__
+#define __ROLE_H__
+
 #include <ctype.h>
 #include <iostream>
 #include "PxPhysicsAPI.h"
@@ -84,6 +87,9 @@ private:
 	//
 	PxVec3 dis = PxVec3(0, 0, 0);
 
+	// 是否已绑定静态模型
+	bool staticAttached = false;
+
 public:
 	Role();
 	~Role() {
@@ -92,7 +98,8 @@ public:
 	};
 
 	bool attachModel(const char*);
-	Model& getModel() const{
+
+	Model& getModel() const {
 		return *this->model;
 	}
 	PxShape* getShape() const {
@@ -168,6 +175,10 @@ public:
 	//人物模拟动态刚体功能
 	void stimulate();
 
+	bool isStaticAttached() {
+		return staticAttached;
+	}
+
 };
 
 class RoleHitCallback :public PxUserControllerHitReport {
@@ -230,3 +241,5 @@ public:
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
 	}
 };
+
+#endif // !__ROLE_H__

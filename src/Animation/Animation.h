@@ -6,6 +6,8 @@
 #include <string>
 #include <map>
 using namespace std;
+#include"../../src/Role/Role.h"
+
 class Animation
 {
 private:
@@ -17,6 +19,10 @@ private:
     aiVector3D scene_max;
     aiVector3D rootPosition;
     std::vector<FBXMesh> initial_state;
+    Role* attachedRole;
+
+    // 改变模型朝向的矩阵
+    PxMat44 yRotate;
 public:
     //初始化FBX模型和Idle动画
     void init();
@@ -37,6 +43,9 @@ public:
 
 
     void cleanup();
+
+    void attachRole(Role&);
+    void changeOrientation(const PxQuat& orientation);
 };
 
 #endif

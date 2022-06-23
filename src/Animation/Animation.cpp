@@ -30,6 +30,8 @@ void Animation::init()
         }
         initial_state.push_back(newMesh);
     }
+
+    yRotate = PxMat44::PxMat44(PxIdentity);
 }
 
 
@@ -123,7 +125,17 @@ void Animation::updating(aiAnimation* anim, double tick)
 void Animation::display()
 {
     aiNode* root = this->scene->mRootNode;
-    renderDisplay(this->scene, this->scene->mRootNode, map<int, int>());
+    //gluLookAt(-0.5, 600.5, 1300.5, -0.5, 200, 1.5, 0, 1, 0);
+    //render(this->scene, this->scene->mRootNode, std::map<int, int>());
+    
+    /*PxMat44 yRotate(PxQuat(-PxHalfPi, PxVec3(0.0f, 1.0f, 0.0f)));*/
+    
+    PxMat44 modelMatrix(PxShapeExt::getGlobalPose(*attachedRole->getShape(), *attachedRole->getActor()));
+    PxMat44 rotate(PxQuat(-PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
+
+   
+    renderDisplay(this->scene, this->scene->mRootNode, std::map<int, int>(), modelMatrix * rotate * yRotate);
+
 }
 
 void Animation::setAnimation(string animationName)
@@ -133,4 +145,14 @@ void Animation::setAnimation(string animationName)
 
 void Animation::cleanup()
 {
+}
+
+void Animation::attachRole(Role& role) {
+    //不要把求变换矩阵写在这里，没法更新位置
+    this->attachedRole = &role;
+}
+
+void Animation::changeOrientation(const PxQuat& orientation)
+{
+    yRotate = PxMat44(orientation);
 }

@@ -2,7 +2,7 @@
 #ifndef MESH_UTILS_H
 #define MESH_UTILS_H
 
-
+#include "../Role/Role.h"
 #include <Animation/assimp_extras.h>
 #include <vector>
 #include <map>
@@ -30,7 +30,6 @@ aiMatrix4x4 get_interpolated_position(double tick, aiNodeAnim* node);
 void render(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap);
 
 // ------A non-recursive function to traverse scene graph and render each mesh----------
-void renderDisplay(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap);
-void tempDisplay(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap);
-
+void renderDisplay(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap,PxMat44 transform);
+void tempDisplay(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap, PxMat44 transform);
 #endif

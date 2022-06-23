@@ -280,18 +280,18 @@ void render(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap)
 	glPopMatrix();
 }
 // ------A non-recursive function to traverse scene graph and render each mesh----------
-void renderDisplay(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap)
+void renderDisplay(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap, PxMat44 transform)
 {
 	// Draw all children
 	glColor4f(1, 1, 1, 1);
 	glEnable(GL_COLOR_MATERIAL);
 	//glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 	for (unsigned int i = 0; i < nd->mNumChildren; i++)
-		tempDisplay(sc, nd->mChildren[i], texMap);
+		tempDisplay(sc, nd->mChildren[i], texMap,transform);
 	
 }
 
-void tempDisplay(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap)
+void tempDisplay(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap,PxMat44 transform)
 {
 	aiMatrix4x4 m = nd->mTransformation;
 	aiMesh* mesh;
@@ -301,7 +301,9 @@ void tempDisplay(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap)
 
 	aiTransposeMatrix4(&m); //Convert to column-major order
 	glPushMatrix();
+	glMultMatrixf(reinterpret_cast<const float*>(&transform));
 	glMultMatrixf((float*)&m); //Multiply by the transformation matrix for this node
+	glScalef(0.015f, 0.015f, 0.015f);
 	// Draw all meshes assigned to this node
 	glBegin(GL_TRIANGLES);
 	for (unsigned int n = 0; n < nd->mNumMeshes; n++)
