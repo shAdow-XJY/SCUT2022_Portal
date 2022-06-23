@@ -11,6 +11,7 @@
 #include <glut.h>
 #include <Render/BMPLoader.h>
 #include <map>
+#include <time.h>
 
 using namespace physx;
 
@@ -328,14 +329,32 @@ v为该迷宫中心相对场景原点的位置
 scale 门的缩放系数
 pose 刚体的朝向*/
 void createMaze(const PxTransform& t, PxVec3 v, float scale, PxTransform& pose) {
+	//迷宫小房间边长
+	float roomLength = 37 * scale;
+	
 	//迷宫左下角坐标
-	float x = v.x + 4 * 37 * scale;
-	float z = v.z - 4 * 37 * scale;
+	float x = v.x + 4 * roomLength;
+	float z = v.z - 4 * roomLength;
 
 	//迷宫门的坐标
 	float door_x;
 	float door_y = v.y + boxHeight + 0.5 + 10 * scale;
 	float door_z;
+
+	//钥匙存放处 21 82 13 86 18
+	vector<PxVec3> keyPositions = {
+		PxVec3(x - 1.5 * roomLength,door_y,z + 0.5 * roomLength),
+		PxVec3(x - 7.5 * roomLength,door_y,z + 1.5 * roomLength),
+		PxVec3(x - 0.5 * roomLength,door_y,z + 2.5 * roomLength),
+		PxVec3(x - 7.5 * roomLength,door_y,z + 5.5 * roomLength),
+		PxVec3(x - 0.5 * roomLength,door_y,z + 7.5 * roomLength)
+	};
+
+	//随机生成钥匙
+	srand(time(NULL));
+	int index = rand() % keyPositions.size();
+	std::cout << "钥匙" << index << endl;
+	createPorp(t, keyPositions[index], 1.0, 1.0, 1.0);
 
 	//正门逻辑
 	//从左到右
@@ -549,6 +568,7 @@ void createPrismaticRoad(const PxTransform& t, PxVec3 v0, PxReal x0, PxReal y0, 
 	PxTransform pos(t.transform(PxTransform(v0)));
 	PxRigidStatic* actor0 = createRoad(pos, PxVec3(0, 0, 0), x0, y0, z0, pose0);
 	PxRigidDynamic* actor1 = createDynamicBox(false, pos, v1, x1, y1, z1, pose1, OrganType::prismaticRoad, velocity);
+	//PxRigidDynamic* actor1 = createDynamicBox(false, pos, v1, x1, y1, z1, pose1, OrganType::prismaticRoad);
 	PxVec3 position = actor1->getGlobalPose().p;
 	PrismaticRoad* prismaticRoad = new PrismaticRoad("平移路面", position, x1, y1, z1, actor1);
 	actor1->userData = prismaticRoad;
@@ -827,6 +847,17 @@ void createFerrisWheel(const PxTransform& t, PxVec3 v, float x, float y, float z
 	PxFixedJointCreate(*gPhysics, ferrisWheel, center, sphere, center);
 }
 
+void createPrismatic(const PxTransform& t, PxVec3 v,PxTransform& pose) {
+	PxRigidDynamic* actor1 = createDynamicBox(false, t, v, 3.0, 1.0, 4.0, pose, OrganType::prismaticRoad,PxVec3(0, 0, 0));
+	PxVec3 position = actor1->getGlobalPose().p;
+	PrismaticRoad* prismaticRoad = new PrismaticRoad("平移路面", position, 3.0, 1.0, 4.0, actor1);
+	actor1->userData = prismaticRoad;
+	actor1->setName("PrismaticRoad");
+	actor1->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+	actor1->setMass(0.f);
+	actor1->setMassSpaceInertiaTensor(PxVec3(0.f));
+}
+
 //创建游戏场景
 void createGameScene(const PxTransform& t) {
 	time_t startTime = time(NULL);
@@ -836,8 +867,8 @@ void createGameScene(const PxTransform& t) {
 	float r_1_w = 15.0;  //road_1_width 8 100
 	float c_1_y = boxHeight;  //the position of the center of road_1
 	// create road_1
-	//createRoad(t, PxVec3(0, c_1_y, 0), r_1_l, boxHeight, r_1_w, defaultPose);
-	createRoad(t, PxVec3(0, c_1_y, 0), 100, boxHeight, 100, defaultPose);
+	createRoad(t, PxVec3(0, c_1_y, 0), r_1_l, boxHeight, r_1_w, defaultPose);
+	//createRoad(t, PxVec3(0, c_1_y, 0), 100, boxHeight, 100, defaultPose);
 
 	float r_2_w = 4.0;
 	float r_2_l = 20.0;
@@ -870,6 +901,7 @@ void createGameScene(const PxTransform& t) {
 	float rb_x = center_x - 2 * stairsLength + dx + roadblock_length;
 	float rb_y = centerHeight - 2 * boxHeight;
 	float rb_z = center_z;
+	//createRoad(t, PxVec3(rb_x, rb_y, rb_z), roadblock_length, boxHeight, roadblock_width, defaultPose);
 	for (int i = 0; i < 3; i++) {
 		createRoad(t, PxVec3(rb_x, rb_y, rb_z), roadblock_length, boxHeight, roadblock_width, defaultPose);
 		if (i % 2 == 0) {
@@ -988,8 +1020,10 @@ void createGameScene(const PxTransform& t) {
 	//水池底部的相对于场景原点t的位置 PxVec3 localPose(bottom_x,bottom_y,bottom_z)
 	//全局位置 t.transform(PxTransform(localPose)).p
 
+
+	//createPrismatic(t, PxVec3(-2, 20, 0), defaultPose);
 	//createRoad(t, PxVec3(-4, 20, -6), 4.0, 1.0, 2.0, defaultPose);
-	createFerrisWheel(t, PxVec3(center_x-12.0, centerHeight, center_z+10.0), 15.0, 0.4, 0.4, PxVec3(0, 0,0.5));
+	//createFerrisWheel(t, PxVec3(center_x-12.0, centerHeight, center_z+10.0), 15.0, 0.4, 0.4, PxVec3(0, 0, 0.5));
 	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
 	createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
 

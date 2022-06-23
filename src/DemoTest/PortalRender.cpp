@@ -37,6 +37,7 @@
 #include <Render/RenderBox.h>
 #include <Render/DynamicBall.h>
 #include <Sound/SoundTools.h>
+#include <time.h>
 using namespace physx;
 extern void initPhysics(bool interactive);
 extern void stepPhysics(bool interactive);	
@@ -67,7 +68,8 @@ extern SoundTool soundtool;
 //∂ØÃ¨‰÷»æ»¶
 PxVec3 roleWorldPosition = PxVec3(0);
 
-DynamicBall dynamicBall = DynamicBall(true);
+DynamicBall dynamicBall = DynamicBall(false);
+
 
 namespace
 {
