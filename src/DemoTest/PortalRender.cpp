@@ -110,6 +110,9 @@ void animationRenderCallback() {
 			animation.setAnimation("idle");
 		}
 	}
+	else if(currentAnimation == "walk"){
+		animation.update(1.0);
+	}
 	
 }
 

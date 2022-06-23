@@ -105,7 +105,6 @@ void specialKeyPress(GLint key) {
 	case GLUT_KEY_RIGHT:
 		animation.setAnimation("walk");
 		getAdditionalAngleRadians();
-		animation.update(1.0);
 		break;
 	default: {
 		return;
@@ -119,7 +118,6 @@ void specialKeyRelease(GLint key) {
 	case GLUT_KEY_DOWN:
 	case GLUT_KEY_LEFT:
 	case GLUT_KEY_RIGHT: 
-		//getAdditionalAngleRadians();
 		animation.setAnimation("idle");
 		break;
 	default: {
@@ -155,6 +153,7 @@ void mousePress(int button, int state, int x, int y) {
 	}
 }
 
+//角色转动时，模型也跟随角色face Dir 向量方向旋转
 void getAdditionalAngleRadians() {
 	//cout << role->getFaceDir().x << "？？" << role->getFaceDir().y << "!!" << role->getFaceDir().z << endl;
 	
