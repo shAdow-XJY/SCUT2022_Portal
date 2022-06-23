@@ -48,12 +48,14 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	case 'E':
 	{
 		if (role->getEquiped()) {
-			role->layDownObj();
-
+			if (role->layDownObj()) {
+				soundtool.playSound("pickProp.wav",true);
+			}
 		}
 		else {
-			role->pickUpObj();
-
+			if (role->pickUpObj()) {
+				soundtool.playSound("pickProp.wav", true);
+			}
 		}
 
 		break;

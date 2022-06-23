@@ -163,9 +163,9 @@ public:
 	//模拟重力
 	void simulationGravity();
 	//捡起物体
-	void pickUpObj();
+	bool pickUpObj();
 	//放置物体
-	void layDownObj();
+	bool layDownObj();
 
 	//角色滑动
 	void roleSlide();

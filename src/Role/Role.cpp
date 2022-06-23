@@ -560,7 +560,7 @@ void Role::simulationGravity() {
 /**
 * @brief 角色道具拾取
 **/
-void Role::pickUpObj() {
+bool Role::pickUpObj() {
 	//cout << this->faceDir.x<<" " << this->faceDir.y <<" "<< this->faceDir.z<<" " << endl;
 	PxVec3 origin = this->getPosition() - PxVec3(0,0.2f,0);
 	//确定role的前方方向
@@ -572,6 +572,7 @@ void Role::pickUpObj() {
 			actor->release();
 			this->equiped = true;
 			std::cout << "拾取道具成功" << std::endl;
+			return true;
 		}
 		else
 		{
@@ -582,12 +583,13 @@ void Role::pickUpObj() {
 	{
 		std::cout << "射线没有找到目标" << std::endl;
 	}
+	return false;
 }
 
 /**
 * @brief 角色道具放置
 **/
-void Role::layDownObj() {
+bool Role::layDownObj() {
 	PxVec3 origin = this->getPosition() -PxVec3(0, 0.2f, 0);
 	//确定role的前方方向
 	PxVec3 forwardDir = PxVec3(this->getFaceDir().x * 1.5f, -3, this->getFaceDir().z * 1.5f);
@@ -601,6 +603,7 @@ void Role::layDownObj() {
 			//cout << role->getFaceDir().x << " " << role->getFaceDir().y << " " << role->getFaceDir().z << endl;
 			createPorp(PxTransform(PxVec3(0, 0, 0)), this->getPosition() + this->getFaceDir() * 2.5, boxHeight, boxHeight, boxHeight);
 			std::cout << "放置道具成功" << std::endl;
+			return true;
 		}
 		else
 		{
@@ -611,6 +614,7 @@ void Role::layDownObj() {
 	{
 		std::cout << "射线没有找到目标" << std::endl;
 	}
+	return false;
 }
 
 

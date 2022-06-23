@@ -26,6 +26,7 @@ void SoundTool::SoundInit() {
 	addSound("openDoorQuickly.wav", false);
 	addSound("gameOver.wav", false);
 	addSound("passLevel.wav", false);
+	addSound("pickProp.wav", false);
 }
 
 //ÃÌº”“Ù–ß
