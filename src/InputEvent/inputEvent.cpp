@@ -96,12 +96,14 @@ void specialKeyPress(GLint key) {
 	switch (key) {
 	case GLUT_KEY_UP: {
 		animation.changeOrientation(PxQuat(0, PxVec3(0, 1, 0)));
+		animation.setAnimation("walk");
 		animation.update(1000 * animationTick);
 		animationTick++;
 		break;
 	}
 	case GLUT_KEY_DOWN: {
 		animation.changeOrientation(PxQuat(PxPi, PxVec3(0, 1, 0)));
+		animation.setAnimation("walk");
 		animation.update(1000 * animationTick);
 		animationTick++;
 		break;
@@ -109,6 +111,7 @@ void specialKeyPress(GLint key) {
 	}case GLUT_KEY_LEFT: {
 		PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
 		animation.changeOrientation(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
+		animation.setAnimation("walk");
 		animation.update(1000 * animationTick);
 		animationTick++;
 		break;
@@ -116,6 +119,7 @@ void specialKeyPress(GLint key) {
 	}case GLUT_KEY_RIGHT: {
 		PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
 		animation.changeOrientation(PxQuat(-PxHalfPi, PxVec3(0, 1, 0)));
+		animation.setAnimation("walk");
 		animation.update(1000 * animationTick);
 		animationTick++;
 		break;
