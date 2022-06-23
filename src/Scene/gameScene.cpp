@@ -742,10 +742,11 @@ PxVec3* createPositions(PxVec3 &p)
 //为每一个粒子生成索引
 PxU32* createParticleIndices(PxU32 num)
 {
-	PxU32 indices[1000];
+	PxU32 indices[5000];
 	for (PxU32 k = 0; k < num; k++)
 	{
 		indices[k] = k;
+		std::cout << indices[k] << std::endl;
 	}
 	return indices;
 }
@@ -766,9 +767,9 @@ void createParticles(PxVec3 v)
 	PxParticleCreationData particleCreationData;
 	particleCreationData.numParticles = 1000;
 	PxVec3* p = createPositions(v);
-	PxU32* indic = createParticleIndices(particleCreationData.numParticles);
+	PxU32* indic = createParticleIndices(maxParticles);
 	particleCreationData.indexBuffer = PxStrideIterator<const PxU32>(indic);
-	//PxU32 numAllocated = indexPool->allocateIndices(particleCreationData.numParticles, PxStrideIterator<PxU32>(particleCreationData.indexBuffer));
+	//PxU32 numAllocated = indexPool->allocateIndices(particleCreationData.numParticles, PxStrideIterator<PxU32>(indic));
 	particleCreationData.positionBuffer = PxStrideIterator<const PxVec3>(p);
 
 	// create particles in *PxParticleSystem* ps
@@ -789,6 +790,7 @@ void createParticles(PxVec3 v)
 			{
 				// access particle position
 				const PxVec3& position = *positionIt;
+				
 				glBegin(GL_POINTS);
 				glVertex3f(position.x, position.y, position.z);
 				glEnd();
