@@ -21,7 +21,7 @@ private:
 
 public:
 	DynamicBall(bool dynamic) {
-		this->radius = 50.0;
+		this->radius = 80.0;
 		this->dynamic = dynamic;
 	};
 	//开启或关闭

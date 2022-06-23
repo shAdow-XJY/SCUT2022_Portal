@@ -1,32 +1,4 @@
-﻿//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions
-// are met:
-//  * Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-//  * Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
-//  * Neither the name of NVIDIA CORPORATION nor the names of its
-//    contributors may be used to endorse or promote products derived
-//    from this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
-// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-// PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
-// Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
-// Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
-#include "Render.h"
+﻿#include "Render.h"
 #include<time.h>
 #include <iostream>
 #include "BMPLoader.h"
@@ -35,6 +7,7 @@
 #include <Block/Block.h>
 #include <Render/DynamicBall.h>
 using namespace std;
+#include "../LoadModel/Model.h"
 using namespace physx;
 
 static float gCylinderData[]={
@@ -318,6 +291,7 @@ void renderGeometry(const PxGeometryHolder& h, string name,bool shadow)
 	}
 }
 
+
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -363,7 +337,10 @@ namespace Snippets
 	glEnable(GL_LIGHT0);
 	/** 启用纹理 */
 	glEnable(GL_TEXTURE_2D);
-	
+	//模型纹理贴图内嵌，开启法向量
+	glEnable(GL_NORMALIZE);
+	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 }
 
 	void renderImGui() {
@@ -423,7 +400,7 @@ namespace Snippets
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(GLdouble(cameraEye.x), GLdouble(cameraEye.y), GLdouble(cameraEye.z), GLdouble(cameraEye.x + cameraDir.x), GLdouble(cameraEye.y + cameraDir.y), GLdouble(cameraEye.z + cameraDir.z), 0.0, 1.0, 0.0);
-
+	//gluLookAt(-0.5, 600.5, 1300.5, -0.5, 200, 1.5, 0, 1, 0);
 	glColor4f(0.4f, 0.4f, 0.4f, 1.0f);
 }
 
@@ -448,11 +425,9 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 		if (nbShapes>0 && !dynamicBall.isInCircle(actorWorldPosition.x, actorWorldPosition.z)) {
 			continue;
 		}
-		
 
 		for(PxU32 j=0;j<nbShapes;j++)
 		{
-
 			const PxMat44 shapePose(PxShapeExt::getGlobalPose(*shapes[j], *actors[i]));
 			PxGeometryHolder h = shapes[j]->getGeometry();
 
@@ -484,7 +459,7 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 			}
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-			if (shadows)/*阴影*/
+			if (shapes[j]->getFlags() & PxShapeFlag::eVISUALIZATION && shadows)/*阴影*/
 			{
 				const PxVec3 shadowDir(0.0f, -0.7071067f, -0.7071067f);
 				const PxReal shadowMat[] = { 1,0,0,0, -shadowDir.x / shadowDir.y,0,-shadowDir.z / shadowDir.y,0, 0,0,1,0, 0,0,0,1 };

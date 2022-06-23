@@ -27,7 +27,6 @@ float dx = 6.0;
 //z_distance z轴方向上可跳跃的间隔长度，可根据跳跃跨度调整
 float dz = 6.0;
 
-
 //迷宫正门可开属性
 vector<vector<int>> frontDoorCanOpen = {
 	{0,1,0,1,1,0,1,1,0},
@@ -814,6 +813,9 @@ void createGameScene(const PxTransform& t) {
 	time_t startTime = time(NULL);
 	PxTransform defaultPose(PxQuat(0, PxVec3(0, 1, 0)));  //刚体默认pose
 
+	//#Checkpoint1
+	totalCheckpoint = 1;
+
 	float r_1_l = 4.0;  //road_1_length 4 100
 	float r_1_w = 15.0;  //road_1_width 8 100
 	float c_1_y = boxHeight;  //the position of the center of road_1
@@ -828,7 +830,7 @@ void createGameScene(const PxTransform& t) {
 	createRoad(t, PxVec3(c_2_x, c_2_y, c_2_z), r_2_l , boxHeight, r_2_w, defaultPose);
 
 	//创建道具类场景
-	createPorp(t, PxVec3(c_2_x, c_2_y + 2.5, c_2_z), boxHeight, boxHeight, boxHeight);
+	createPorp(t, PxVec3(c_2_x, c_2_y + 2.5, c_2_z), boxHeight, 2*boxHeight, boxHeight);
 
 	//stairs
 	float stairsWidth = 4.0;
@@ -845,6 +847,8 @@ void createGameScene(const PxTransform& t) {
 	//最后一节台阶的中心点（center_x-2*stairsLength,centerHeight-2*boxHeight,center_z）
 	std::cout << "摆锤前位置相对场景原点的坐标为:" << center_x - 2 * stairsLength << "," << centerHeight - 2 * boxHeight << "," << center_z << endl;
 	
+	//#Checkpoint2
+	totalCheckpoint++;
 	//悬空路段
 	float roadblock_length = 3.0;
 	float roadblock_width = 4.0;
@@ -877,6 +881,8 @@ void createGameScene(const PxTransform& t) {
 	float lastSeesaw_x = createSeesawLevel(t, seesawpos_v, sx, sy, sz, defaultPose);
 	//最后一块跷板的中心点（lastSeesaw_x,seesawpos_y, seesawpos_z）
 
+	//#Checkpoint3
+	totalCheckpoint++;
 	//连接跷板关卡与迷宫关卡的路段
 	float r_3_l = 5.0;
 	float r_3_w = 50.0;
@@ -896,9 +902,15 @@ void createGameScene(const PxTransform& t) {
 	float mazePos_z = c_3_z + r_3_w + 4 * sideLength;
 	PxVec3 maze_v(mazePos_x, mazePos_y, mazePos_z);
 	//迷宫地板边长
-	float mazeLength = 4 * sideLength+1;
+	//float mazeLength = 4 * sideLength+1;
+	float mazeLength =  2 * sideLength;
 	//创建迷宫地板
-	createRoad(t, maze_v, mazeLength, boxHeight, mazeLength, defaultPose);
+	//createRoad(t, maze_v, mazeLength, boxHeight, mazeLength, defaultPose);
+	createRoad(t, maze_v+PxVec3(mazeLength,0.0f, mazeLength), mazeLength, boxHeight, mazeLength, defaultPose);
+	createRoad(t, maze_v+ PxVec3(mazeLength, 0.0f, -mazeLength), mazeLength, boxHeight, mazeLength, defaultPose);
+	createRoad(t, maze_v+ PxVec3(-mazeLength, 0.0f, mazeLength), mazeLength, boxHeight, mazeLength, defaultPose);
+	createRoad(t, maze_v+ PxVec3(-mazeLength, 0.0f, -mazeLength), mazeLength, boxHeight, mazeLength, defaultPose);
+
 	createMaze(t, maze_v, scale, defaultPose);
 	//迷宫出口坐标
 	float mazeOut_x = mazePos_x - 3.5 * sideLength;
@@ -914,6 +926,8 @@ void createGameScene(const PxTransform& t) {
 	createRoad(t, PxVec3(c_4_x, c_4_y, c_4_z), r_4_l, boxHeight, r_4_w, defaultPose);
 	std::cout << "迷宫出口路段相对场景原点的坐标为:" <<c_4_x << "," << c_4_y << "," << c_4_z << endl;
 
+	//#Checkpoint4
+	totalCheckpoint++;
 	//楼梯1
 	//stairsWidth ： 4.0
 	//stairsLength ： 2.0
@@ -939,6 +953,8 @@ void createGameScene(const PxTransform& t) {
 	createPrismaticRoad(t, PxVec3(c_5_x, c_5_y, c_5_z), roadblock_length, boxHeight, roadblock_width, defaultPose, pr_v0, roadblock_length, boxHeight, roadblock_width, defaultPose, limits0, velocity0);
 	std::cout << "平移路段前相对场景原点的坐标为:" << c_5_x << "," << c_5_y << "," << c_5_z << endl;
 
+	//#Race5
+	totalCheckpoint++;
 	//旋转杆0中心点
 	float rod_length = 25.0;
 	float c_6_x = c_5_x - 45.0;

@@ -4,6 +4,7 @@
 
 #include<windows.h>        /**< 包含windows.h文件 */
 
+
 #define BITMAP_ID 0x4D42    /**< 位图文件的标志 */
 
 /** 位图载入类 */
@@ -20,7 +21,10 @@ public:
     unsigned int ID;                 /**< 生成纹理的ID号 */
     int imageWidth;                  /**< 图像宽度 */
     int imageHeight;                 /**< 图像高度 */
+    int nbChannels;                  /**< 图像颜色通道数 */
     unsigned char* image;            /**< 指向图像数据的指针 */
+    bool LoadOtherPic(const char* filename);
+    unsigned int generateModelID(const char* filename);
 };
 
 #endif //__CBMPLOADER_H__

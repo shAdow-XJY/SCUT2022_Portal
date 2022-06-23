@@ -1,31 +1,3 @@
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions
-// are met:
-//  * Redistributions of source code must retain the above copyright
-//    notice, this list of conditions and the following disclaimer.
-//  * Redistributions in binary form must reproduce the above copyright
-//    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provided with the distribution.
-//  * Neither the name of NVIDIA CORPORATION nor the names of its
-//    contributors may be used to endorse or promote products derived
-//    from this software without specific prior written permission.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
-// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-// PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-// Copyright (c) 2008-2018 NVIDIA Corporation. All rights reserved.
-// Copyright (c) 2004-2008 AGEIA Technologies, Inc. All rights reserved.
-// Copyright (c) 2001-2004 NovodeX AG. All rights reserved.  
 #define RENDER_SNIPPET 1
 #ifdef RENDER_SNIPPET
 #include <vector>
@@ -37,6 +9,7 @@
 #include <Render/RenderBox.h>
 #include <Render/DynamicBall.h>
 #include <Sound/SoundTools.h>
+#include <Animation/Animation.h>
 using namespace physx;
 extern void initPhysics(bool interactive);
 extern void stepPhysics(bool interactive);	
@@ -52,6 +25,7 @@ extern void initGame();
 
 extern Role* role;
 
+extern void renderVisible(const Role& role);
 //角色背后照相机默认位置
 PxVec3 roleBackPosition = PxVec3(0, 0, 0);
 
@@ -66,8 +40,9 @@ RenderBox skyBox;
 extern SoundTool soundtool;
 //动态渲染圈
 PxVec3 roleWorldPosition = PxVec3(0);
+DynamicBall dynamicBall = DynamicBall(true);
 
-DynamicBall dynamicBall = DynamicBall(false);
+extern Animation animation;
 
 namespace
 {
@@ -77,14 +52,12 @@ namespace
 	{
 		sCamera->handleMotion(x, y);
 	}
-
 void keyboardDownCallback(unsigned char key, int x, int y)
 {
 	if(key==27)
 		exit(0);
 	if(!sCamera->handleKey(key, x, y))
 		keyPress(key, sCamera->getTransform());
-
 }
 void keyboardUpCallback(unsigned char key, int x, int y)
 {
@@ -94,12 +67,14 @@ void keyboardUpCallback(unsigned char key, int x, int y)
 void specialKeyDownCallback(GLint key, GLint x, GLint y)
 {
 	role->move(key,true,sCamera->isFree());
+	
 	specialKeyPress(key);
 }
 
 void specialKeyUpCallback(GLint key, GLint x, GLint y)
 {
-	role->move(key,false,sCamera->isFree());
+	role->move(key, false, sCamera->isFree());
+
 	sCamera->calDirMoving(key);
 	specialKeyRelease(key);
 }
@@ -115,14 +90,40 @@ void idleCallback()
 	glutPostRedisplay();
 }
 
+int timeAlways = 0;
+int timeOnce = 0;
+void animationRenderCallback() {
+	animation.display();
 
+	string currentAnimation = animation.getCurrentAnimation();
+
+	if ((currentAnimation == "idle")) 
+	{
+		animation.update(0.5);
+		timeAlways++;
+	}
+	/*else if (currentAnimation == "walk")
+	{
+		animation.update(1000 * timeAlways);
+		timeAlways++;
+	}*/
+	else if(currentAnimation == "jump")
+	{
+		if (animation.update(2.0,true)) {
+			animation.setAnimation("idle");
+			timeOnce = 0;
+		}
+		timeOnce++;
+	}
+	
+}
 
 void renderCallback()
 {
 	if (soundtool.getSoundResult()!= FMOD_OK) {
 		soundtool.SoundUpdate();
 	}
-
+	
 	stepPhysics(true);
 
 		
@@ -142,31 +143,38 @@ void renderCallback()
 			dir = role->getPosition() - roleBackPosition;
 			sCamera->targetDir = dir;
 			sCamera->updateDir(role->getPosition());
-			
+			//非自由视角动态渲染圈跟人
+			dynamicBall.setCircleCenterPosition_XZ(role->getRoleWorldPosition().x, role->getRoleWorldPosition().z);
 		}
 		else
 		{
 			dir = role->getPosition() - roleBackPosition;
 			roleBackPosition = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getDir() * -50);
+			//自由视角动态渲染圈跟摄像机
+			dynamicBall.setCircleCenterPosition_XZ(sCamera->getEye().x, sCamera->getEye().z);
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
-
-		/*if (sCamera->isFree())
-		{
-			role->move();
-		}*/
+		
 		if (role) {
+			//是否重生传送
+			role->protal();
+			//是否跳跃
+			//是否检测底部是否接触物体
+			role->simulationGravity();
 			role->roleJump();
 			role->roleFall();
-			role->roleSlide();	
+			//是否发生滑动
+			role->roleSlide();
 			role->rayAround();
-			role->simulationGravity();
+			//是否进行物理刚体模拟
 			role->stimulate();
-			
+			//动态刚体渲染
 			roleWorldPosition = role->getRoleWorldPosition();
 			dynamicBall.setCircleCenterPosition_XZ(roleWorldPosition.x, roleWorldPosition.z);
+			role->move();
+			//更新得分
+			role->updateScore();
 		}
-
 		PxScene* scene;
 		PxGetPhysics().getScenes(&scene,1);
 		PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
@@ -176,10 +184,20 @@ void renderCallback()
 			scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
 			Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
 		}
+		
+		// 渲染模型
+		if (role->isStaticAttached()) {
+			renderVisible(*role);
+		}
+		
+
 		/** 绘制天空 */
 		skyBox.CreateSkyBox(-2000, -200, -2000, 1.0, 0.5, 1.0);
+		
+		animationRenderCallback();
 
 		Snippets::finishRender();
+		
 		calculateElapsedClocksFromLastFrame();
 	}
 
@@ -188,7 +206,6 @@ void exitCallback(void)
 		delete sCamera;
 		cleanupPhysics(true);
 	}
-
 }
 
 /**
@@ -216,7 +233,7 @@ void renderLoop()
 
 	/** 初始化天空 */
 	skyBox.Init(true);
-
+	animation.init();
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();

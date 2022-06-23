@@ -2,6 +2,126 @@
 #include <IL/il.h>
 #include <iostream>
 #include <glut.h>
+#include <LoadModel/stb_image.h>
+
+extern map<string, unsigned int> textureMap;
+
+//load FBX
+map<int, int> getTextureMap(aiMaterial* mat, const aiScene* scene)
+{
+	map<int, int> texMap;
+	vector<Texture> resultVector = loadMaterialTextures(mat, scene);
+	int a = 0;
+	for (auto text : resultVector) {
+		texMap.insert(pair<int, int>(a,text.m_texID));
+		a++;
+	}
+	return texMap;
+}
+
+vector<Texture> loadMaterialTextures(aiMaterial* mat,const aiScene* scene)
+{
+	vector<Texture> textures;
+
+	vector<Texture> textures_loaded;
+	for (unsigned int i = 0; i < mat->GetTextureCount(aiTextureType_DIFFUSE); i++)
+	{
+		aiString imagePath;
+		mat->GetTexture(aiTextureType_DIFFUSE, i, &imagePath);
+		// check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
+		bool skip = false;
+		for (unsigned int j = 0; j < textures_loaded.size(); j++)
+		{
+			if (std::strcmp(textures_loaded[j].filename.c_str(), imagePath.C_Str()) == 0)
+			{
+				textures.push_back(textures_loaded[j]);
+				skip = true; // a texture with the same filepath has already been loaded, continue to next one. (optimization)
+				break;
+			}
+		}
+		if (!skip)
+		{
+			// if texture hasn't been loaded already, load it
+			Texture texture;
+
+			//auto filePath = directory + str.C_Str() ;
+
+			//利用此方法判断是否是FBX模型内嵌贴图
+			auto tex = scene->GetEmbeddedTexture(imagePath.C_Str());
+
+			if (tex != nullptr)
+			{
+				//有内嵌贴图
+				texture.m_texID = TextureFrom_FBX_EmbeddedTexture(tex);
+			}
+
+			//texture.type = typeName;
+			texture.filename = imagePath.C_Str();
+			textures.push_back(texture);
+			textures_loaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
+		}
+	}
+	return textures;
+};
+
+unsigned int TextureFrom_FBX_EmbeddedTexture(const aiTexture* aiTex)
+{
+	int width, height, channels;
+	//unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+	unsigned char* data = nullptr;
+
+	//FBX模型用stbi_load_form_memory加载
+	if (aiTex->mHeight == 0)
+	{
+		data = stbi_load_from_memory(reinterpret_cast<unsigned char*>(aiTex->pcData), aiTex->mWidth, &width, &height, &channels, 0);
+	}
+	else
+	{
+		data = stbi_load_from_memory(reinterpret_cast<unsigned char*>(aiTex->pcData), aiTex->mWidth * aiTex->mHeight, &width, &height, &channels, 0);
+	}
+
+	return GenerateTex(data, width, height, channels);
+}
+
+unsigned int GenerateTex(unsigned char* data, int width, int height, int nrComponents)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+
+	if (data)
+	{
+		GLenum format;
+		if (nrComponents == 1)
+			format = GL_RED;
+		else if (nrComponents == 3)
+			format = GL_RGB;
+		else if (nrComponents == 4)
+			format = GL_RGBA;
+
+		glBindTexture(GL_TEXTURE_2D, textureID);
+
+		//伽马矫正需要设置内部格式（第三个参数）为GL_SRGB或者GL_SRGB_ALPHA，这里未设置，可参考伽马矫正那一章节
+		//https://learnopengl-cn.github.io/05%20Advanced%20Lighting/02%20Gamma%20Correction/
+		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+		//glGenerateMipmap(GL_TEXTURE_2D);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		stbi_image_free(data);
+	}
+	else
+	{
+		std::cout << "Texture failed to load at path: " << std::endl;
+		stbi_image_free(data);
+	}
+
+	return textureID;
+}
+
+
 
 // Find the keyframes that the animation is currently between, and produce an interpolated rotation.
 aiMatrix4x4 get_interpolated_rotation(double tick, aiNodeAnim *node)
@@ -62,81 +182,18 @@ aiMatrix4x4 get_interpolated_position(double tick, aiNodeAnim *node)
 	return positionMatrix;
 }
 
-void loadGLTextures(const aiScene *scene, std::map<int, int> &texIdMap)
-{
-
-	/* initialization of DevIL */
-	ilInit();
-	if (scene->HasTextures())
-	{
-		std::cout << "Support for meshes with embedded textures is not implemented" << endl;
-		exit(1);
-	}
-
-	/* scan scene's materials for textures */
-	/* Simplified version: Retrieves only the first texture with index 0 if present*/
-	for (unsigned int m = 0; m < scene->mNumMaterials; ++m)
-	{
-		aiString path; // filename
-
-		if (scene->mMaterials[m]->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS)
-		{
-			std::string s(path.C_Str());
-			std::string delimiter = "/";
-			std::string token = s.substr(s.rfind(delimiter) + 1, s.length());
-
-			std::string s2("models/Model3_X/");
-			s2.append(token);
-
-			glEnable(GL_TEXTURE_2D);
-			ILuint imageId;
-			GLuint texId;
-			ilGenImages(1, &imageId);
-			glGenTextures(1, &texId);
-			texIdMap[m] = texId;  //store tex ID against material id in a hash map
-			ilBindImage(imageId); /* Binding of DevIL image name */
-			ilEnable(IL_ORIGIN_SET);
-			ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
-			if (ilLoadImage((ILstring)s2.c_str())) //if success
-			{
-				/* Convert image to RGBA */
-				ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
-
-				/* Create and load textures to OpenGL */
-				glBindTexture(GL_TEXTURE_2D, texId);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, ilGetInteger(IL_IMAGE_WIDTH),
-							 ilGetInteger(IL_IMAGE_HEIGHT), 0, GL_RGBA, GL_UNSIGNED_BYTE,
-							 ilGetData());
-				glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-				cout << "Texture:" << s2 << " successfully loaded." << endl;
-				glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-				glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-				glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
-				glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
-			}
-			else
-			{
-				cout << "Couldn't load Image:\n"
-					 << s2 << endl;
-			}
-		}
-	} //loop for material
-}
-
 // ------A recursive function to traverse scene graph and render each mesh----------
-void render(const aiScene *sc, const aiNode *nd, std::map<int, int> texMap)
+void render(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap)
 {
 	aiMatrix4x4 m = nd->mTransformation;
-	aiMesh *mesh;
-	aiFace *face;
+	aiMesh* mesh;
+	aiFace* face;
 	//GLuint texId;
 	int meshIndex; //, materialIndex;
 
 	aiTransposeMatrix4(&m); //Convert to column-major order
 	glPushMatrix();
-	glMultMatrixf((float *)&m); //Multiply by the transformation matrix for this node
+	glMultMatrixf((float*)&m); //Multiply by the transformation matrix for this node
 
 	// Draw all meshes assigned to this node
 	for (unsigned int n = 0; n < nd->mNumMeshes; n++)
@@ -158,7 +215,7 @@ void render(const aiScene *sc, const aiNode *nd, std::map<int, int> texMap)
 		}
 		else
 		{
-			float black[3] = {0, 0, 0};
+			float black[3] = { 0, 0, 0 };
 			glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, black);
 			glDisable(GL_TEXTURE_2D);
@@ -199,7 +256,7 @@ void render(const aiScene *sc, const aiNode *nd, std::map<int, int> texMap)
 				int vertexIndex = face->mIndices[i];
 
 				if (mesh->HasVertexColors(0))
-					glColor4fv((GLfloat *)&mesh->mColors[0][vertexIndex]);
+					glColor4fv((GLfloat*)&mesh->mColors[0][vertexIndex]);
 
 				if (mesh->HasNormals())
 					glNormal3fv(&mesh->mNormals[vertexIndex].x);
@@ -220,5 +277,64 @@ void render(const aiScene *sc, const aiNode *nd, std::map<int, int> texMap)
 	for (unsigned int i = 0; i < nd->mNumChildren; i++)
 		render(sc, nd->mChildren[i], texMap);
 
+	glPopMatrix();
+}
+// ------A non-recursive function to traverse scene graph and render each mesh----------
+void renderDisplay(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap, PxMat44 transform)
+{
+	// Draw all children
+	glColor4f(1, 1, 1, 1);
+	glEnable(GL_COLOR_MATERIAL);
+	//glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
+	for (unsigned int i = 0; i < nd->mNumChildren; i++)
+		tempDisplay(sc, nd->mChildren[i], texMap,transform);
+	
+}
+
+void tempDisplay(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap,PxMat44 transform)
+{
+	aiMatrix4x4 m = nd->mTransformation;
+	aiMesh* mesh;
+	aiFace* face;
+	//GLuint texId;
+	int meshIndex;// , materialIndex;
+
+	aiTransposeMatrix4(&m); //Convert to column-major order
+	glPushMatrix();
+	glMultMatrixf(reinterpret_cast<const float*>(&transform));
+	glMultMatrixf((float*)&m); //Multiply by the transformation matrix for this node
+	glScalef(0.06f, 0.06f, 0.06f);
+	glTranslatef(0.0f,0.5f,0.0f);
+	// Draw all meshes assigned to this node
+	glBegin(GL_TRIANGLES);
+	for (unsigned int n = 0; n < nd->mNumMeshes; n++)
+	{
+		meshIndex = nd->mMeshes[n];	//Get the mesh indices from the current node
+		mesh = sc->mMeshes[meshIndex]; //Using mesh index, get the mesh object
+
+		for (unsigned int k = 0; k < mesh->mNumFaces; k++)
+		{
+			face = &mesh->mFaces[k];
+			for (unsigned int i = 0; i < face->mNumIndices; i++)
+			{
+				int vertexIndex = face->mIndices[i];
+
+				if (mesh->HasNormals())
+				{
+					//cout << "if (mesh->HasNormals())" << endl;
+					glNormal3fv(&mesh->mNormals[vertexIndex].x);
+				}
+				
+				if (mesh->HasTextureCoords(0))
+				{
+					//cout << "if (mesh->HasTextureCoords(0))" << endl;
+					glTexCoord2f(mesh->mTextureCoords[0][vertexIndex].x, mesh->mTextureCoords[0][vertexIndex].y);
+				}
+				glVertex3fv(&mesh->mVertices[vertexIndex].x);
+			}
+		}
+
+	}
+	glEnd();
 	glPopMatrix();
 }
