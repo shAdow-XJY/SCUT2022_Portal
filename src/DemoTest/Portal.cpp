@@ -127,8 +127,8 @@ void initGame() {
 	//role->setFootPosition(t.transform(PxVec3(3, 45, 416.8)));
 	//旋转杆关卡角落位置
 	//role->setFootPosition(t.transform(PxVec3(-17, 45, 406.8)));
-	//role->attachModel("../../models/paimon/paimon.obj");
-	role->attachModel("../../models/human.obj");
+	role->attachModel("../../models/paimon/paimon.obj");
+	//role->attachModel("../../models/human.obj");
 	role->fall();
 
 }
@@ -160,7 +160,7 @@ void initPhysics(bool interactive)
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
 	gScene = gPhysics->createScene(sceneDesc);
 
-
+	
 
 	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
 	if (pvdClient)
@@ -229,7 +229,6 @@ PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir)
 	//std::cout << "rayHit is not hit" << std::endl;
 	return NULL;
 }
-
 
 
 //（在render中调用）

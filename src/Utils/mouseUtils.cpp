@@ -1,6 +1,8 @@
 ﻿#include "PxPhysicsAPI.h"
 #include "../Render/Render.h"
 #include <time.h>
+#include"../LoadModel/Model.h"
+#include"../Role/Role.h"
 using namespace physx;
 
 /**
@@ -42,4 +44,68 @@ void calculateElapsedClocksFromLastFrame() {
 	//deltaTime = static_cast<double>((currClock - lastClock) / CLOCKS_PER_SEC);
 	deltaClock = currClock - lastClock;
 	lastClock = currClock;
+}
+
+void renderVisible(const Role& role) {
+	const PxU32 triangleCount = role.getModel().getNbTriangles();
+	//const void* indexBuffer = mesh.getTriangles();
+
+	//const PxVec3* vertexBuffer = mesh.getVertices();
+
+	/*const PxU32* intIndices = reinterpret_cast<const PxU32*>(indexBuffer);
+	const PxU16* shortIndices = reinterpret_cast<const PxU16*>(indexBuffer);
+	PxU32 numTotalTriangles = 0;*/
+	size_t indices = 0;
+	//for (PxU32 i = 0; i < triangleCount; ++i)
+	//{
+	//	PxVec3 triVert[3];
+
+	//	triVert[0] = m.m_vertices[m.m_indices[indices++]];
+	//	triVert[1] = m.m_vertices[m.m_indices[indices++]];
+	//	triVert[2] = m.m_vertices[m.m_indices[indices++]];
+	//	
+
+	//	//PxVec3 fnormal = (triVert[1] - triVert[0]).cross(triVert[2] - triVert[0]);
+	//	//fnormal.normalize();
+
+	//	if (numTotalTriangles * 6 < MAX_NUM_MESH_VEC3S)
+	//	{
+	//		gVertexBuffer[numTotalTriangles * 6 + 0] = fnormal;
+	//		gVertexBuffer[numTotalTriangles * 6 + 1] = triVert[0];
+	//		gVertexBuffer[numTotalTriangles * 6 + 2] = fnormal;
+	//		gVertexBuffer[numTotalTriangles * 6 + 3] = triVert[1];
+	//		gVertexBuffer[numTotalTriangles * 6 + 4] = fnormal;
+	//		gVertexBuffer[numTotalTriangles * 6 + 5] = triVert[2];
+	//		numTotalTriangles++;
+	//	}
+	//}
+	glPushMatrix();
+
+	float identity[] = {
+		1.0f,0.0f,0.0f,0.0f,
+		0.0f,1.0f,0.0f,0.0f,
+		0.0f,0.0f,1.0f,0.0f,
+		0.0f,0.0f,0.0f,1.0f
+	};
+	PxMat44 modelMatrix(PxShapeExt::getGlobalPose(*role.getShape(), *role.getActor()));
+	PxMat44 rotate(PxQuat(-PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
+	glMultMatrixf(reinterpret_cast<const float*>(&modelMatrix));
+	glMultMatrixf(reinterpret_cast<const float*>(&rotate));
+	glGetFloatv(GL_MODELVIEW_MATRIX, identity);
+	
+	glGetFloatv(GL_MODELVIEW_MATRIX, identity);
+	glColor4f(0.0f, 0.5f, 0.8f, 1.0f);
+
+	//glScalef(scale.x, scale.y, scale.z);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glNormalPointer(GL_FLOAT, 0, &role.getModel().m_normals[0]);
+	glVertexPointer(3, GL_FLOAT, 0, &role.getModel().m_vertices[0]);
+	glTexCoordPointer(2, GL_FLOAT, 0, &role.getModel().m_texCoords[0]);
+	glDrawElements(GL_TRIANGLES, role.getModel().m_vertices.size(), GL_UNSIGNED_INT, &role.getModel().m_indices[0]);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glPopMatrix();
 }

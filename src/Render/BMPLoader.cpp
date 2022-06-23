@@ -2,6 +2,10 @@
 #include <cstdio>
 #include <iostream>
 #include <glut.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include<../src/LoadModel/stb_image.h>
+
 #define GL_CLAMP_TO_EDGE    0x812F
 /** 构造函数 */
 CBMPLoader::CBMPLoader()
@@ -65,7 +69,7 @@ bool CBMPLoader::LoadBitmap(const char* file)
     fseek(pFile, header.bfOffBits, SEEK_SET);
 
     /** 分配内存 */
-    image = new unsigned char[bitmapInfoHeader.biSizeImage];
+    image = new unsigned char[bitmapInfoHeader.biSizeImage * 2];
 
     /** 检查内存分配是否成功 */
     if (!image)                        /**< 若分配内存失败则返回 */
@@ -97,6 +101,7 @@ unsigned int CBMPLoader::generateID(const char* file) {
     {
         std::cout << "error load image in Init" << std::endl;
     }
+    std::cout << file << std::endl;
 
     glGenTextures(1, &ID);                        /**< 生成一个纹理对象名称 */
 
@@ -112,11 +117,13 @@ unsigned int CBMPLoader::generateID(const char* file) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     /** 创建纹理 */
+    //glTexImage2D(GL_TEXTURE_2D, 0, 3, imageWidth, imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+
     gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, imageWidth,
         imageHeight, GL_RGB, GL_UNSIGNED_BYTE,
         image);
 
-    std::cout << "sucess" << std::endl;
+    //std::cout << "sucess" << std::endl;
     return ID;
 }
 
@@ -127,6 +134,46 @@ void CBMPLoader::FreeImage()
     if (image)
     {
         delete[] image;
+        //stbi_image_free(image);
         image = 0;
     }
+}
+
+
+bool CBMPLoader::LoadOtherPic(const char* filename)
+{
+    image = stbi_load(filename, &imageWidth, &imageHeight, &nbChannels, 0);
+    if (image != nullptr) return true;
+    return false;
+}
+
+
+unsigned int CBMPLoader::generateModelID(const char* filename)
+{
+    if (!LoadOtherPic(filename)) {
+        std::cout << "error load image in Init" << std::endl;
+    }
+    std::cout << "Imported: " << filename << std::endl;
+
+    unsigned int ID;
+    glGenTextures(1, &ID);
+    glBindTexture(GL_TEXTURE_2D, ID); 
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    if (this->nbChannels == 3) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imageWidth, imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    }
+    else {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+    }
+    
+    /*gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, imageWidth,
+        imageHeight, GL_RGB, GL_UNSIGNED_BYTE,
+        image);*/
+    return ID;
 }

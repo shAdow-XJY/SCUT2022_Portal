@@ -35,6 +35,7 @@
 #include <Block/Block.h>
 #include <Render/DynamicBall.h>
 using namespace std;
+#include "../LoadModel/Model.h"
 using namespace physx;
 
 static float gCylinderData[]={
@@ -318,6 +319,7 @@ void renderGeometry(const PxGeometryHolder& h, string name,bool shadow)
 	}
 }
 
+
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
@@ -363,7 +365,10 @@ namespace Snippets
 	glEnable(GL_LIGHT0);
 	/** 启用纹理 */
 	glEnable(GL_TEXTURE_2D);
-	
+	//模型纹理贴图内嵌，开启法向量
+	glEnable(GL_NORMALIZE);
+	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 }
 
 	void renderImGui() {
@@ -423,7 +428,7 @@ namespace Snippets
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(GLdouble(cameraEye.x), GLdouble(cameraEye.y), GLdouble(cameraEye.z), GLdouble(cameraEye.x + cameraDir.x), GLdouble(cameraEye.y + cameraDir.y), GLdouble(cameraEye.z + cameraDir.z), 0.0, 1.0, 0.0);
-
+	//gluLookAt(-0.5, 600.5, 1300.5, -0.5, 200, 1.5, 0, 1, 0);
 	glColor4f(0.4f, 0.4f, 0.4f, 1.0f);
 }
 

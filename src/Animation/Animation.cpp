@@ -4,10 +4,10 @@
 void Animation::init()
 {
     //"D:/Microsoft Visual Studio Projects/PhysX-Tutorial-master/PhysX_3.4/SCUT2022_Portal/src/Animation/models/Model2_FBX/mannequin.fbx"
-    scene = aiImportFile("D:/Microsoft Visual Studio Projects/PhysX-Tutorial-master/PhysX_3.4/SCUT2022_Portal/src/Animation/models/Model2_FBX/mannequin.fbx", aiProcessPreset_TargetRealtime_MaxQuality);
-    animations.push_back(aiImportFile("D:/Microsoft Visual Studio Projects/PhysX-Tutorial-master/PhysX_3.4/SCUT2022_Portal/src/Animation/models/Model2_FBX/walk.fbx", aiProcessPreset_TargetRealtime_MaxQuality));
-    animations.push_back(aiImportFile("D:/Microsoft Visual Studio Projects/PhysX-Tutorial-master/PhysX_3.4/SCUT2022_Portal/src/Animation/models/Model2_FBX/jump.fbx", aiProcessPreset_TargetRealtime_MaxQuality));
-    animations.push_back(aiImportFile("D:/Microsoft Visual Studio Projects/PhysX-Tutorial-master/PhysX_3.4/SCUT2022_Portal/src/Animation/models/Model2_FBX/run.fbx", aiProcessPreset_TargetRealtime_MaxQuality));
+    scene = aiImportFile("../../src/Animation/models/Model2_FBX/mannequin.fbx", aiProcessPreset_TargetRealtime_MaxQuality);
+    animations.push_back(aiImportFile("../../src/Animation/models/Model2_FBX/walk.fbx", aiProcessPreset_TargetRealtime_MaxQuality));
+    animations.push_back(aiImportFile("../../src/Animation/models/Model2_FBX/jump.fbx", aiProcessPreset_TargetRealtime_MaxQuality));
+    animations.push_back(aiImportFile("../../src/Animation/models/Model2_FBX/run.fbx", aiProcessPreset_TargetRealtime_MaxQuality));
 
     if (scene == nullptr)
     {
@@ -18,11 +18,11 @@ void Animation::init()
         cout << "load fbx success" << endl;
     }
 
-    initial_state = std::vector<Mesh>();
+    initial_state = std::vector<FBXMesh>();
     // save initial state of the mesh so that mesh transformations can be applied.
     for (int i = 0; i < scene->mNumMeshes; i++)
     {
-        Mesh newMesh = Mesh(std::vector<aiVector3D>(), std::vector<aiVector3D>());
+        FBXMesh newMesh = FBXMesh(std::vector<aiVector3D>(), std::vector<aiVector3D>());
         aiMesh* mesh = scene->mMeshes[i];
         for (int j = 0; j < mesh->mNumVertices; j++)
         {
@@ -94,26 +94,17 @@ void Animation::update(int millisSinceStart)
 
 void Animation::display()
 {
-    float pos[4] = { -400, 1500, 1300, 1 };
-    glLightfv(GL_LIGHT0, GL_POSITION, pos);
-    glColor3f(1.0, 1.0, 1.0);
+    //float pos[4] = { -400, 1500, 1300, 1 };
+    //glLightfv(GL_LIGHT0, GL_POSITION, pos);
+    /*glColor3f(1.0, 1.0, 1.0);
     glEnable(GL_COLOR_MATERIAL);
-    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);*/
 
     aiNode* root = this->scene->mRootNode;
+    //gluLookAt(-0.5, 600.5, 1300.5, -0.5, 200, 1.5, 0, 1, 0);
+    //render(this->scene, this->scene->mRootNode, std::map<int, int>());
+    renderDisplay(this->scene, this->scene->mRootNode, std::map<int, int>());
 
-    gluLookAt(-0.5, 600.5, 1300.5, -0.5, 200, 1.5, 0, 1, 0);
-
-    render(this->scene, this->scene->mRootNode, std::map<int, int>());
-
-    glPushMatrix();
-    glEnable(GL_COLOR_MATERIAL);
-    glColor3f(0.1, 0.5, 0.1);
-    glScalef(1000, 0.01, 1000);
-    glutSolidCube(1);
-    glDisable(GL_COLOR_MATERIAL);
-
-    glPopMatrix();
 }
 
 void Animation::keyboard(unsigned char key)

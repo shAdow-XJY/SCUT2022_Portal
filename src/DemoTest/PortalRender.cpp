@@ -37,6 +37,7 @@
 #include <Render/RenderBox.h>
 #include <Render/DynamicBall.h>
 #include <Sound/SoundTools.h>
+#include <Animation/Animation.h>
 using namespace physx;
 extern void initPhysics(bool interactive);
 extern void stepPhysics(bool interactive);	
@@ -52,6 +53,7 @@ extern void initGame();
 
 extern Role* role;
 
+extern void renderVisible(const Role& role);
 //角色背后照相机默认位置
 PxVec3 roleBackPosition = PxVec3(0, 0, 0);
 
@@ -66,9 +68,9 @@ RenderBox skyBox;
 extern SoundTool soundtool;
 //动态渲染圈
 PxVec3 roleWorldPosition = PxVec3(0);
-
 DynamicBall dynamicBall = DynamicBall(false);
 
+Animation animation;
 namespace
 {
 	Snippets::Camera*	sCamera;
@@ -77,7 +79,7 @@ namespace
 	{
 		sCamera->handleMotion(x, y);
 	}
-
+	int animationTick = 0;
 void keyboardDownCallback(unsigned char key, int x, int y)
 {
 	if(key==27)
@@ -85,6 +87,8 @@ void keyboardDownCallback(unsigned char key, int x, int y)
 	if(!sCamera->handleKey(key, x, y))
 		keyPress(key, sCamera->getTransform());
 
+	animation.update(1000*animationTick);
+	animationTick++;
 }
 void keyboardUpCallback(unsigned char key, int x, int y)
 {
@@ -94,12 +98,14 @@ void keyboardUpCallback(unsigned char key, int x, int y)
 void specialKeyDownCallback(GLint key, GLint x, GLint y)
 {
 	role->move(key,true,sCamera->isFree());
+	
 	specialKeyPress(key);
 }
 
 void specialKeyUpCallback(GLint key, GLint x, GLint y)
 {
-	role->move(key,false,sCamera->isFree());
+	role->move(key, false, sCamera->isFree());
+
 	sCamera->calDirMoving(key);
 	specialKeyRelease(key);
 }
@@ -122,7 +128,7 @@ void renderCallback()
 	if (soundtool.getSoundResult()!= FMOD_OK) {
 		soundtool.SoundUpdate();
 	}
-
+	
 	stepPhysics(true);
 
 		
@@ -150,11 +156,7 @@ void renderCallback()
 			roleBackPosition = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getDir() * -50);
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
-
-		/*if (sCamera->isFree())
-		{
-			role->move();
-		}*/
+		animation.display();
 		if (role) {
 			//是否重生传送
 			role->protal();
@@ -183,10 +185,17 @@ void renderCallback()
 			scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
 			Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
 		}
+		
+		// 渲染模型
+		if (role) {
+			renderVisible(*role);
+		}
+		
 		/** 绘制天空 */
 		skyBox.CreateSkyBox(-2000, -200, -2000, 1.0, 0.5, 1.0);
-
+		
 		Snippets::finishRender();
+		
 		calculateElapsedClocksFromLastFrame();
 	}
 
@@ -223,7 +232,7 @@ void renderLoop()
 
 	/** 初始化天空 */
 	skyBox.Init(true);
-
+	animation.init();
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();

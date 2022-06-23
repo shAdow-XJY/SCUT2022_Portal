@@ -58,6 +58,7 @@ private:
 	float nowJumpHeight = 0.0;
 	float wantJumpHeight = primaryJumpHeight;
 	float maxJumpHeight = 10.0;
+	float gravityAcceleration = 0.0005f;
 
 	/// <summary>
 	/// 状态量
@@ -65,6 +66,7 @@ private:
 	bool isAutoMoving = false;
 	bool canMove = true;
 	bool isJump = false;
+	bool isHanging = false;
 	bool isFall = false;
 	bool isAlive = true;
 	bool equiped = false;
@@ -97,13 +99,24 @@ public:
 	};
 
 	bool attachModel(const char*);
+	Model& getModel() const{
+		return *this->model;
+	}
+	PxShape* getShape() const {
+		PxShape* shapePtr = nullptr;
+		this->roleController->getActor()->getShapes(&shapePtr, 1);
+		return shapePtr;
+	}
+	PxRigidActor* getActor() const {
+		return this->role;
+	}
 	bool getAliveStatus();
 	bool gameOver();
 
 	//角色位置信息
 	void setFootPosition(PxVec3 position);
 	PxVec3 getFootPosition();
-	PxVec3 getPosition();
+	PxVec3 getPosition() const;
 	void updatePosition();
 	PxVec3 getRoleWorldPosition();
 

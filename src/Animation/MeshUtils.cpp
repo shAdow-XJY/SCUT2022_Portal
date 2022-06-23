@@ -139,6 +139,7 @@ void render(const aiScene *sc, const aiNode *nd, std::map<int, int> texMap)
 	glMultMatrixf((float *)&m); //Multiply by the transformation matrix for this node
 
 	// Draw all meshes assigned to this node
+	glBegin(GL_TRIANGLES);
 	for (unsigned int n = 0; n < nd->mNumMeshes; n++)
 	{
 		meshIndex = nd->mMeshes[n];	//Get the mesh indices from the current node
@@ -171,29 +172,10 @@ void render(const aiScene *sc, const aiNode *nd, std::map<int, int> texMap)
 		}
 
 		//Get the polygons from each mesh and draw them
+		
 		for (unsigned int k = 0; k < mesh->mNumFaces; k++)
 		{
 			face = &mesh->mFaces[k];
-			GLenum face_mode;
-
-			switch (face->mNumIndices)
-			{
-			case 1:
-				face_mode = GL_POINTS;
-				break;
-			case 2:
-				face_mode = GL_LINES;
-				break;
-			case 3:
-				face_mode = GL_TRIANGLES;
-				break;
-			default:
-				face_mode = GL_POLYGON;
-				break;
-			}
-
-			glBegin(face_mode);
-
 			for (unsigned int i = 0; i < face->mNumIndices; i++)
 			{
 				int vertexIndex = face->mIndices[i];
@@ -208,17 +190,101 @@ void render(const aiScene *sc, const aiNode *nd, std::map<int, int> texMap)
 				{
 					glTexCoord2f(mesh->mTextureCoords[0][vertexIndex].x, mesh->mTextureCoords[0][vertexIndex].y);
 				}
-
 				glVertex3fv(&mesh->mVertices[vertexIndex].x);
 			}
-
-			glEnd();
 		}
+		
 	}
-
+	glEnd();
 	// Draw all children
 	for (unsigned int i = 0; i < nd->mNumChildren; i++)
 		render(sc, nd->mChildren[i], texMap);
 
+	glPopMatrix();
+}
+
+// ------A non-recursive function to traverse scene graph and render each mesh----------
+void renderDisplay(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap)
+{
+	glColor3f(1.0, 1.0, 1.0);
+	glEnable(GL_COLOR_MATERIAL);
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+
+	// Draw all children
+	for (unsigned int i = 0; i < nd->mNumChildren; i++)
+		tempDisplay(sc, nd->mChildren[i], texMap);
+	
+}
+
+void tempDisplay(const aiScene* sc, const aiNode* nd, std::map<int, int> texMap)
+{
+	aiMatrix4x4 m = nd->mTransformation;
+	aiMesh* mesh;
+	aiFace* face;
+	//GLuint texId;
+	int meshIndex; //, materialIndex;
+
+	aiTransposeMatrix4(&m); //Convert to column-major order
+	glPushMatrix();
+	glMultMatrixf((float*)&m); //Multiply by the transformation matrix for this node
+
+	// Draw all meshes assigned to this node
+	glBegin(GL_TRIANGLES);
+	for (unsigned int n = 0; n < nd->mNumMeshes; n++)
+	{
+		meshIndex = nd->mMeshes[n];	//Get the mesh indices from the current node
+		mesh = sc->mMeshes[meshIndex]; //Using mesh index, get the mesh object
+
+		apply_material(sc->mMaterials[mesh->mMaterialIndex]); //Change opengl state to that material's properties
+
+		if (mesh->HasNormals())
+			glEnable(GL_LIGHTING);
+		else
+			glDisable(GL_LIGHTING);
+
+		if (mesh->HasTextureCoords(0))
+		{
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, texMap[meshIndex]);
+		}
+		else
+		{
+			float black[3] = { 0, 0, 0 };
+			glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, black);
+			glDisable(GL_TEXTURE_2D);
+		}
+
+		if (mesh->HasVertexColors(0))
+		{
+			glEnable(GL_COLOR_MATERIAL);
+			glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+		}
+
+		//Get the polygons from each mesh and draw them
+
+		for (unsigned int k = 0; k < mesh->mNumFaces; k++)
+		{
+			face = &mesh->mFaces[k];
+			for (unsigned int i = 0; i < face->mNumIndices; i++)
+			{
+				int vertexIndex = face->mIndices[i];
+
+				if (mesh->HasVertexColors(0))
+					glColor4fv((GLfloat*)&mesh->mColors[0][vertexIndex]);
+
+				if (mesh->HasNormals())
+					glNormal3fv(&mesh->mNormals[vertexIndex].x);
+
+				if (mesh->HasTextureCoords(0))
+				{
+					glTexCoord2f(mesh->mTextureCoords[0][vertexIndex].x, mesh->mTextureCoords[0][vertexIndex].y);
+				}
+				glVertex3fv(&mesh->mVertices[vertexIndex].x);
+			}
+		}
+
+	}
+	glEnd();
 	glPopMatrix();
 }
