@@ -43,27 +43,26 @@ public:
 		//if (actor.getName() != "Ground") {
 		//	this->role->stopMoving();
 		//}
-		string name(actor.getName());
-		if (name == "Door") {
-			Door* door = (Door*)actor.userData;
-			float scale = 9000.0f;
-			door->addPForce(role->getFaceDir() * scale);
+		if (actor.getName()) {
+			string name(actor.getName());
+			if (name == "Door") {
+				Door* door = (Door*)actor.userData;
+				float scale = 9000.0f;
+				door->addPForce(role->getFaceDir() * scale);
 
-			if (door->canOpen()) {
-				if (!door->getDoorStauts()) {
-					animation.setAnimation("openDoor");
-					soundtool.playSound("openDoorSlowly.wav", true);
-					door->setDoorStatus(true);
+				if (door->canOpen()) {
+					if (!door->getDoorStauts()) {
+						animation.setAnimation("openDoor");
+						soundtool.playSound("openDoorSlowly.wav", true);
+						door->setDoorStatus(true);
+					}
 				}
 			}
-		}
-		else if (name == "Over") {
-			if (this->role->gameOver()) {
-				const char* msg = "游戏结束";
-				//渲染游戏结束
-				renderGameOver();
+			else if (name == "Over") {
+				role->roleOver();
 			}
 		}
+
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
 	}
 	PxControllerBehaviorFlags getBehaviorFlags(const PxController& controller) {
@@ -73,5 +72,4 @@ public:
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
 	}
 };
-
 #endif // !__ROLE_H__
