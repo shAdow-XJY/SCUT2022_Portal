@@ -46,6 +46,25 @@ extern Role* role;
 extern std::map<string, unsigned int> textureMap;
 unsigned int textureID;
 extern DynamicBall dynamicBall;
+
+extern void reshape(int width, int height);
+
+namespace Callbacks {
+	extern void idleCallback();
+	extern void renderCallback();
+	extern void keyboardUpCallback(unsigned char key, int x, int y);
+	extern void specialKeyDownCallback(GLint key, GLint x, GLint y);
+	extern void specialKeyUpCallback(GLint key, GLint x, GLint y);
+	extern void mouseCallback(int button, int state, int x, int y);
+	extern void idleCallback();
+	extern void animationRenderCallback();
+	extern void renderCallback();
+	extern void exitCallback(void);
+	extern void keyboardDownCallback(unsigned char key, int x, int y);
+	extern void motionCallback(int x, int y);
+}
+
+
 static void drawBox(GLfloat x, GLfloat y, GLfloat z,bool shadow)
 {
 	static GLfloat n[6][3] =
@@ -298,7 +317,9 @@ const unsigned int SCR_HEIGHT = 600;
 
 //extern void reshape(int width, int height);
 
-
+bool defaultWindow = false;
+bool fps = false;
+bool welcome = true;
 
 namespace Snippets
 {
@@ -344,25 +365,62 @@ namespace Snippets
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 }
 	
-	void renderImGui() {
+	void installPlayFunc() {
+		glutKeyboardFunc(Callbacks::keyboardDownCallback);
+		glutKeyboardUpFunc(Callbacks::keyboardUpCallback);
+		glutSpecialFunc(Callbacks::specialKeyDownCallback);
+		glutSpecialUpFunc(Callbacks::specialKeyUpCallback);
+		glutMouseFunc(Callbacks::mouseCallback);
+		glutMotionFunc(Callbacks::motionCallback);
+		glutReshapeFunc(reshape);
 
-	{
-		static float f = 0.0f;
-		static int counter = 0;
-		//bool demo = true;
-		//ImGui::ShowDemoWindow(&demo);
-		ImGui::Begin("Monitoring");                         
-
-		//ImGui::Text("ImGui successfully deployed.");           
-
-		//ImGui::SameLine();
-		ImGui::Text("Checkpoint: %d", role->getCheckpoint());
-		ImGui::Text("Life: %d", role->getHealth());
-		ImGui::Text("Score: %d", role->getScore());
-		ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
-		ImGui::End();
 	}
+
+	void renderImGui() {
+		ImGuiWindowFlags window_flags = 0;
+		window_flags |= ImGuiWindowFlags_NoBackground;
+		window_flags |= ImGuiWindowFlags_NoTitleBar;
 	
+		if (welcome) {
+			ImGui::Begin(" ", &welcome, window_flags - 128);
+			ImGui::Text("Welcome to Portal's game.");
+			if (ImGui::Button("Play")) {
+				welcome = false;
+				defaultWindow = true;
+				fps = true;
+				installPlayFunc();
+
+			}
+				
+				
+			ImGui::End();
+		}
+
+
+		if (defaultWindow) {
+			//ImGui::ShowDemoWindow(&demo);
+
+			ImGui::Begin("Monitoring", &defaultWindow, window_flags);
+
+			//ImGui::Text("ImGui successfully deployed.");           
+
+			//ImGui::SameLine();
+			ImGui::Text("Checkpoint: %d", role->getCheckpoint());
+			ImGui::Text("Life: %d", role->getHealth());
+			ImGui::Text("Score: %d", role->getScore());
+			//ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
+			ImGui::End();
+		}
+		
+	
+			
+	
+		if (fps) {
+			ImGui::Begin("FPS check", &fps, window_flags);
+			ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
+			ImGui::End();
+		}
+		
 	// 3. Show another simple window.
 	if (show_another_window)
 	{
@@ -378,6 +436,8 @@ namespace Snippets
 	ImGuiIO& io = ImGui::GetIO();
 	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 }
+
+	
 
 	void startRender(const PxVec3& cameraEye, const PxVec3& cameraDir, PxReal clipNear, PxReal clipFar)
 {

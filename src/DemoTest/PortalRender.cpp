@@ -44,7 +44,7 @@ DynamicBall dynamicBall = DynamicBall(true);
 
 extern Animation animation;
 
-namespace
+namespace Callbacks
 {
 	Snippets::Camera*	sCamera;
 
@@ -228,7 +228,7 @@ void reshape(int width, int height)
 
 void renderLoop()
 {
-	sCamera = new Snippets::Camera(PxVec3(50.0f, 50.0f, 50.0f), PxVec3(-0.6f, -0.2f, -0.7f));
+	Callbacks::sCamera = new Snippets::Camera(PxVec3(50.0f, 50.0f, 50.0f), PxVec3(-0.6f, -0.2f, -0.7f));
 
 	Snippets::setupDefaultWindow("PhysX Demo");
 
@@ -239,18 +239,10 @@ void renderLoop()
 	animation.init();
 
 	
-
-	glutIdleFunc(idleCallback);
-	glutDisplayFunc(renderCallback);
-	glutKeyboardFunc(keyboardDownCallback);
-	glutKeyboardUpFunc(keyboardUpCallback);
-	glutSpecialFunc(specialKeyDownCallback);
-	glutSpecialUpFunc(specialKeyUpCallback);
-	glutMouseFunc(mouseCallback);
-	glutMotionFunc(motionCallback);
-	glutReshapeFunc(reshape);
-	motionCallback(0,0);
-	atexit(exitCallback);
+	glutIdleFunc(Callbacks::idleCallback);
+	glutDisplayFunc(Callbacks::renderCallback);
+	Callbacks::motionCallback(0,0);
+	atexit(Callbacks::exitCallback);
 	
 	initPhysics(true);
 	loadTexture();
@@ -259,11 +251,11 @@ void renderLoop()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.Fonts->AddFontFromFileTTF("../../src/ImGui/segoeui.ttf",23.0f);
 	ImGui::StyleColorsDark();
 
 	ImGui_ImplGLUT_Init();
-	//ImGui_ImplGLUT_InstallFuncs();
-	//glutMouseFunc(ImGui_ImplGLUT_MouseFunc);
+	ImGui_ImplGLUT_InstallFuncs();
 	ImGui_ImplOpenGL2_Init();
 
 

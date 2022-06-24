@@ -10,8 +10,8 @@
 #include "../Render/BMPLoader.h"
 #include "../Sound/SoundTools.h"
 #include "../Animation/Animation.h"
-#include<vector>
-#include<string>
+#include <vector>
+#include <string>
 #include <glut.h>
 #include<iostream>
 #include<time.h>
