@@ -865,8 +865,8 @@ void createGameScene(const PxTransform& t) {
 	PxTransform defaultPose(PxQuat(0, PxVec3(0, 1, 0)));  //刚体默认pose
 	
 	//地面 接触判定死亡用
-	PxRigidStatic* ground = createStaticBox(t, PxVec3(50, 1.0, 300), 500, 1.0, 500, defaultPose,OrganType::ground);
-	ground->setName("Over");
+	/*PxRigidStatic* ground = createStaticBox(t, PxVec3(50, 1.0, 300), 500, 1.0, 500, defaultPose,OrganType::ground);
+	ground->setName("Over");*/
 
 	//#Checkpoint1
 	totalCheckpoint = 1;
@@ -1006,9 +1006,6 @@ void createGameScene(const PxTransform& t) {
 	float fan2_z = createFanRoadLevel(t, PxVec3(fan0_x, fan0_y, fan0_z), fan_l, fan_h, fan_w, PxVec3(0, 3, 0), defaultPose);
 	//最后一个旋转路的中心点（fan0_x,fan0_y,fan2_z）
 
-	//#Checkpoint5
-	totalCheckpoint++;
-
 	//连接旋转路关卡与迷宫的路段
 	float r_7_l = 6.0;
 	float r_7_w = 10.0;
@@ -1020,6 +1017,8 @@ void createGameScene(const PxTransform& t) {
 
 	checkpoints.push_back(t.transform(PxVec3(c_7_x, c_7_y + 7.0, c_7_z)));
 
+	//#Checkpoint5
+	totalCheckpoint++;
 	//迷宫边长缩放系数
 	float scale = 0.8;
 	//迷宫小正方形边长37*scale
@@ -1043,6 +1042,8 @@ void createGameScene(const PxTransform& t) {
 	createRoad(t, maze_v+ PxVec3(-mazeLength, 0.0f, -mazeLength), mazeLength, boxHeight, mazeLength, defaultPose);
 
 	createMaze(t, maze_v, scale, defaultPose);
+	//#Checkpoint6
+	totalCheckpoint++;
 	//迷宫出口坐标
 	float mazeOut_x = mazePos_x - 3.5 * sideLength;
 	float mazeOut_y = mazePos_y;
@@ -1057,9 +1058,8 @@ void createGameScene(const PxTransform& t) {
 	createRoad(t, PxVec3(c_4_x, c_4_y, c_4_z), r_4_l, boxHeight, r_4_w, defaultPose);
 	std::cout << "迷宫出口路段相对场景原点的坐标为:" <<c_4_x << "," << c_4_y << "," << c_4_z << endl;
 	
-	//#Checkpoint6
-	totalCheckpoint++;
-	checkpoints.push_back(t.transform(PxVec3(c_4_x, c_4_y + 7.0, c_4_z)));
+
+	
 
 	//楼梯1
 	//stairsWidth ： 4.0
@@ -1067,6 +1067,7 @@ void createGameScene(const PxTransform& t) {
 	float center_x1 = c_4_x - r_4_l - stairsLength;
 	float centerHeight1 = center_y(c_4_y);
 	float center_z1 = c_4_z + r_4_w - stairsWidth;
+	checkpoints.push_back(t.transform(PxVec3(center_x1, centerHeight1 + 7.0, center_z1)));
 	for (int i = 0; i <= 5; i++) {
 		createRoad(t, PxVec3(center_x1, centerHeight1, center_z1), stairsLength, boxHeight, stairsWidth, defaultPose);
 		centerHeight1 = center_y(centerHeight1);

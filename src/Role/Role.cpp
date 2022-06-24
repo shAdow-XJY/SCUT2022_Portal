@@ -52,7 +52,7 @@ bool Role::attachModel(const char* path) {
 **/
 PxVec3 Role::roleHandleKey(GLint key, bool free) {
 	PxVec3 dir;
-	if (!free) dir = this->faceDir; //非自由镜头以人物朝向为前进方向
+	if (!free && this->rotateMoveDir) dir = this->faceDir; //非自由镜头以人物朝向为前进方向
 	else dir = this->dir; //自由镜头以摄像机正前方为前进方向
 	//移动方向计算
 	switch (key) {
@@ -223,7 +223,7 @@ bool Role::getAliveStatus() {
 /**
 * @brief 角色死亡
 **/
-bool Role::gameOver() {
+bool Role::roleOver() {
 	this->resetStatus();
 	if (this->stimulateObj) {
 		this->stimulateObj->release();
@@ -239,6 +239,7 @@ bool Role::gameOver() {
 	return false;
 
 }
+
 
 /**
 * @brief 角色是否可以移动
@@ -375,6 +376,9 @@ void Role::rayAround() {
 void Role::stimulate() {
 	if (this->stimulateObj) {
 		const PxVec3 pos = this->stimulateObj->getGlobalPose().p;
+		if (pos.y < 1.0f) {
+			this->roleOver();
+		}
 		this->roleController->setPosition(PxExtendedVec3(pos.x, pos.y, pos.z));
 	}
 }
@@ -403,11 +407,15 @@ void Role::updateScore() {
 	if (actor = RayCast(origin, unitDir)) {
 		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
 		if (basic) {
-			int checkpoint = basic->getCheckpoint();
+			int checkpoint = basic->getCheckpoint();		
 			if (this->arrivedCheckpoint < checkpoint) {
 				this->arrivedCheckpoint = checkpoint;
 				this->score += 100;
 			}
+			if (checkpoint != nowCheckpoint) {
+				lastCheckpoint = nowCheckpoint;
+			}
+			nowCheckpoint = checkpoint;
 		}
 	}
 }
@@ -479,7 +487,7 @@ void Role::move(GLint key, bool status, bool free) {
 	{
 		if (!this->isJump && !this->isFall) {
 			this->faceDir = this->lastPressDir; //更新为最后一次移动的面朝方向
-			if (!free) {
+			if (!free && this->rotateMoveDir) {
 				this->dir = this->faceDir;//抬起的时候才更新角色朝向，确保持续移动
 			}
 			if (standingBlock->getType() == OrganType::iceroad) {
@@ -569,7 +577,7 @@ void Role::simulationGravity() {
 				else
 				{
 					//防止CCT边缘卡住模拟滑动一下
-					PxVec3 slide = this->getFaceDir().getNormalized() * 0.04;
+					PxVec3 slide = this->getFaceDir().getNormalized() * 0.045;
 					roleController->move(slide * deltaClock, PxF32(0.00001), deltaClock, NULL);
 
 				}
@@ -660,4 +668,25 @@ void Role::resetStatus() {
 **/
 PxVec3 Role::getHorizontalVelocity() {
 	return PxVec3(this->speed.x, 0, this->speed.z);
+}
+
+
+bool Role::getRotateOrNot() {
+	return this->rotateMoveDir;
+}
+
+void Role::setRotateOrNot(bool flag) {
+	this->rotateMoveDir = flag;
+}
+
+bool Role::isJumping() {
+	return this->isJump || this->isFall;
+}
+
+void Role::setDir(PxVec3 dir) {
+	this->dir = dir;
+}
+
+void Role::setFaceDir(PxVec3 dir){
+	this->faceDir = dir;
 }

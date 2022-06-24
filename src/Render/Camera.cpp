@@ -28,8 +28,6 @@ namespace Snippets
 		switch (button)
 		{
 		case 0: {
-			if (state == 1) {
-			}
 			break;
 		}
 		case 2: {

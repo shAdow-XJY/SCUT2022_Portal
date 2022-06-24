@@ -93,11 +93,11 @@ void initGame() {
 	//摆锤前位置
 	//role->setFootPosition(checkpoints[1]);
 	//摩天轮前位置
-	role->setFootPosition(checkpoints[2]);
+	//role->setFootPosition(checkpoints[2]);
 	//旋转路关卡前位置
 	//role->setFootPosition(checkpoints[3]);
 	//迷宫前位置
-	//role->setFootPosition(checkpoints[4]);
+	role->setFootPosition(checkpoints[4]);
 	//迷宫出口位置 
 	//role->setFootPosition(checkpoints[5]);
 	//平移路段前位置 
@@ -152,9 +152,9 @@ void initPhysics(bool interactive)
 	//静摩擦，动摩擦，restitution恢复原状(弹性)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
 
-	/*PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
+	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	groundPlane->setName("Over");
-	gScene->addActor(*groundPlane);*/
+	gScene->addActor(*groundPlane);
 }
 
 

@@ -36,7 +36,7 @@ namespace Snippets
 	
 		int				mMouseX;
 		int				mMouseY;
-		bool			free = true; //Ƿƶ
+		bool			free = false; //Ƿƶ
 	};
 
 

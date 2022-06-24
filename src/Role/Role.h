@@ -20,7 +20,6 @@ extern PxPhysics* gPhysics;
 extern PxControllerManager* cManager;
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
 extern PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir);
-extern void renderGameOver();
 const float primaryUpSpeed = 0.10;
 
 extern SoundTool soundtool;
@@ -87,6 +86,8 @@ private:
 	//得分
 	int score = 0;
 
+	//视角是否随面朝方向移动
+	bool rotateMoveDir = true;
 
 	// 是否已绑定静态模型
 	bool staticAttached = false;
@@ -112,7 +113,7 @@ public:
 		return this->role;
 	}
 	bool getAliveStatus();
-	bool gameOver();
+	bool roleOver();
 
 	//角色位置信息
 	void setFootPosition(PxVec3 position);
@@ -123,7 +124,6 @@ public:
 
 	//速度相关
 	PxVec3 getSpeed();
-	bool isSpeedZero();
 	void setSpeed(PxVec3 speed);
 
 	//相机朝向
@@ -134,7 +134,6 @@ public:
 	//角色移动相关
 	void move();
 	void move(GLint key, bool status, bool free);
-	void stopMoving();
 
 	//人物站立的方块基类
 	GameSceneBasic* standingBlock = errorGameSceneBasic;
@@ -180,15 +179,20 @@ public:
 	//更新角色得分
 	void updateScore();
 	bool getRebirthing();
-
+	bool getRotateOrNot();
+	void setRotateOrNot(bool);
 
 	//重构部分
 	PxVec3 roleHandleKey(GLint key, bool free);
 	void touchGround();
 	PxVec3 getHorizontalVelocity();
 	void resetStatus();
-
-
+	
+	int nowCheckpoint = 1;
+	int lastCheckpoint = 1;
+	bool isJumping();
+	void setDir(PxVec3 dir);
+	void setFaceDir(PxVec3 dir);
 };
 
 class RoleHitCallback :public PxUserControllerHitReport {
@@ -214,26 +218,25 @@ public:
 		//if (actor.getName() != "Ground") {
 		//	this->role->stopMoving();
 		//}
-		string name(actor.getName());
-		if (name == "Door") {
-			Door* door = (Door*)actor.userData;
-			float scale = 9000.0f;
-			door->addPForce(role->getFaceDir() * scale);
+		if (actor.getName()) {
+			string name(actor.getName());
+			if (name == "Door") {
+				Door* door = (Door*)actor.userData;
+				float scale = 9000.0f;
+				door->addPForce(role->getFaceDir() * scale);
 
-			if (door->canOpen()) {
-				if (!door->getDoorStauts()) {
-					soundtool.playSound("openDoorSlowly.wav", true);
-					door->setDoorStatus(true);
+				if (door->canOpen()) {
+					if (!door->getDoorStauts()) {
+						soundtool.playSound("openDoorSlowly.wav", true);
+						door->setDoorStatus(true);
+					}
 				}
 			}
-		}
-		else if (name == "Over") {
-			if (this->role->gameOver()) {
-				const char* msg = "游戏结束";
-				//渲染游戏结束
-				renderGameOver();
+			else if (name == "Over") {
+				role->roleOver();
 			}
 		}
+		
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
 	}
 	PxControllerBehaviorFlags getBehaviorFlags(const PxController& controller) {
