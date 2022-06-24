@@ -98,14 +98,26 @@ void keyRelease(unsigned char key)
 
 //Ãÿ ‚º¸…Ë÷√
 void specialKeyPress(GLint key) {
+	int mod;
+
 	switch (key) {
-	case GLUT_KEY_UP:
+	case GLUT_KEY_UP: 
 	case GLUT_KEY_DOWN:
 	case GLUT_KEY_LEFT:
 	case GLUT_KEY_RIGHT:
-		animation.setAnimation("walk");
+	{
+		mod = glutGetModifiers();
+		if (mod == (GLUT_ACTIVE_SHIFT)) {
+			cout << "shift" << endl;
+			role->setSpeed(role->getSpeed() * 1.5);
+			animation.setAnimation("run");
+		}
+		else {
+			animation.setAnimation("walk");
+		}
 		getAdditionalAngleRadians();
 		break;
+	}
 	default: {
 		return;
 	}

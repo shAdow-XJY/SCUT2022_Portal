@@ -106,11 +106,14 @@ void animationRenderCallback() {
 	}*/
 	else if(currentAnimation == "jump")
 	{
-		if (animation.update(2.0,true)) {
+		if (animation.update(1.0,true)) {
 			animation.setAnimation("idle");
 		}
 	}
 	else if(currentAnimation == "walk"){
+		animation.update(1.0);
+	}
+	else {
 		animation.update(1.0);
 	}
 	

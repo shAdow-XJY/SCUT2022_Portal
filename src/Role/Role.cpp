@@ -54,6 +54,8 @@ PxVec3 Role::roleHandleKey(GLint key, bool free) {
 	PxVec3 dir;
 	if (!free) dir = this->faceDir; //非自由镜头以人物朝向为前进方向
 	else dir = this->dir; //自由镜头以摄像机正前方为前进方向
+
+	
 	//移动方向计算
 	switch (key) {
 	case GLUT_KEY_UP: {
