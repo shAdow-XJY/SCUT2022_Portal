@@ -155,20 +155,28 @@ void Role::roleSlide() {
 }
 
 /**
+* @brief ½ÇÉ«ÏÂ¶××´Ì¬
+**/
+bool Role::getCrouch(){
+	return this->isCrouch;
+}
+
+/**
 * @brief ½ÇÉ«ÏÂ¶×
 **/
 void Role::roleCrouch() {
 	if (!isJump && !isFall) {
+		this->isCrouch = true;
 		this->roleController->resize(roleHeight / 2.5);
 	}
 }
-
 
 /**
 * @brief ½ÇÉ«ÏÂ¶×»Ö¸´½×¶Î
 **/
 void Role::roleNoCrouch() {
 	this->roleController->resize(roleHeight + roleRadius);
+	this->isCrouch = false;
 }
 
 /**
