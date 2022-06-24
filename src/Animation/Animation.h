@@ -8,6 +8,8 @@
 using namespace std;
 #include"../../src/Role/Role.h"
 
+class Role;
+
 class Animation
 {
 private:

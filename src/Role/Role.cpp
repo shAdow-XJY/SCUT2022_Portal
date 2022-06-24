@@ -1,6 +1,8 @@
 #include "Role.h"
 #include "cmath"
 #include <iostream>
+#include <Role/RoleHitCallback.h>
+
 extern void printPxVecFun(const PxVec3& vec);
 extern clock_t deltaClock;
 
@@ -55,7 +57,6 @@ PxVec3 Role::roleHandleKey(GLint key, bool free) {
 	if (!free) dir = this->faceDir; //非自由镜头以人物朝向为前进方向
 	else dir = this->dir; //自由镜头以摄像机正前方为前进方向
 
-	
 	//移动方向计算
 	switch (key) {
 	case GLUT_KEY_UP: {
@@ -524,7 +525,6 @@ void Role::fall() {
 
 }
 
-
 /**
 * @brief 角色底部发送射线
 * @desc  角色重力模拟并与底部物体进行模拟交互
@@ -652,6 +652,8 @@ void Role::roleFall() {
 		this->speed.y -= gravityAcceleration * deltaClock;
 	}
 }
+
+
 
 /**
 * @brief 重置角色状态

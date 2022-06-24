@@ -38,7 +38,6 @@ PxPvd*                  gPvd        = NULL;
 PxReal stackZ = 10.0f;
 
 
-
 Role* role = NULL;
 PxControllerManager* cManager = NULL;
 
@@ -93,11 +92,11 @@ void initGame() {
 	//摆锤前位置
 	//role->setFootPosition(checkpoints[1]);
 	//摩天轮前位置
-	role->setFootPosition(checkpoints[2]);
+	//role->setFootPosition(checkpoints[2]);
 	//旋转路关卡前位置
 	//role->setFootPosition(checkpoints[3]);
 	//迷宫前位置
-	//role->setFootPosition(checkpoints[4]);
+	role->setFootPosition(checkpoints[4]);
 	//迷宫出口位置 
 	//role->setFootPosition(checkpoints[5]);
 	//平移路段前位置 
@@ -137,8 +136,6 @@ void initPhysics(bool interactive)
 	sceneDesc.cpuDispatcher = gDispatcher;
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
 	gScene = gPhysics->createScene(sceneDesc);
-
-	
 
 	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
 	if (pvdClient)

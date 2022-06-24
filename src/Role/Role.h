@@ -8,11 +8,12 @@
 #include "../Block/Door.h"
 #include "../LoadModel/Model.h"
 #include "../Block/Seesaw.h"
-#include "../Sound/SoundTools.h"
 #include "../Block/PrismaticRoad.h"
 #include "../Block/RotateRod.h"
 #include <glut.h>
 using namespace physx;
+
+
 
 extern PxScene* gScene;
 extern PxMaterial* gMaterial;
@@ -23,10 +24,9 @@ extern PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir);
 extern void renderGameOver();
 const float primaryUpSpeed = 0.10;
 
-extern SoundTool soundtool;
+
 extern vector<PxVec3> checkpoints;
 static GameSceneBasic* errorGameSceneBasic = new GameSceneBasic();
-
 
 class Role {
 private:
@@ -37,7 +37,7 @@ private:
 	/// <summary>
 	/// 角色属性
 	/// </summary>
-	PxF32 roleRadius = 1.5f;
+	PxF32 roleRadius = 3.5f;
 	PxF32 roleHeight = 10.0f;
 	//人物速度
 	PxVec3 speed = PxVec3(0, 0, 0);
@@ -191,59 +191,6 @@ public:
 	void resetStatus();
 
 
-};
-
-class RoleHitCallback :public PxUserControllerHitReport {
-public:
-	void onShapeHit(const PxControllerShapeHit& hit) {
-	}
-	void onControllerHit(const PxControllersHit& hit) {
-	}
-	void  onObstacleHit(const PxControllerObstacleHit& hit) {
-	}
-};
-
-/**
-* @brief 角色碰撞判定，用于角色撞物体和推物体
-**/
-class RoleHitBehaviorCallback :public PxControllerBehaviorCallback {
-private:
-	Role* role = NULL;
-public:
-	RoleHitBehaviorCallback(Role* role) :role(role) {};
-	PxControllerBehaviorFlags getBehaviorFlags(const PxShape& shape, const PxActor& actor) {
-		////是否接触到地面
-		//if (actor.getName() != "Ground") {
-		//	this->role->stopMoving();
-		//}
-		string name(actor.getName());
-		if (name == "Door") {
-			Door* door = (Door*)actor.userData;
-			float scale = 9000.0f;
-			door->addPForce(role->getFaceDir() * scale);
-
-			if (door->canOpen()) {
-				if (!door->getDoorStauts()) {
-					soundtool.playSound("openDoorSlowly.wav", true);
-					door->setDoorStatus(true);
-				}
-			}
-		}
-		else if (name == "Over") {
-			if (this->role->gameOver()) {
-				const char* msg = "游戏结束";
-				//渲染游戏结束
-				renderGameOver();
-			}
-		}
-		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
-	}
-	PxControllerBehaviorFlags getBehaviorFlags(const PxController& controller) {
-		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
-	}
-	PxControllerBehaviorFlags getBehaviorFlags(const PxObstacle& obstacle) {
-		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
-	}
 };
 
 #endif // !__ROLE_H__
