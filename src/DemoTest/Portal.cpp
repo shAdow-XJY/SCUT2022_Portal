@@ -62,7 +62,7 @@ Animation animation;
 
 //可读取的存档点
 vector<PxVec3> checkpoints = {
-	PxVec3(-50, 20, -250),
+	//t.transform(PxVec3(0,7.0,0)),
 	//t.transform(PxVec3(88, 36, 26)), //摆锤前
 	//t.transform(PxVec3(270, 36, 71)), //迷宫前
 	//t.transform(PxVec3(122, 36, 392.8)), //迷宫出口
@@ -89,17 +89,21 @@ void initGame() {
 	role = new Role();
 
 	//初始位置
-	role->setFootPosition(checkpoints[0]);
+	//role->setFootPosition(checkpoints[0]);
 	//摆锤前位置
 	//role->setFootPosition(checkpoints[1]);
-	//迷宫前位置
-	//role->setFootPosition(checkpoints[2]);
-	//迷宫出口位置 
+	//摩天轮前位置
+	role->setFootPosition(checkpoints[2]);
+	//旋转路关卡前位置
 	//role->setFootPosition(checkpoints[3]);
+	//迷宫前位置
+	//role->setFootPosition(checkpoints[4]);
+	//迷宫出口位置 
+	//role->setFootPosition(checkpoints[5]);
 	//平移路段前位置 
 	//role->setFootPosition(t.transform(PxVec3(66, 69.6, 421.8)));
 	//旋转杆关卡角落位置
-	//role->setFootPosition(checkpoints[4]);
+	//role->setFootPosition(checkpoints[6]);
 	//role->attachModel("../../models/paimon/paimon.obj");
 	role->fall();
 
@@ -148,9 +152,9 @@ void initPhysics(bool interactive)
 	//静摩擦，动摩擦，restitution恢复原状(弹性)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
 
-	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
+	/*PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	groundPlane->setName("Over");
-	gScene->addActor(*groundPlane);
+	gScene->addActor(*groundPlane);*/
 }
 
 
