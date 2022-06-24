@@ -1,7 +1,7 @@
 ﻿#pragma once
 #ifndef DYNAMICCIRCLE_H
 #define DYNAMICCIRCLE_H
-
+#include <iostream>
 #include <math.h>
 
 //动态渲染圈，以中心的圈，圈内的返回true要渲染，圈外的返回false不渲染
@@ -24,6 +24,9 @@ public:
 		this->radius = 100.0;
 		this->dynamic = dynamic;
 	};
+	void printDynamicXYZ() {
+		std::cout << "dynamic XYZ:" <<  center_X << " " << center_Y << " " << center_Z << std::endl;
+	}
 	//开启或关闭
 	void setDynamic(bool dynamic);
 	//切换圆圈范围/圆球范围

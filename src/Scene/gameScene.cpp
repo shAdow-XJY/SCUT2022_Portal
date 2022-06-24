@@ -868,6 +868,7 @@ void createGameScene(const PxTransform& t) {
 	/*PxRigidStatic* ground = createStaticBox(t, PxVec3(50, 1.0, 300), 500, 1.0, 500, defaultPose,OrganType::ground);
 	ground->setName("Over");*/
 
+
 	//#Checkpoint1
 	totalCheckpoint = 1;
 

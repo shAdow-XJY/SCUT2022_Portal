@@ -41,7 +41,11 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	//角色下蹲按键：Z
 	case 'Z':
 	{
-		role->roleCrouch();
+		if (!role->getCrouch()) {
+			animation.setAnimation("crouching");
+			role->roleCrouch();
+		}
+		
 		break;
 	}
 	//角色拾取/放置道具：E
@@ -88,6 +92,7 @@ void keyRelease(unsigned char key)
 	}
 	case 'Z':
 	{
+		animation.setAnimation("idle");
 		role->roleNoCrouch();
 		break;
 	}
@@ -98,14 +103,29 @@ void keyRelease(unsigned char key)
 
 //特殊键设置
 void specialKeyPress(GLint key) {
+	int mod;
+
 	switch (key) {
-	case GLUT_KEY_UP:
+	case GLUT_KEY_UP: 
 	case GLUT_KEY_DOWN:
 	case GLUT_KEY_LEFT:
 	case GLUT_KEY_RIGHT:
-		animation.setAnimation("walk");
+	{
+		mod = glutGetModifiers();
+		if (mod == (GLUT_ACTIVE_SHIFT)) {
+			cout << "shift" << endl;
+			role->setSpeed(role->getSpeed() * 1.5);
+			animation.setAnimation("run");
+		}else if (role->getCrouch()) {
+			role->setSpeed(role->getSpeed() * 0.8);
+			animation.setAnimation("crouchedWalking");
+		}
+		else {
+			animation.setAnimation("walk");
+		}
 		getAdditionalAngleRadians();
 		break;
+	}
 	default: {
 		return;
 	}
@@ -118,8 +138,15 @@ void specialKeyRelease(GLint key) {
 	case GLUT_KEY_DOWN:
 	case GLUT_KEY_LEFT:
 	case GLUT_KEY_RIGHT: 
-		animation.setAnimation("idle");
+	{	
+		if (role->getCrouch()) {
+			animation.setAnimation("crouching");
+		}
+		else {
+			animation.setAnimation("idle");
+		}
 		break;
+	}
 	default: {
 		return;
 	}

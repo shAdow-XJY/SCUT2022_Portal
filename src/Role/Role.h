@@ -70,6 +70,7 @@ private:
 	bool equiped = false;
 	bool standingOnBlock = true;
 	bool isRebirthing = false;
+	bool isCrouch = false;
 	//冰面滑动
 	bool slide = false;
 	//边缘滑动
@@ -150,6 +151,7 @@ public:
 
 
 	//下蹲
+	bool getCrouch();
 	void roleCrouch();
 	void roleNoCrouch();
 

@@ -108,18 +108,16 @@ void animationRenderCallback() {
 	{
 		animation.update(0.5);
 	}
-	/*else if (currentAnimation == "walk")
-	{
-		animation.update(1000 * timeAlways);
-		timeAlways++;
-	}*/
 	else if(currentAnimation == "jump")
 	{
-		if (animation.update(2.0,true)) {
+		if (animation.update(1.0,true)) {
 			animation.setAnimation("idle");
 		}
 	}
 	else if(currentAnimation == "walk"){
+		animation.update(1.0);
+	}
+	else {
 		animation.update(1.0);
 	}
 	
@@ -169,6 +167,7 @@ void renderCallback()
 			sCamera->targetDir = dir;
 			sCamera->updateDir(role->getPosition());
 			//非自由视角动态渲染圈跟人
+			//dynamicBall.printDynamicXYZ();
 			dynamicBall.setCircleCenterPosition_XZ(role->getRoleWorldPosition().x, role->getRoleWorldPosition().z);
 		}
 		else
@@ -176,6 +175,8 @@ void renderCallback()
 			/*dir = role->getPosition() - roleBackPosition;
 			roleBackPosition = role->getFootPosition() + PxVec3(0, 80, 0) + (role->getDir() * -50);*/
 			//自由视角动态渲染圈跟摄像机
+			//cout << "camera" << sCamera->getEye().x << " " << sCamera->getEye().z <<  endl;
+			//dynamicBall.printDynamicXYZ();
 			dynamicBall.setCircleCenterPosition_XZ(sCamera->getEye().x, sCamera->getEye().z);
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
