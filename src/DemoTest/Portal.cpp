@@ -152,9 +152,9 @@ void initPhysics(bool interactive)
 	//¾²Ä¦²Á£¬¶¯Ä¦²Á£¬restitution»Ö¸´Ô­×´(µ¯ÐÔ)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
 
-	/*PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
+	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	groundPlane->setName("Over");
-	gScene->addActor(*groundPlane);*/
+	gScene->addActor(*groundPlane);
 }
 
 

@@ -865,8 +865,8 @@ void createGameScene(const PxTransform& t) {
 	PxTransform defaultPose(PxQuat(0, PxVec3(0, 1, 0)));  //刚体默认pose
 	
 	//地面 接触判定死亡用
-	PxRigidStatic* ground = createStaticBox(t, PxVec3(50, 1.0, 300), 500, 1.0, 500, defaultPose,OrganType::ground);
-	ground->setName("Over");
+	//PxRigidStatic* ground = createStaticBox(t, PxVec3(50, 1.0, 300), 500, 1.0, 500, defaultPose,OrganType::ground);
+	//ground->setName("Over");
 
 	//#Checkpoint1
 	totalCheckpoint = 1;
