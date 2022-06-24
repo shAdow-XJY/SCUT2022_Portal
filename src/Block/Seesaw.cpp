@@ -17,6 +17,7 @@ void Seesaw::attachRevolute(PxRevoluteJoint* revorevolute) {
 * @brief 跷跷板受重力影响
 **/
 PxVec3 Seesaw::addGForce(PxVec3 position, PxVec3 force) {
+	revorevolute->setRevoluteJointFlag(PxRevoluteJointFlag::eLIMIT_ENABLED, false);
 	position -= PxVec3(0, 0.25, 0);
 	PxRigidBodyExt::addForceAtPos(*this->seesaw, force, position);
 	return this->calTilt();

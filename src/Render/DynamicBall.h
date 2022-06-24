@@ -21,7 +21,7 @@ private:
 
 public:
 	DynamicBall(bool dynamic) {
-		this->radius = 80.0;
+		this->radius = 100.0;
 		this->dynamic = dynamic;
 	};
 	void printDynamicXYZ() {

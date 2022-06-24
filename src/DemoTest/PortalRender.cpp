@@ -40,9 +40,10 @@ RenderBox skyBox;
 extern SoundTool soundtool;
 //∂ØÃ¨‰÷»æ»¶
 PxVec3 roleWorldPosition = PxVec3(0);
-DynamicBall dynamicBall = DynamicBall(true);
+DynamicBall dynamicBall = DynamicBall(false);
 
 extern Animation animation;
+
 
 namespace
 {

@@ -87,7 +87,7 @@ private:
 	int life = 5;
 	//得分
 	int score = 0;
-	
+
 
 	// 是否已绑定静态模型
 	bool staticAttached = false;
@@ -185,11 +185,11 @@ public:
 
 
 	//重构部分
-	PxVec3 roleHandleKey(GLint key,bool free);
+	PxVec3 roleHandleKey(GLint key, bool free);
 	void touchGround();
 	PxVec3 getHorizontalVelocity();
 	void resetStatus();
-	
+
 
 };
 
