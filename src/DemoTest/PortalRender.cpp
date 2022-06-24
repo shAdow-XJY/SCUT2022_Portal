@@ -24,10 +24,17 @@ extern void loadTexture();
 extern void initGame();
 
 extern Role* role;
+extern clock_t deltaClock;
 
 extern void renderVisible(const Role& role);
+extern void printPxVecFun(const PxVec3& vec);
 //角色背后照相机默认位置
 PxVec3 roleBackPosition = PxVec3(0, 0, 0);
+//相机目标位置
+PxVec3 targetPosition = PxVec3(0, 0, 0);
+
+//咋瓦鲁多
+bool timeStop = false;
 
 //看向角色的视线
 PxVec3 dir = PxVec3(0, 0, 0);
@@ -43,15 +50,16 @@ PxVec3 roleWorldPosition = PxVec3(0);
 DynamicBall dynamicBall = DynamicBall(true);
 
 extern Animation animation;
+extern void renderGameOver();
 
 namespace Callbacks
 {
 	Snippets::Camera*	sCamera;
 
-	void motionCallback(int x, int y)
-	{
-		sCamera->handleMotion(x, y);
-	}
+void motionCallback(int x, int y)
+{
+	sCamera->handleMotion(x, y);
+}
 void keyboardDownCallback(unsigned char key, int x, int y)
 {
 	if(key==27)
@@ -74,8 +82,9 @@ void specialKeyDownCallback(GLint key, GLint x, GLint y)
 void specialKeyUpCallback(GLint key, GLint x, GLint y)
 {
 	role->move(key, false, sCamera->isFree());
-
-	sCamera->calDirMoving(key);
+	if (role->getRotateOrNot()) {
+		sCamera->calDirMoving(key);
+	}
 	specialKeyRelease(key);
 }
 
@@ -91,8 +100,6 @@ void idleCallback()
 	glutPostRedisplay();
 }
 
-int timeAlways = 0;
-int timeOnce = 0;
 void animationRenderCallback() {
 	animation.display();
 
@@ -101,20 +108,21 @@ void animationRenderCallback() {
 	if ((currentAnimation == "idle")) 
 	{
 		animation.update(0.5);
-		timeAlways++;
 	}
-	/*else if (currentAnimation == "walk")
-	{
-		animation.update(1000 * timeAlways);
-		timeAlways++;
-	}*/
-	else if(currentAnimation == "jump")
+	else if(currentAnimation == "jumping")
 	{
 		if (animation.update(2.0,true)) {
 			animation.setAnimation("idle");
-			timeOnce = 0;
 		}
-		timeOnce++;
+	}
+	else if (currentAnimation == "openDoor")
+	{
+		if (animation.update(0.5, true)) {
+			animation.setAnimation("idle");
+		}
+	}
+	else {
+		animation.update(1.0);
 	}
 	
 }
@@ -131,9 +139,27 @@ void renderCallback()
 		if (!sCamera->isFree() || beginGame) {
 			if (beginGame) {
 				sCamera->isChangeImmediate = true;
+				roleBackPosition = role->getFootPosition() + PxVec3(0, 32, 0) + (role->getFaceDir() * -30);
 				beginGame = false;
 			}
-			roleBackPosition = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getFaceDir() * -50);
+			//迷宫
+			if (role->nowCheckpoint == 5) {
+				if (role->getRotateOrNot() && role->getSpeed().isZero()) {
+					role->setRotateOrNot(true);
+					sCamera->isMoving = 1;
+					role->setRotateOrNot(false);
+					role->setDir(PxVec3(0, 0, 1));
+					
+				}
+				roleBackPosition = role->getFootPosition() + PxVec3(0, 32, 0) + (PxVec3(0, 0, -30));
+			}
+			else  if(role->nowCheckpoint != 5){
+				if (!role->getRotateOrNot() && role->getSpeed().isZero()) {
+					role->setRotateOrNot(true);
+					sCamera->isMoving = 1;
+				}
+				roleBackPosition = role->getFootPosition() + PxVec3(0, 32, 0) + (role->getFaceDir() * -30);
+			}
 			if (!sCamera->isMoving) {
 				sCamera->setEye(roleBackPosition);
 				role->changeCanMove(true);
@@ -145,18 +171,21 @@ void renderCallback()
 			sCamera->targetDir = dir;
 			sCamera->updateDir(role->getPosition());
 			//非自由视角动态渲染圈跟人
+			//dynamicBall.printDynamicXYZ();
 			dynamicBall.setCircleCenterPosition_XZ(role->getRoleWorldPosition().x, role->getRoleWorldPosition().z);
 		}
 		else
 		{
-			dir = role->getPosition() - roleBackPosition;
-			roleBackPosition = role->getFootPosition() + PxVec3(0, 50, 0) + (role->getDir() * -50);
+			/*dir = role->getPosition() - roleBackPosition;
+			roleBackPosition = role->getFootPosition() + PxVec3(0, 80, 0) + (role->getDir() * -50);*/
 			//自由视角动态渲染圈跟摄像机
+			//cout << "camera" << sCamera->getEye().x << " " << sCamera->getEye().z <<  endl;
+			//dynamicBall.printDynamicXYZ();
 			dynamicBall.setCircleCenterPosition_XZ(sCamera->getEye().x, sCamera->getEye().z);
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
 		
-		if (role) {
+		if (role && !timeStop) {
 			//是否重生传送
 			role->protal();
 			//是否跳跃
@@ -171,10 +200,12 @@ void renderCallback()
 			role->stimulate();
 			//动态刚体渲染
 			roleWorldPosition = role->getRoleWorldPosition();
-			dynamicBall.setCircleCenterPosition_XZ(roleWorldPosition.x, roleWorldPosition.z);
 			role->move();
 			//更新得分
 			role->updateScore();
+			if (!role->getAliveStatus()) {
+				renderGameOver();
+			}
 		}
 		PxScene* scene;
 		PxGetPhysics().getScenes(&scene,1);

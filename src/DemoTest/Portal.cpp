@@ -38,7 +38,6 @@ PxPvd*                  gPvd        = NULL;
 PxReal stackZ = 10.0f;
 
 
-
 Role* role = NULL;
 PxControllerManager* cManager = NULL;
 
@@ -62,11 +61,11 @@ Animation animation;
 
 //可读取的存档点
 vector<PxVec3> checkpoints = {
-	PxVec3(-50, 20, -250),
-	t.transform(PxVec3(58, 20, 19)),
-	t.transform(PxVec3(183, 20, 64)),
-	t.transform(PxVec3(35, 20, 385.8)),
-	t.transform(PxVec3(-17, 45, 406.8))
+	//t.transform(PxVec3(0,7.0,0)),
+	//t.transform(PxVec3(88, 36, 26)), //摆锤前
+	//t.transform(PxVec3(270, 36, 71)), //迷宫前
+	//t.transform(PxVec3(122, 36, 392.8)), //迷宫出口
+	//t.transform(PxVec3(46, 69.6, 403.8)) //旋转杆关卡角落
 };
 
 
@@ -89,17 +88,21 @@ void initGame() {
 	role = new Role();
 
 	//初始位置
-	role->setFootPosition(PxVec3(-50, 20, -250));
+	//role->setFootPosition(checkpoints[0]);
 	//摆锤前位置
-	//role->setFootPosition(t.transform(PxVec3(58, 20, 19)));
+	//role->setFootPosition(checkpoints[1]);
+	//摩天轮前位置
+	//role->setFootPosition(checkpoints[2]);
+	//旋转路关卡前位置
+	//role->setFootPosition(checkpoints[3]);
 	//迷宫前位置
-	//role->setFootPosition(t.transform(PxVec3(183, 20, 64)));
-	//迷宫出口位置
-	//role->setFootPosition(t.transform(PxVec3(35, 20, 385.8)));
-	//平移路段前位置
-	//role->setFootPosition(t.transform(PxVec3(3, 45, 416.8)));
+	role->setFootPosition(checkpoints[4]);
+	//迷宫出口位置 
+	//role->setFootPosition(checkpoints[5]);
+	//平移路段前位置 
+	//role->setFootPosition(t.transform(PxVec3(66, 69.6, 421.8)));
 	//旋转杆关卡角落位置
-	//role->setFootPosition(t.transform(PxVec3(-17, 45, 406.8)));
+	//role->setFootPosition(checkpoints[6]);
 	//role->attachModel("../../models/paimon/paimon.obj");
 	role->fall();
 
@@ -133,8 +136,6 @@ void initPhysics(bool interactive)
 	sceneDesc.cpuDispatcher = gDispatcher;
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
 	gScene = gPhysics->createScene(sceneDesc);
-
-	
 
 	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
 	if (pvdClient)

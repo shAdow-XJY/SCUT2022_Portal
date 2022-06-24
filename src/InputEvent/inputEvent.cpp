@@ -41,7 +41,11 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	//角色下蹲按键：Z
 	case 'Z':
 	{
-		role->roleCrouch();
+		if (!role->getCrouch()) {
+			animation.setAnimation("crouching");
+			role->roleCrouch();
+		}
+		
 		break;
 	}
 	//角色拾取/放置道具：E
@@ -82,12 +86,13 @@ void keyRelease(unsigned char key)
 		//soundtool.pauseSound();
 		if (role->tryJump(true)) {
 			soundtool.playSound("jump.wav");
-			animation.setAnimation("jump");
+			animation.setAnimation("jumping");
 		}
 		break;
 	}
 	case 'Z':
 	{
+		animation.setAnimation("idle");
 		role->roleNoCrouch();
 		break;
 	}
@@ -98,19 +103,38 @@ void keyRelease(unsigned char key)
 
 //特殊键设置
 void specialKeyPress(GLint key) {
+
+	if (animation.getCurrentAnimation() == "jumping") {
+		return;
+	}
+	else if (animation.getCurrentAnimation() == "openDoor") {
+		role->setSpeed(role->getSpeed() * 0.08);
+		return;
+	}
+
+	int mod;
 	switch (key) {
-	case GLUT_KEY_UP: {
-		animation.changeOrientation(PxQuat(0, PxVec3(0, 1, 0)));
-		animation.setAnimation("walk");
-		animation.update(1000 * animationTick);
-		animationTick++;
+	case GLUT_KEY_UP: 
 	case GLUT_KEY_DOWN:
 	case GLUT_KEY_LEFT:
 	case GLUT_KEY_RIGHT:
-		animation.setAnimation("walk");
+	{
+		mod = glutGetModifiers();
+		if (mod == (GLUT_ACTIVE_SHIFT)) {
+			cout << "shift" << endl;
+			role->setSpeed(role->getSpeed() * 1.5);
+			animation.setAnimation("run");
+		}else if (role->getCrouch()) {
+			role->setSpeed(role->getSpeed() * 0.8);
+			animation.setAnimation("crouchedWalking");
+		}
+		else
+		{
+			animation.setAnimation("walk");
+		}
 		getAdditionalAngleRadians();
-		animation.update(1.0);
 		break;
+	}
 	default: {
 		return;
 	}
@@ -118,14 +142,26 @@ void specialKeyPress(GLint key) {
 	}
 }
 void specialKeyRelease(GLint key) {
+
+	if (animation.getCurrentAnimation() == "jumping") {
+		return;
+	}
+
 	switch (key) {
 	case GLUT_KEY_UP: 
 	case GLUT_KEY_DOWN:
 	case GLUT_KEY_LEFT:
 	case GLUT_KEY_RIGHT: 
-		//getAdditionalAngleRadians();
-		animation.setAnimation("idle");
+	{	
+		if (role->getCrouch()) {
+			animation.setAnimation("crouching");
+		}
+		else {
+			animation.setAnimation("idle");
+		}
+		
 		break;
+	}
 	default: {
 		return;
 	}
@@ -159,6 +195,7 @@ void mousePress(int button, int state, int x, int y) {
 	}
 }
 
+//角色转动时，模型也跟随角色face Dir 向量方向旋转
 void getAdditionalAngleRadians() {
 	//cout << role->getFaceDir().x << "？？" << role->getFaceDir().y << "!!" << role->getFaceDir().z << endl;
 	

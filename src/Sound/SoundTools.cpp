@@ -21,9 +21,9 @@ SoundTool::~SoundTool() {
 void SoundTool::SoundInit() {
 	addSound("jumpLoading.wav", true);
 	addSound("jump.wav", false);
-	addSound("rain.wav", false);
+	//addSound("rain.wav", false);
 	addSound("openDoorSlowly.wav", false);
-	addSound("openDoorQuickly.wav", false);
+	//addSound("openDoorQuickly.wav", false);
 	addSound("gameOver.wav", false);
 	addSound("passLevel.wav", false);
 	addSound("pickProp.wav", false);
