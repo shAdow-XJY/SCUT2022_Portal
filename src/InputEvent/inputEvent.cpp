@@ -86,7 +86,7 @@ void keyRelease(unsigned char key)
 		//soundtool.pauseSound();
 		if (role->tryJump(true)) {
 			soundtool.playSound("jump.wav");
-			animation.setAnimation("jump");
+			animation.setAnimation("jumping");
 		}
 		break;
 	}
@@ -103,8 +103,16 @@ void keyRelease(unsigned char key)
 
 //ÌØÊâ¼üÉèÖÃ
 void specialKeyPress(GLint key) {
-	int mod;
 
+	if (animation.getCurrentAnimation() == "jumping") {
+		return;
+	}
+	else if (animation.getCurrentAnimation() == "openDoor") {
+		role->setSpeed(role->getSpeed() * 0.08);
+		return;
+	}
+
+	int mod;
 	switch (key) {
 	case GLUT_KEY_UP: 
 	case GLUT_KEY_DOWN:
@@ -120,7 +128,8 @@ void specialKeyPress(GLint key) {
 			role->setSpeed(role->getSpeed() * 0.8);
 			animation.setAnimation("crouchedWalking");
 		}
-		else {
+		else
+		{
 			animation.setAnimation("walk");
 		}
 		getAdditionalAngleRadians();
@@ -133,6 +142,11 @@ void specialKeyPress(GLint key) {
 }
 
 void specialKeyRelease(GLint key) {
+
+	if (animation.getCurrentAnimation() == "jumping") {
+		return;
+	}
+
 	switch (key) {
 	case GLUT_KEY_UP: 
 	case GLUT_KEY_DOWN:
@@ -145,6 +159,7 @@ void specialKeyRelease(GLint key) {
 		else {
 			animation.setAnimation("idle");
 		}
+		
 		break;
 	}
 	default: {

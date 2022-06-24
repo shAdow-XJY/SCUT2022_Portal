@@ -38,7 +38,6 @@ PxPvd*                  gPvd        = NULL;
 PxReal stackZ = 10.0f;
 
 
-
 Role* role = NULL;
 PxControllerManager* cManager = NULL;
 
@@ -137,8 +136,6 @@ void initPhysics(bool interactive)
 	sceneDesc.cpuDispatcher = gDispatcher;
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
 	gScene = gPhysics->createScene(sceneDesc);
-
-	
 
 	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
 	if (pvdClient)

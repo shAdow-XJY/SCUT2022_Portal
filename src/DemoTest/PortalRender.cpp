@@ -108,14 +108,17 @@ void animationRenderCallback() {
 	{
 		animation.update(0.5);
 	}
-	else if(currentAnimation == "jump")
+	else if(currentAnimation == "jumping")
 	{
-		if (animation.update(1.0,true)) {
+		if (animation.update(2.0,true)) {
 			animation.setAnimation("idle");
 		}
 	}
-	else if(currentAnimation == "walk"){
-		animation.update(1.0);
+	else if (currentAnimation == "openDoor")
+	{
+		if (animation.update(0.5, true)) {
+			animation.setAnimation("idle");
+		}
 	}
 	else {
 		animation.update(1.0);
