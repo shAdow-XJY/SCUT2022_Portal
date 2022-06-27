@@ -54,11 +54,13 @@ void keyPress(unsigned char key, const PxTransform& camera)
 		if (role->getEquiped()) {
 			if (role->layDownObj()) {
 				soundtool.playSound("pickProp.wav",true);
+				animation.setAnimation("picking");
 			}
 		}
 		else {
 			if (role->pickUpObj()) {
 				soundtool.playSound("pickProp.wav", true);
+				animation.setAnimation("picking");
 			}
 		}
 
@@ -67,9 +69,7 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	//½ÇÉ«ÇÐ»»¶¯»­£»ÔÝÊ±
 	case 'Q':
 	{
-		//animation.
-		animation.update(1.0);
-		animationTick++;
+		animation.setAnimation("dancing");
 		break;
 	}
 	default:

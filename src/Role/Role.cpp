@@ -280,9 +280,9 @@ void Role::edgeSliding() {
 **/
 bool Role::pickUpObj() {
 	//cout << this->faceDir.x<<" " << this->faceDir.y <<" "<< this->faceDir.z<<" " << endl;
-	PxVec3 origin = this->getPosition() - PxVec3(0, 0.2f, 0);
+	PxVec3 origin = this->getFootPosition() + PxVec3(0, 0.5f, 0);
 	//确定role的前方方向
-	PxVec3 forwardDir = this->getFaceDir() * 2;
+	PxVec3 forwardDir = this->getFaceDir()*5;
 	PxRigidActor* actor = NULL;
 	if (actor = RayCast(origin, forwardDir)) {
 		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;

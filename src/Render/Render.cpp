@@ -45,7 +45,9 @@ extern int textX, textY;
 //材质贴图ID数组
 extern std::map<string, unsigned int> textureMap;
 unsigned int textureID;
+//动态渲染圈
 extern DynamicBall dynamicBall;
+//GL绘制盒子加纹理
 static void drawBox(GLfloat x, GLfloat y, GLfloat z,bool shadow)
 {
 	static GLfloat n[6][3] =
@@ -107,7 +109,8 @@ static void drawBox(GLfloat x, GLfloat y, GLfloat z,bool shadow)
 	glPopMatrix();                 /** 绘制结束 */
 	glFlush();
 }
-
+//关卡数
+int* checkpoint = new int[1]{ 0 };
 
 void renderGeometry(const PxGeometryHolder& h, string name,bool shadow)
 {
@@ -420,17 +423,16 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 		bool sleeping = actors[i]->is<PxRigidDynamic>() ? actors[i]->is<PxRigidDynamic>()->isSleeping() : false; 
 		/*这里以后会用到来判断每一杆的行动机会，sleeping则可以行动，不是sleeping状态说明还在运动*/
 
-		//判断在动态渲染范围外的跳过绘画渲染
 		PxVec3 actorWorldPosition = actors[i]->getGlobalPose().p;
-		if (nbShapes>0 && !dynamicBall.isInCircle(actorWorldPosition.x, actorWorldPosition.z)) {
+		if (nbShapes > 0 && !dynamicBall.isInCircle(actorWorldPosition.x, actorWorldPosition.z)) {
 			continue;
 		}
+		
 
 		for(PxU32 j=0;j<nbShapes;j++)
 		{
 			const PxMat44 shapePose(PxShapeExt::getGlobalPose(*shapes[j], *actors[i]));
 			PxGeometryHolder h = shapes[j]->getGeometry();
-
 			if (shapes[j]->getFlags() & PxShapeFlag::eTRIGGER_SHAPE)
 				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 			if (shapes[j]->getFlags() & PxShapeFlag::eVISUALIZATION) {

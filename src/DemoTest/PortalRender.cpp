@@ -108,16 +108,34 @@ void animationRenderCallback() {
 	{
 		animation.update(0.5);
 	}
-	else if(currentAnimation == "jumping")
-	{
-		if (animation.update(2.0,true)) {
-			animation.setAnimation("idle");
-		}
-	}
 	else if (currentAnimation == "openDoor")
 	{
 		if (animation.update(0.5, true)) {
 			animation.setAnimation("idle");
+		}
+	}
+	else if (currentAnimation == "picking")
+	{
+		if (animation.update(1.2, true)) {
+			animation.setAnimation("idle");
+		}
+	}
+	else if(currentAnimation == "jumping")
+	{
+		if (animation.update(1.8,true)) {
+			animation.setAnimation("idle");
+		}
+	}
+	else if (currentAnimation == "dying")
+	{
+		if (animation.update(0.5, true)) {
+			if (!role->roleOver()) {
+				animation.setAnimation("idle");
+			}
+			else {
+				soundtool.playSound("gameOver.wav");
+				animation.setAnimation("sleeping");
+			}
 		}
 	}
 	else {
@@ -177,9 +195,9 @@ void renderCallback()
 		{
 			/*dir = role->getPosition() - roleBackPosition;
 			roleBackPosition = role->getFootPosition() + PxVec3(0, 80, 0) + (role->getDir() * -50);*/
-			//自由视角动态渲染圈跟摄像机
 			//cout << "camera" << sCamera->getEye().x << " " << sCamera->getEye().z <<  endl;
 			//dynamicBall.printDynamicXYZ();
+			//自由视角动态渲染圈跟摄像机
 			dynamicBall.setCircleCenterPosition_XZ(sCamera->getEye().x, sCamera->getEye().z);
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
@@ -213,6 +231,7 @@ void renderCallback()
 		{
 			std::vector<PxRigidActor*> actors(nbActors);
 			scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
+			//role->nowCheckpoint;
 			Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
 		}
 		

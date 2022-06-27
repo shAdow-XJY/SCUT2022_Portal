@@ -52,8 +52,12 @@ public:
 
     void cleanup();
 
+    //模型绑定位置和旋转移动
     void attachRole(Role&);
     void changeOrientation(const PxQuat& orientation);
+
+    //第一次播放死亡动画
+    bool firstOver = true;
 };
 
 #endif

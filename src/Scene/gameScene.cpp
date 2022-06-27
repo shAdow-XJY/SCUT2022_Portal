@@ -100,6 +100,9 @@ PxRigidStatic* createStaticBox(const PxTransform& t, const PxVec3& v, PxReal x, 
 	PxRigidStatic* sceneBox = gPhysics->createRigidStatic(t.transform(local));
 	sceneBox->attachShape(*shape);
 	sceneBox->setName(typeMapName(type));
+	int* temp = new int[1]{ totalCheckpoint };
+	sceneBox->userData = temp;
+	//cout << temp << temp[0] << endl;
 	gScene->addActor(*sceneBox);
 	return sceneBox;
 }
@@ -125,6 +128,9 @@ PxRigidDynamic* createDynamicBox(bool kinematic, const PxTransform& t, const PxV
 	if (kinematic) {
 		sceneBox->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 	}
+	int* temp = new int[1]{ totalCheckpoint };
+	sceneBox->userData = temp;
+	//cout << temp << temp[0] << endl;
 	gScene->addActor(*sceneBox);
 	return sceneBox;
 }
@@ -354,7 +360,7 @@ void createMaze(const PxTransform& t, PxVec3 v, float scale, PxTransform& pose) 
 	srand(time(NULL));
 	int index = rand() % keyPositions.size();
 	std::cout << "钥匙" << index << endl;
-	createPorp(t, keyPositions[index], 1.0, 1.0, 1.0);
+	createPorp(t, keyPositions[index], 1.5, 2.0, 1.5);
 
 	//正门逻辑
 	//从左到右

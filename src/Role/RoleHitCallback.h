@@ -20,6 +20,8 @@ extern void renderGameOver();
 extern SoundTool soundtool;
 extern Animation animation;
 
+bool firstOver = true;
+
 class RoleHitCallback :public PxUserControllerHitReport {
 public:
 	void onShapeHit(const PxControllerShapeHit& hit) {
@@ -49,7 +51,7 @@ public:
 				Door* door = (Door*)actor.userData;
 				float scale = 9000.0f;
 				door->addPForce(role->getFaceDir() * scale);
-
+				
 				if (door->canOpen()) {
 					if (!door->getDoorStauts()) {
 						animation.setAnimation("openDoor");
@@ -59,7 +61,10 @@ public:
 				}
 			}
 			else if (name == "Over") {
-				role->roleOver();
+				if (role->getAliveStatus()) {
+					animation.setAnimation("dying");
+				}
+				//role->roleOver();
 			}
 		}
 

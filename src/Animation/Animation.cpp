@@ -37,7 +37,7 @@ void Animation::init()
 
 void Animation::initAssetAnimaion()
 {
-    string aniName[] = { "walk","run","jumping","dying","crouching","crouchedWalking","openDoor", "dancing",};
+    string aniName[] = { "walk","run","jumping","dying","sleeping", "crouching","crouchedWalking","openDoor", "dancing","picking" };
 
     for (string name : aniName) {
         string baseUrl = "../../src/Animation/models/" + name + ".fbx";
@@ -149,9 +149,12 @@ void Animation::display()
     
     PxMat44 rotate(PxQuat(-PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
     
-    PxMat44 translate = PxMat44(PxTransform(PxVec3(0.0f, -1.0f, 0.0f)));
+    PxMat44 translate = PxMat44(PxTransform(PxVec3(0.0f, -4.5f, 0.0f)));
     if (this->current_animation == "crouchedWalking") {
-        translate = PxMat44(PxTransform(PxVec3(0.0f, 1.0f, 0.0f)));
+        translate = PxMat44(PxTransform(PxVec3(0.0f, -0.5f, 0.0f)));
+    }
+    else if (this->current_animation == "crouching") {
+        translate = PxMat44(PxTransform(PxVec3(0.0f, -2.5f, 0.0f)));
     }
     renderDisplay(this->scene, this->scene->mRootNode, std::map<int, int>(), modelMatrix * rotate * translate *yRotate);
 

@@ -45,7 +45,6 @@ PxControllerManager* cManager = NULL;
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
 
 const PxTransform t = PxTransform(PxVec3(-50, 0, -250));
-extern void createPorp(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z);
 
 //材质贴图ID数组
 std::map<string, unsigned int> textureMap;
@@ -96,14 +95,14 @@ void initGame() {
 	//旋转路关卡前位置
 	//role->setFootPosition(checkpoints[3]);
 	//迷宫前位置
-	role->setFootPosition(checkpoints[4]);
+	//role->setFootPosition(checkpoints[4]);
 	//迷宫出口位置 
 	//role->setFootPosition(checkpoints[5]);
 	//平移路段前位置 
 	//role->setFootPosition(t.transform(PxVec3(66, 69.6, 421.8)));
 	//旋转杆关卡角落位置
-	//role->setFootPosition(checkpoints[6]);
-	//role->attachModel("../../models/paimon/paimon.obj");
+	role->setFootPosition(checkpoints[6]);
+	
 	role->fall();
 
 	animation.attachRole(*role);

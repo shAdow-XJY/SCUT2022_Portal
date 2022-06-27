@@ -3,7 +3,9 @@
 #include <ctype.h>
 #include <iostream>
 #include "foundation/PxMat33.h"
+#include <Render/DynamicBall.h>
 
+extern DynamicBall dynamicBall;
 using namespace physx;
 extern clock_t deltaClock;
 extern PxVec3 roleBackPosition;
@@ -70,6 +72,13 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 		this->free = !this->free; ;
 		this->isChangeImmediate = true;
 		this->mDir = this->mDir.getNormalized();
+		if (this->free) {
+			dynamicBall.setRadius(200);
+		}
+		else
+		{
+			dynamicBall.setRadius(100);
+		}
 		//if (!this->free) this->mDir = dir.getNormalized(); //朝物体下方看
 		break;
 	}
