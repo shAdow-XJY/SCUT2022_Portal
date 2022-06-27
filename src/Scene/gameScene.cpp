@@ -80,6 +80,9 @@ const char* typeMapName(OrganType type) {
 	case OrganType::iceroad: {
 		return "Ice";
 	}
+	case OrganType::keyDoor: {
+		return "KeyDoor";
+	}
 	default:
 		return "Block";
 		break;
@@ -262,7 +265,7 @@ v为该正门与joint连接的门框的中心点相对场景原点的位置 v(v_x, 底下所有盒子的高+10*
 scale 门的缩放系数
 pose 刚体朝向
 canOpen 门的可开属性*/
-void createFrontDoor(const PxTransform& t, PxVec3 v, float scale, PxTransform& pose,bool canOpen = true) {
+void createFrontDoor(const PxTransform& t, PxVec3 v, float scale, PxTransform& pose,bool canOpen = true, bool needKey = false) {
 	PxTransform pos(t.transform(PxTransform(v)));//-17.8  -18.56 -18.561815
 
 	PxReal x = 10 * scale;
@@ -272,11 +275,27 @@ void createFrontDoor(const PxTransform& t, PxVec3 v, float scale, PxTransform& p
 	PxRigidStatic* actor1 = createStaticBox(pos, PxVec3(0, 0, 0), 6 * scale, 10 * scale, 1 * scale, pose, OrganType::wall);
 	createStaticBox(pos, PxVec3(23 * scale, 0, 0), 6 * scale, 10 * scale, 1 * scale, pose, OrganType::wall);
 	if (canOpen) {
-		PxRigidDynamic* actor0 = createDynamicBox(false, pos, PxVec3(6.5 * scale, -5 * scale, 0), x, y, z, pose, OrganType::door);
+		PxRigidDynamic* actor0;
+		if (needKey) {
+			actor0 = createDynamicBox(false, pos, PxVec3(6.5 * scale, -5 * scale, 0), x, y, z, pose, OrganType::keyDoor);
+		}
+		else
+		{
+			actor0 = createDynamicBox(false, pos, PxVec3(6.5 * scale, -5 * scale, 0), x, y, z, pose, OrganType::door);
+		}
 		PxTransform localFrame0(PxVec3(0, 5 * scale, 0));
 		PxTransform localFrame1(PxVec3(6.5 * scale, 0, 0));
 		PxRevoluteJoint* revolute = PxRevoluteJointCreate(*gPhysics, actor0, localFrame0, actor1, localFrame1);
-		Door* door = new Door("正门", actor0->getGlobalPose().p, x, y, z, actor0, canOpen, revolute);
+
+		Door* door;
+		if (needKey) {
+			door = new Door("正门", actor0->getGlobalPose().p, x, y, z, actor0, revolute, needKey);
+		}
+		else
+		{
+			door = new Door("正门", actor0->getGlobalPose().p, x, y, z, actor0, canOpen, revolute);
+		}
+
 		actor0->userData = door;
 		PxJointAngularLimitPair limits(-PxPi / 130, 0, 0.01f);
 		revolute->setLimit(limits);
@@ -360,7 +379,7 @@ void createMaze(const PxTransform& t, PxVec3 v, float scale, PxTransform& pose) 
 	srand(time(NULL));
 	int index = rand() % keyPositions.size();
 	std::cout << "钥匙" << index << endl;
-	createPorp(t, keyPositions[index], 1.5, 2.0, 1.5);
+	createPorp(t, keyPositions[index], 1.0, 1.0, 1.0);
 
 	//正门逻辑
 	//从左到右
@@ -370,7 +389,13 @@ void createMaze(const PxTransform& t, PxVec3 v, float scale, PxTransform& pose) 
 		for (int j = 0; j < 9; j++) {
 			door_z = z + j * 37 * scale;
 			if (frontDoorCanOpen[i][j]) {
-				createFrontDoor(t, PxVec3(door_x, door_y, door_z), scale, pose, true);
+				if (i == 7 && j == 8) {
+					createFrontDoor(t, PxVec3(door_x, door_y, door_z), scale, pose, true, true);
+				}
+				else
+				{
+					createFrontDoor(t, PxVec3(door_x, door_y, door_z), scale, pose, true);
+				}
 			}
 			else {
 				createFrontDoor(t, PxVec3(door_x, door_y, door_z), scale, pose, false);

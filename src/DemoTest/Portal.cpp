@@ -48,7 +48,7 @@ const PxTransform t = PxTransform(PxVec3(-50, 0, -250));
 
 //材质贴图ID数组
 std::map<string, unsigned int> textureMap;
-std::string texture[] = { "Door","Wall","Road","SeesawBox","Seesaw","Ice","man"};
+std::string texture[] = { "Door","Wall","Road","SeesawBox","Seesaw","Ice","man","KeyDoor"};
 
 //音频类
 SoundTool soundtool = SoundTool();
@@ -97,11 +97,11 @@ void initGame() {
 	//迷宫前位置
 	//role->setFootPosition(checkpoints[4]);
 	//迷宫出口位置 
-	//role->setFootPosition(checkpoints[5]);
+	role->setFootPosition(checkpoints[5]);
 	//平移路段前位置 
 	//role->setFootPosition(t.transform(PxVec3(66, 69.6, 421.8)));
 	//旋转杆关卡角落位置
-	role->setFootPosition(checkpoints[6]);
+	//role->setFootPosition(checkpoints[6]);
 	
 	role->fall();
 

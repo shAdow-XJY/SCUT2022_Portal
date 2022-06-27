@@ -310,7 +310,7 @@ bool Role::pickUpObj() {
 bool Role::layDownObj() {
 	PxVec3 origin = this->getPosition() - PxVec3(0, 0.2f, 0);
 	//确定role的前方方向
-	PxVec3 forwardDir = PxVec3(this->getFaceDir().x * 1.5f, -3, this->getFaceDir().z * 1.5f);
+	PxVec3 forwardDir = PxVec3(this->getFaceDir().x * 1.5f, -20.0f, this->getFaceDir().z * 1.5f);
 	PxRigidActor* actor = NULL;
 	if (actor = RayCast(origin, forwardDir)) {
 		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
@@ -319,13 +319,59 @@ bool Role::layDownObj() {
 			extern void createPorp(const PxTransform & t, const PxVec3 & v, PxReal x, PxReal y, PxReal z);
 			//cout << role->getPosition().x << " " << role->getPosition().y << " " << role->getPosition().z << endl;
 			//cout << role->getFaceDir().x << " " << role->getFaceDir().y << " " << role->getFaceDir().z << endl;
-			createPorp(PxTransform(PxVec3(0, 0, 0)), this->getPosition() + this->getFaceDir() * 2.5, boxHeight, boxHeight, boxHeight);
+			createPorp(PxTransform(PxVec3(0, 0, 0)), this->getFootPosition() + PxVec3(this->getFaceDir().x * 3.5f, 1.0f, this->getFaceDir().z * 3.5f), 1.0, 1.0, 1.0);
 			std::cout << "放置道具成功" << std::endl;
 			return true;
 		}
 		else
 		{
 			std::cout << "不是可放置道具的地方" << std::endl;
+		}
+	}
+	else
+	{
+		std::cout << "射线没有找到目标" << std::endl;
+	}
+	return false;
+}
+
+/**
+* @brief 角色道具使用
+**/
+bool Role::useKeyObj() {
+	PxVec3 origin = this->getPosition();
+	//确定role的前方方向
+	PxRigidActor* actor = NULL;
+	if (actor = RayCast(origin, this->getFaceDir()*5.0f)) {
+		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
+		if (basic->getType() == OrganType::keyDoor) {
+			Door* door = (Door*)actor->userData;;
+			if (this->equiped) {
+				if (door->getNeedKey()) {
+					if (door->getHasKey()) {
+						std::cout << "该门已被使用道具" << std::endl;
+					}
+					else {
+						door->setHasKey(true);
+						this->equiped = false;
+						std::cout << "使用道具成功" << std::endl;
+						this->keyDoorActor = actor;
+						//door->setPosition();
+						return true;
+					}
+				}
+				else {
+					cout << "不是可使用道具的门" << endl;
+				}
+			}
+			else
+			{
+				std::cout << "角色没有装备道具" << std::endl;
+			}
+		}
+		else
+		{
+			std::cout << "不是门" << std::endl;
 		}
 	}
 	else

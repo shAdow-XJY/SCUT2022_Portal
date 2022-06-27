@@ -54,16 +54,29 @@ void keyPress(unsigned char key, const PxTransform& camera)
 		if (role->getEquiped()) {
 			if (role->layDownObj()) {
 				soundtool.playSound("pickProp.wav",true);
-				animation.setAnimation("picking");
+				animation.setAnimation("putDown");
 			}
 		}
 		else {
 			if (role->pickUpObj()) {
 				soundtool.playSound("pickProp.wav", true);
-				animation.setAnimation("picking");
+				animation.setAnimation("pickUp");
 			}
 		}
 
+		break;
+	}
+	case 'R':
+	{
+		
+		if (role->useKeyObj()) {
+			soundtool.playSound("pickProp.wav", true);
+			animation.setAnimation("useKey");
+		}
+		else
+		{
+			animation.setAnimation("notUseKey");
+		}
 		break;
 	}
 	//½ÇÉ«ÇÐ»»¶¯»­£»ÔÝÊ±

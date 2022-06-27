@@ -36,7 +36,7 @@ private:
 	/// <summary>
 	/// 角色属性
 	/// </summary>
-	PxF32 roleRadius = 3.5f;
+	PxF32 roleRadius = 3.0f;
 	PxF32 roleHeight = 10.0f;
 	//人物速度
 	PxVec3 speed = PxVec3(0, 0, 0);
@@ -116,6 +116,7 @@ public:
 	bool getAliveStatus();
 	bool roleOver();
 
+	
 	//角色位置信息
 	void setFootPosition(PxVec3 position);
 	PxVec3 getFootPosition();
@@ -138,6 +139,7 @@ public:
 
 	//人物站立的方块基类
 	GameSceneBasic* standingBlock = errorGameSceneBasic;
+	PxRigidActor* keyDoorActor;
 
 	//放置物体
 	void setEquiped(bool equip = true);
@@ -164,6 +166,8 @@ public:
 	bool pickUpObj();
 	//放置物体
 	bool layDownObj();
+	//使用道具
+	bool useKeyObj();
 
 	//角色滑动
 	void roleSlide();

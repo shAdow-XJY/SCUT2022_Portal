@@ -47,7 +47,7 @@ RenderBox skyBox;
 extern SoundTool soundtool;
 //¶¯Ì¬äÖÈ¾È¦
 PxVec3 roleWorldPosition = PxVec3(0);
-DynamicBall dynamicBall = DynamicBall(true);
+DynamicBall dynamicBall = DynamicBall(false);
 
 extern Animation animation;
 extern void renderGameOver();
@@ -104,8 +104,7 @@ void animationRenderCallback() {
 
 	string currentAnimation = animation.getCurrentAnimation();
 
-	if ((currentAnimation == "idle")) 
-	{
+	if (currentAnimation == "idle") {
 		animation.update(0.5);
 	}
 	else if (currentAnimation == "openDoor")
@@ -114,9 +113,18 @@ void animationRenderCallback() {
 			animation.setAnimation("idle");
 		}
 	}
-	else if (currentAnimation == "picking")
+	else if (currentAnimation == "pickUp" || currentAnimation == "putDown" || currentAnimation == "notUseKey")
 	{
 		if (animation.update(1.2, true)) {
+			animation.setAnimation("idle");
+		}
+	}
+	else if (currentAnimation == "useKey")
+	{
+		PxVec3 tempPosition = role->keyDoorActor->getGlobalPose().p;
+		PxQuat tempQuat = role->keyDoorActor->getGlobalPose().q;
+		role->keyDoorActor->setGlobalPose(PxTransform(PxVec3(tempPosition.x, tempPosition.y + 0.25f, tempPosition.z), tempQuat),false);
+		if (animation.update(1.5, true)) {
 			animation.setAnimation("idle");
 		}
 	}
@@ -161,6 +169,7 @@ void renderCallback()
 			}
 			//ÃÔ¹¬
 			if (role->nowCheckpoint == 5) {
+				
 				if (role->getRotateOrNot() && role->getSpeed().isZero()) {
 					role->setRotateOrNot(true);
 					sCamera->isMoving = 1;
@@ -171,6 +180,7 @@ void renderCallback()
 				roleBackPosition = role->getFootPosition() + PxVec3(0, 32, 0) + (PxVec3(0, 0, -30));
 			}
 			else  if(role->nowCheckpoint != 5){
+				
 				if (!role->getRotateOrNot() && role->getSpeed().isZero()) {
 					role->setRotateOrNot(true);
 					sCamera->isMoving = 1;

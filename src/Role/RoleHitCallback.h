@@ -20,8 +20,6 @@ extern void renderGameOver();
 extern SoundTool soundtool;
 extern Animation animation;
 
-bool firstOver = true;
-
 class RoleHitCallback :public PxUserControllerHitReport {
 public:
 	void onShapeHit(const PxControllerShapeHit& hit) {
@@ -50,13 +48,20 @@ public:
 			if (name == "Door") {
 				Door* door = (Door*)actor.userData;
 				float scale = 9000.0f;
-				door->addPForce(role->getFaceDir() * scale);
-				
-				if (door->canOpen()) {
-					if (!door->getDoorStauts()) {
+
+				if (!door->getNeedKey()) {
+
+					door->addPForce(role->getFaceDir() * scale);
+
+					if (door->canOpen()) {
+						if (!door->getDoorStauts()) {
+							animation.setAnimation("openDoor");
+							soundtool.playSound("openDoorSlowly.wav", true);
+							door->setDoorStatus(true);
+						}
+					}
+					else {
 						animation.setAnimation("openDoor");
-						soundtool.playSound("openDoorSlowly.wav", true);
-						door->setDoorStatus(true);
 					}
 				}
 			}
