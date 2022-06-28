@@ -47,12 +47,15 @@ extern SoundTool soundtool;
 //动态渲染圈
 PxVec3 roleWorldPosition = PxVec3(0);
 //是否开启动态渲染圈（场景机关据此设置不同速度）
-bool openDynamicBall = true;
+bool openDynamicBall = false;
 DynamicBall dynamicBall = DynamicBall(openDynamicBall);
 
 
 extern Animation animation;
 extern void renderGameOver();
+
+int changePendulumDir = 0;
+bool changePendulumDirFlag = true;
 
 namespace
 {
@@ -250,20 +253,16 @@ void renderCallback()
 					GameSceneBasic* gsb = (GameSceneBasic*)actor->userData;
 					PrismaticRoad* pr = (PrismaticRoad*)gsb;
 					if (actor->getGlobalPose().p.x <= pr->getEndPosition().x) {
-						if (openDynamicBall) {
+						actor->setLinearVelocity(PxVec3(0.4, 0, 0) * deltaClock);
+						/*if (openDynamicBall) {
 							actor->setLinearVelocity(PxVec3(15, 0, 0));
 						}
 						else {
 							actor->setLinearVelocity(PxVec3(40, 0, 0));
-						}
+						}*/
 					}
 					else if (actor->getGlobalPose().p.x >= pr->getStartPosition().x) {
-						if (openDynamicBall) {
-							actor->setLinearVelocity(PxVec3(-15, 0, 0));
-						}
-						else {
-							actor->setLinearVelocity(PxVec3(-40, 0, 0));
-						}
+						actor->setLinearVelocity(PxVec3(-0.4, 0, 0) * deltaClock);
 					}
 				}
 				//摆锤处平移路段
@@ -272,20 +271,28 @@ void renderCallback()
 					GameSceneBasic* gsb = (GameSceneBasic*)actor->userData;
 					PrismaticRoad* pr = (PrismaticRoad*)gsb;
 					if (actor->getGlobalPose().p.x <= pr->getStartPosition().x) {
-						if (openDynamicBall) {
-							actor->setLinearVelocity(PxVec3(15, 0, 0));
+						actor->setLinearVelocity(PxVec3(0.4, 0, 0)* deltaClock);
+						/*if (openDynamicBall) {
+							actor->setLinearVelocity(PxVec3(15, 0, 0)* deltaClock);
 						}
 						else {
-							actor->setLinearVelocity(PxVec3(30, 0, 0));
-						}
+							actor->setLinearVelocity(PxVec3(30, 0, 0)* deltaClock);
+						}*/
 					}
 					else if (actor->getGlobalPose().p.x >= pr->getEndPosition().x) {
-						if (openDynamicBall) {
-							actor->setLinearVelocity(PxVec3(-15, 0, 0));
-						}
-						else {
-							actor->setLinearVelocity(PxVec3(-30, 0, 0));
-						}
+						actor->setLinearVelocity(PxVec3(-0.4, 0, 0)* deltaClock);
+					}
+				}
+				else if (actors[i]->getName() == "Pendulum0") {
+					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
+					if (actor->getGlobalPose().q.getAngle() >= PxHalfPi/2 && changePendulumDirFlag) {
+						std::cout << "达到45度" << endl;
+						actor->setLinearVelocity(PxVec3(0, -cos(PxHalfPi / 2), sin(PxHalfPi / 2)) * 10 * deltaClock);
+						changePendulumDir++;
+						changePendulumDirFlag = false;
+					}
+					else if (actor->getGlobalPose().q.getAngle() < PxHalfPi / 2) {
+						changePendulumDirFlag = true;
 					}
 				}
 				

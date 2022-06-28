@@ -899,7 +899,7 @@ void createPrismatic(const PxTransform& t, PxVec3 v, const char* name, float x, 
 
 void createSyntheticLevel(const PxTransform& t, PxVec3 v, float halfExtend, float roadblock_length, float roadblock_width, float sideSeesaw_length, float sideSeesaw_Height, float sideSeesaw_width, PxTransform& pose) {
 	PxTransform pos(t.transform(PxTransform(v)));
-	createPendulum(pos, PxVec3(0, boxHeight + halfExtend + 0.5, 0), halfExtend, 0.6, 10.0, 0.6, "Pendulum0", pose, PxVec3(0, 0, -1));
+	createPendulum(pos, PxVec3(0, boxHeight + halfExtend + 0.5, 0), halfExtend, 0.6, 10.0, 0.6, "Pendulum0", pose, PxVec3(0, 0, -2));
 	createSideSeesaw(pos, PxVec3(-halfExtend - 0.5 * dx, 0, -roadblock_width - dz), sideSeesaw_width, 1.0, sideSeesaw_length, pose);
 	createPendulum(pos, PxVec3(0.5 * dx + 2 * halfExtend, boxHeight + halfExtend + 0.5, 0), halfExtend, 0.6, 10.0, 0.6, "Pendulum1", pose, PxVec3(0, 0, 0.5));
 	createPendulum(pos, PxVec3(dx + 4 * halfExtend, boxHeight + halfExtend + 0.5, 0), halfExtend, 0.6, 10.0, 0.6, "Pendulum2", pose, PxVec3(0, 0, 1));
