@@ -48,7 +48,11 @@ const PxTransform t = PxTransform(PxVec3(-50, 0, -250));
 
 //材质贴图ID数组
 std::map<string, unsigned int> textureMap;
-std::string texture[] = { "Door","Wall","Road","SeesawBox","Seesaw","Ice","man","KeyDoor"};
+std::string texture[] = {	"Door","Wall","Road",
+							"SeesawBox","Seesaw","Ice",
+							"KeyDoor","Prop", "RotateRod",
+							"PrismaticRoad0","PrismaticRoad1","Gear",
+							"FerrisWheel","PoolWall"};
 
 //音频类
 SoundTool soundtool = SoundTool();

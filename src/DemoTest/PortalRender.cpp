@@ -47,7 +47,7 @@ extern SoundTool soundtool;
 //动态渲染圈
 PxVec3 roleWorldPosition = PxVec3(0);
 //是否开启动态渲染圈（场景机关据此设置不同速度）
-bool openDynamicBall = true;
+bool openDynamicBall = false;
 DynamicBall dynamicBall = DynamicBall(openDynamicBall);
 
 

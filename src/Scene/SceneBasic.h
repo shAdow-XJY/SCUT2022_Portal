@@ -25,7 +25,8 @@ enum OrganType
 	sphere = 10, //普通球体
 	pendulum = 11, //摆锤
 	ground = 12,  //地面
-	keyDoor = 13 //需要钥匙的门
+	keyDoor = 13, //需要钥匙的门
+	poolWall = 14
 };
 
 static int totalCheckpoint = 1;

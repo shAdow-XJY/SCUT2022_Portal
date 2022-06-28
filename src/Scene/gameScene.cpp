@@ -85,6 +85,9 @@ const char* typeMapName(OrganType type) {
 	case OrganType::keyDoor: {
 		return "KeyDoor";
 	}
+	case OrganType::poolWall: {
+		return "PoolWall";
+	}
 	default:
 		return "Block";
 		break;
@@ -391,7 +394,7 @@ void createMaze(const PxTransform& t, PxVec3 v, float scale, PxTransform& pose) 
 		for (int j = 0; j < 9; j++) {
 			door_z = z + j * 37 * scale;
 			if (frontDoorCanOpen[i][j]) {
-				if (i == 7 && j == 8) {
+				if ((i == 7 && j == 8)||(i == 2 && j == 0)) {
 					createFrontDoor(t, PxVec3(door_x, door_y, door_z), scale, pose, true, true);
 				}
 				else
@@ -723,15 +726,15 @@ pose刚体初始姿态*/
 void createPool(const PxTransform& t, PxVec3 bottom, float poolLength, float poolHeight,float poolWidth, PxTransform& pose) {
 	PxTransform pos(t.transform(PxTransform(bottom)));
 	//底部
-	createStaticBox(pos, PxVec3(0, 0, 0), poolLength + 2.0, 1.0, poolWidth + 2.0, pose);
+	createStaticBox(pos, PxVec3(0, 0, 0), poolLength + 2.0, 1.0, poolWidth + 2.0, pose,OrganType::poolWall);
 	//左侧
-	createStaticBox(pos, PxVec3(1.0 + poolLength, 1.0 + poolHeight, 0), 1.0, poolHeight, poolWidth + 2.0, pose);
+	createStaticBox(pos, PxVec3(1.0 + poolLength, 1.0 + poolHeight, 0), 1.0, poolHeight, poolWidth + 2.0, pose, OrganType::poolWall);
 	//右侧
-	createStaticBox(pos, PxVec3(- 1.0 - poolLength,  1.0 + poolHeight, 0), 1.0, poolHeight, poolWidth + 2.0, pose);
+	createStaticBox(pos, PxVec3(- 1.0 - poolLength,  1.0 + poolHeight, 0), 1.0, poolHeight, poolWidth + 2.0, pose, OrganType::poolWall);
 	//前侧
-	createStaticBox(pos, PxVec3(0,  1.0 + poolHeight, - 1.0 - poolWidth), poolLength, poolHeight, 1.0, pose);
+	createStaticBox(pos, PxVec3(0,  1.0 + poolHeight, - 1.0 - poolWidth), poolLength, poolHeight, 1.0, pose, OrganType::poolWall);
 	//后侧
-	createStaticBox(pos, PxVec3(0,  1.0 + poolHeight, 1.0 + poolWidth), poolLength, poolHeight, 1.0, pose);
+	createStaticBox(pos, PxVec3(0,  1.0 + poolHeight, 1.0 + poolWidth), poolLength, poolHeight, 1.0, pose, OrganType::poolWall);
 }
 
 /*旋转杆关卡与水池连接处的齿轮
@@ -742,7 +745,7 @@ abgularVelocity 齿轮旋转角速度，这里扇面竖直，通过角速度PxVec3(0,0,z)中z的大小控
 void createGear(const PxTransform& t, PxVec3 v, float x, float y, float z, PxVec3 angularVelocity) {
 	PxTransform pos(t.transform(v));
 	PxRigidDynamic* gear = gPhysics->createRigidDynamic(pos);
-	gear->setName("");
+	gear->setName("Gear");
 	PxShape* shape0 = PxRigidActorExt::createExclusiveShape(*gear, PxBoxGeometry(x, y, z), *gMaterial);
 	PxShape* shape1 = PxRigidActorExt::createExclusiveShape(*gear, PxBoxGeometry(x, y, z), *gMaterial);
 	//PxShape* shape2 = PxRigidActorExt::createExclusiveShape(*ferrisWheel, PxBoxGeometry(x, y, z), *gMaterial);
@@ -780,7 +783,7 @@ void createFerrisWheel(const PxTransform& t, PxVec3 v, float x, float y, float z
 	shape0->setQueryFilterData(collisionGroup);
 	shape1->setQueryFilterData(collisionGroup);
 	shape2->setQueryFilterData(collisionGroup);
-	ferrisWheel->setName("");
+	ferrisWheel->setName("FerrisWheel");
 	ferrisWheel->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
 	ferrisWheel->setAngularVelocity(angularVelocity);
 	ferrisWheel->setAngularDamping(0.f);
@@ -863,7 +866,7 @@ void createFerrisWheel(const PxTransform& t, PxVec3 v, float x, float y, float z
 	gScene->addActor(*ferrisWheel1);
 	ferrisWheel1->setMass(0.f);
 	ferrisWheel1->setMassSpaceInertiaTensor(PxVec3(0.f));
-	ferrisWheel1->setName("");
+	ferrisWheel1->setName("FerrisWheel");
 	//另一中心球体
 	PxRigidDynamic* sphere1 = createDynamicSphere(pos1, PxVec3(0, 0, 0), 2 * y);
 	PxFixedJointCreate(*gPhysics, ferrisWheel1, center, sphere1, center);
