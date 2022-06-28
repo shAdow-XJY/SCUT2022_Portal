@@ -89,7 +89,7 @@ void initGame() {
 	//初始位置
 	//role->setFootPosition(checkpoints[0]);
 	//摆锤前位置
-	//role->setFootPosition(checkpoints[1]);
+	role->setFootPosition(checkpoints[1]);
 	//摩天轮前位置
 	//role->setFootPosition(checkpoints[2]);
 	//旋转路关卡前位置
@@ -97,9 +97,7 @@ void initGame() {
 	//迷宫前位置
 	//role->setFootPosition(checkpoints[4]);
 	//迷宫出口位置 
-	role->setFootPosition(checkpoints[5]);
-	//平移路段前位置 
-	//role->setFootPosition(t.transform(PxVec3(66, 69.6, 421.8)));
+	//role->setFootPosition(checkpoints[5]);
 	//旋转杆关卡角落位置
 	//role->setFootPosition(checkpoints[6]);
 	

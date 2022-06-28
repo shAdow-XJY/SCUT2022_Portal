@@ -1,7 +1,6 @@
 #define RENDER_SNIPPET 1
 #ifdef RENDER_SNIPPET
 #include <vector>
-
 #include "PxPhysicsAPI.h"
 #include "../Render/Render.h"
 #include "../Render/Camera.h"
@@ -10,6 +9,7 @@
 #include <Render/DynamicBall.h>
 #include <Sound/SoundTools.h>
 #include <Animation/Animation.h>
+#include <time.h>
 using namespace physx;
 extern void initPhysics(bool interactive);
 extern void stepPhysics(bool interactive);	
@@ -22,7 +22,6 @@ extern void specialKeyRelease(GLint key);
 extern void calculateElapsedClocksFromLastFrame();
 extern void loadTexture();
 extern void initGame();
-
 extern Role* role;
 extern clock_t deltaClock;
 
@@ -47,7 +46,10 @@ RenderBox skyBox;
 extern SoundTool soundtool;
 //动态渲染圈
 PxVec3 roleWorldPosition = PxVec3(0);
-DynamicBall dynamicBall = DynamicBall(false);
+//是否开启动态渲染圈（场景机关据此设置不同速度）
+bool openDynamicBall = true;
+DynamicBall dynamicBall = DynamicBall(openDynamicBall);
+
 
 extern Animation animation;
 extern void renderGameOver();
@@ -241,7 +243,53 @@ void renderCallback()
 		{
 			std::vector<PxRigidActor*> actors(nbActors);
 			scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
-			//role->nowCheckpoint;
+			for (int i = 0; i < nbActors; i++) {
+				//迷宫处平移路段
+				if (actors[i]->getName() == "PrismaticRoad0") {
+					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
+					GameSceneBasic* gsb = (GameSceneBasic*)actor->userData;
+					PrismaticRoad* pr = (PrismaticRoad*)gsb;
+					if (actor->getGlobalPose().p.x <= pr->getEndPosition().x) {
+						if (openDynamicBall) {
+							actor->setLinearVelocity(PxVec3(15, 0, 0));
+						}
+						else {
+							actor->setLinearVelocity(PxVec3(40, 0, 0));
+						}
+					}
+					else if (actor->getGlobalPose().p.x >= pr->getStartPosition().x) {
+						if (openDynamicBall) {
+							actor->setLinearVelocity(PxVec3(-15, 0, 0));
+						}
+						else {
+							actor->setLinearVelocity(PxVec3(-40, 0, 0));
+						}
+					}
+				}
+				//摆锤处平移路段
+				else if (actors[i]->getName() == "PrismaticRoad1") {
+					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
+					GameSceneBasic* gsb = (GameSceneBasic*)actor->userData;
+					PrismaticRoad* pr = (PrismaticRoad*)gsb;
+					if (actor->getGlobalPose().p.x <= pr->getStartPosition().x) {
+						if (openDynamicBall) {
+							actor->setLinearVelocity(PxVec3(15, 0, 0));
+						}
+						else {
+							actor->setLinearVelocity(PxVec3(30, 0, 0));
+						}
+					}
+					else if (actor->getGlobalPose().p.x >= pr->getEndPosition().x) {
+						if (openDynamicBall) {
+							actor->setLinearVelocity(PxVec3(-15, 0, 0));
+						}
+						else {
+							actor->setLinearVelocity(PxVec3(-30, 0, 0));
+						}
+					}
+				}
+				
+			}
 			Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
 		}
 		

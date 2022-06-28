@@ -20,3 +20,11 @@ PxVec3 PrismaticRoad::getStaticPosition() {
 void PrismaticRoad::resetDistance() {
 	this->distance = PxVec3(0, 0, 0);
 }
+
+PxVec3 PrismaticRoad::getStartPosition() {
+	return this->startPosition;
+}
+
+PxVec3 PrismaticRoad::getEndPosition() {
+	return this->endPosition;
+}
