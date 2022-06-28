@@ -10,6 +10,8 @@
 #include <Render/DynamicBall.h>
 #include <Sound/SoundTools.h>
 #include <Animation/Animation.h>
+#include"../ImGui/imgui_freetype.h"
+#include <time.h>
 using namespace physx;
 extern void initPhysics(bool interactive);
 extern void stepPhysics(bool interactive);	
@@ -47,7 +49,9 @@ RenderBox skyBox;
 extern SoundTool soundtool;
 //动态渲染圈
 PxVec3 roleWorldPosition = PxVec3(0);
-DynamicBall dynamicBall = DynamicBall(true);
+//是否开启动态渲染圈（场景机关据此设置不同速度）
+bool openDynamicBall = true;
+DynamicBall dynamicBall = DynamicBall(openDynamicBall);
 
 extern Animation animation;
 extern void renderGameOver();
@@ -329,7 +333,7 @@ void reshape(int width, int height)
 	
 }
 
-
+ImFont* emojiFont;
 void renderLoop()
 {
 	sCamera = new Snippets::Camera(PxVec3(50.0f, 50.0f, 50.0f), PxVec3(-0.6f, -0.2f, -0.7f));
@@ -355,7 +359,14 @@ void renderLoop()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.Fonts->AddFontFromFileTTF("../../src/ImGui/segoeui.ttf",23.0f);
+	io.Fonts->AddFontFromFileTTF("../../src/ImGui/segoeui.ttf", 23.0f);
+
+	static ImWchar ranges[] = { 0x1, 0x1FFFF, 0 };
+	static ImFontConfig cfg;
+	cfg.OversampleH = cfg.OversampleV = 1;
+	cfg.MergeMode = true;
+	cfg.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_LoadColor;
+	emojiFont = io.Fonts->AddFontFromFileTTF("../../src/ImGui/seguiemj.ttf", 23.0f, &cfg, ranges);
 	ImGui::StyleColorsDark();
 
 	ImGui_ImplGLUT_Init();

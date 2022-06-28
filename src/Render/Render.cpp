@@ -52,6 +52,7 @@ bool helpMenu = false;
 
 extern void reshape(int width, int height);
 extern Snippets::Camera* sCamera;
+extern ImFont* emojiFont;
 
 namespace Callbacks {
 	extern void idleCallback();
@@ -416,11 +417,13 @@ namespace Snippets
 		ImGuiWindowFlags window_flags = 0;
 		window_flags |= ImGuiWindowFlags_NoBackground;
 		window_flags |= ImGuiWindowFlags_NoTitleBar;
+		window_flags |= ImGuiWindowFlags_NoResize;
 	
 		if (welcome) {
 			ImGui::Begin(" ", &welcome, window_flags - 128);
 			ImGui::NewLine();
 			textCentered("Welcome to Portal's game");
+			
 			ImGui::NewLine();
 			menuButtonCentered2("Play", "Exit");
 				
@@ -436,12 +439,20 @@ namespace Snippets
 			//ImGui::Text("ImGui successfully deployed.");           
 
 			//ImGui::SameLine();
-			ImGui::Text("Press H to open help menu.");
+			for (int i = 0; i <= role->getHealth(); ++i) {
+				ImGui::Text(u8"♥");
+				ImGui::SameLine();
+			}
+			ImGui::NewLine();
 			ImGui::Text("Checkpoint: %d", role->getCheckpoint());
-			ImGui::Text("Life: %d", role->getHealth());
+			//ImGui::Text("Life: %d", role->getHealth());
 			ImGui::Text("Score: %d", role->getScore());
+			ImGui::Text("Press H to open help menu");
 			if (!sCamera->isFree()) {
-				ImGui::Text("Camera is locked.");
+				ImGui::PushFont(emojiFont);
+				ImGui::Text("Camera is locked");
+				ImGui::PopFont();
+				
 			}
 			//ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
 			ImGui::End();
@@ -449,11 +460,22 @@ namespace Snippets
 		
 		if(helpMenu)
 		{
-			ImGui::Begin("Play Guide");
+			ImGuiWindowFlags flags = 0;
+			flags |= ImGuiWindowFlags_NoTitleBar;
+			flags |= ImGuiWindowFlags_NoBackground;
+			flags |= ImGuiWindowFlags_NoResize;
+
+			ImGui::Begin("Play Guide", &helpMenu, flags - 128);
 			ImGui::Text("Arraw keys: Move the player");
 			ImGui::Text("T: Unlock/Lock camera");
 			ImGui::Text("Hold/Release space: Charge/Jump");
 			ImGui::Text("WASD: Free camera");
+			ImGui::End();
+
+			ImGui::Begin("Control the character and head to the end!", &helpMenu, flags);
+			ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+			ImGui::Text("Control the character and head to the end!");
+			ImGui::PopStyleColor();
 			ImGui::End();
 		}
 			
