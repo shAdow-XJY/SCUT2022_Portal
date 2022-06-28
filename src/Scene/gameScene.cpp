@@ -20,6 +20,8 @@ extern PxMaterial* gMaterial;
 extern PxPhysics* gPhysics;
 extern vector<PxVec3> checkpoints;
 extern int primaryJumpHeight;
+extern bool openDynamicBall;
+
 //设定的最大跳跃高度，可调整
 float maxJumpHeight = 6.0;
 //场景道路盒子的半高
@@ -537,7 +539,7 @@ halfExtend 摆锤底部球体的半径
 rod_x,rod_y,rod_z 连接杆的长高宽
 pose 刚体（连接杆）的初始朝向
 velocity 摆锤的初始速度*/
-void createPendulum(const PxTransform& t, PxVec3 v, float halfExtend, float rod_x, float rod_y, float rod_z, PxTransform& pose,PxVec3 velocity) {
+void createPendulum(const PxTransform& t, PxVec3 v, float halfExtend, float rod_x, float rod_y, float rod_z, const char* name, PxTransform& pose,PxVec3 velocity) {
 	PxTransform pos(t.transform(PxTransform(v)));
 	PxRigidDynamic* actor0 = createDynamicSphere(pos, PxVec3(0, 0, 0), halfExtend);
 	actor0->setMass(30.0f);
@@ -550,6 +552,7 @@ void createPendulum(const PxTransform& t, PxVec3 v, float halfExtend, float rod_
 	actor1->setMass(1.0f);
 	actor1->setLinearVelocity(velocity * 2400);
 	actor1->setAngularDamping(0.f);
+	actor1->setName(name);
 	//actor1->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
 	PxTransform localFrame0(PxVec3(0, halfExtend, 0));
 	PxTransform localFrame1(PxVec3(0, -rod_y + 2, 0)); 
@@ -564,7 +567,7 @@ void createPendulum(const PxTransform& t, PxVec3 v, float halfExtend, float rod_
 }
 
 //创建平移路面 属于动态刚体(区别于road静态刚体)
-void createPrismaticRoad(const PxTransform& t, PxVec3 v0, PxReal x0, PxReal y0, PxReal z0, PxTransform& pose0, PxVec3 v1, PxReal x1, PxReal y1, PxReal z1, PxTransform& pose1, PxJointLinearLimitPair& limits, const PxVec3& velocity = PxVec3(0)) {
+/*/void createPrismaticRoad(const PxTransform& t, PxVec3 v0, PxReal x0, PxReal y0, PxReal z0, PxTransform& pose0, PxVec3 v1, PxReal x1, PxReal y1, PxReal z1, PxTransform& pose1, PxJointLinearLimitPair& limits, const PxVec3& velocity = PxVec3(0)) {
 	PxTransform pos(t.transform(PxTransform(v0)));
 	PxRigidStatic* actor0 = createRoad(pos, PxVec3(0, 0, 0), x0, y0, z0, pose0);
 	PxRigidDynamic* actor1 = createDynamicBox(false, pos, v1, x1, y1, z1, pose1, OrganType::prismaticRoad, velocity);
@@ -579,7 +582,7 @@ void createPrismaticRoad(const PxTransform& t, PxVec3 v0, PxReal x0, PxReal y0, 
 	//PxSpring spring(40.0f, 0.f);  //stiffness、dampling
 	prismatic->setLimit(PxJointLinearLimitPair(limits));
 	prismatic->setPrismaticJointFlag(PxPrismaticJointFlag::eLIMIT_ENABLED, true);
-}
+}*/
 
 void createRotateRod(const PxTransform& t, PxVec3 v, PxReal halfExtend, PxTransform& pose, PxVec3 velocity0, PxVec3 velocity1) {
 	PxTransform pos(t.transform(PxTransform(v)));
@@ -651,10 +654,10 @@ t为该刚体构建的相对原点
 v为该刚体中心点相对其构建原点的位置
 rod_length, rod_height, rod_width为杆的长、高、宽
 abgularVelocity 风扇旋转角速度，这里扇面水平，通过角速度PxVec3(0,y,0)中y的大小控制其旋转速度*/
-void createRoTateRodLevel(const PxTransform& t, PxVec3 v,float rod_length,float rod_height,float rod_width, float boxHeight,PxTransform& pose) {
+void createRoTateRodLevel(const PxTransform& t, PxVec3 v,float rod_length,float rod_height,float rod_width, float boxHeight, PxVec3 angularVelocity, PxTransform& pose) {
 	createIceRoad(t, v, rod_length, boxHeight, rod_length, pose);
 	//createRotateRod(t, PxVec3(v.x, v.y + boxHeight + 2.0, v.z), 1.5, pose, PxVec3(1, 0, 0) * 70, PxVec3(0, 0, -1) * 70);
-	createFan(t, PxVec3(v.x, v.y + 2 * boxHeight + 1.7f, v.z), rod_length, rod_height, rod_width, PxVec3(0, 4, 0));
+	createFan(t, PxVec3(v.x, v.y + 2 * boxHeight + 1.7f, v.z), rod_length, rod_height, rod_width, angularVelocity);
 
 	//旋转杆1中心点
 	float rr1_x = v.x - 2 * rod_length;
@@ -663,14 +666,14 @@ void createRoTateRodLevel(const PxTransform& t, PxVec3 v,float rod_length,float 
 	//中间路段
 	createIceRoad(t, PxVec3(rr1_x, rr1_y, v.z), rod_length, boxHeight, 2 * rod_length + 1.0, pose);
 	//createRotateRod(t, PxVec3(rr1_x, rr1_y + 2 * boxHeight, rr1_z), 1.5, pose, PxVec3(1, 0, 0) * 70, PxVec3(0, 0, -1) * 70);
-	createFan(t, PxVec3(rr1_x, rr1_y + 2 * boxHeight + 1.7f, rr1_z), rod_length, rod_height, rod_width, PxVec3(0, 4, 0));
+	createFan(t, PxVec3(rr1_x, rr1_y + 2 * boxHeight + 1.7f, rr1_z), rod_length, rod_height, rod_width, angularVelocity);
 
 	//旋转杆2中心点
 	float rr2_x = rr1_x;
 	float rr2_y = rr1_y;
 	float rr2_z = v.z - rod_length - 0.5;
 	//createRotateRod(t, PxVec3(rr2_x, rr2_y + 2 * boxHeight, rr2_z), 1.5, pose, PxVec3(-1, 0, 0) * 70, PxVec3(0, 0, 1) * 70);
-	createFan(t, PxVec3(rr2_x, rr2_y + 2 * boxHeight + 1.7f, rr2_z), rod_length, rod_height, rod_width, PxVec3(0, -4, 0));
+	createFan(t, PxVec3(rr2_x, rr2_y + 2 * boxHeight + 1.7f, rr2_z), rod_length, rod_height, rod_width, -angularVelocity);
 
 	//旋转杆3中心点
 	float rr3_x = v.x - 4 * rod_length;
@@ -678,7 +681,7 @@ void createRoTateRodLevel(const PxTransform& t, PxVec3 v,float rod_length,float 
 	float rr3_z = v.z;
 	createIceRoad(t, PxVec3(rr3_x, rr3_y, rr3_z), rod_length, boxHeight, rod_length, pose);
 	//createRotateRod(t, PxVec3(rr3_x, rr3_y + 2 * boxHeight, rr3_z), 1.5, pose, PxVec3(-1, 0, 0) * 70, PxVec3(0, 0, 1) * 70);
-	createFan(t, PxVec3(rr3_x, rr3_y + 2 * boxHeight + 1.7f, rr3_z), rod_length, rod_height, rod_width, PxVec3(0, -4, 0));
+	createFan(t, PxVec3(rr3_x, rr3_y + 2 * boxHeight + 1.7f, rr3_z), rod_length, rod_height, rod_width, -angularVelocity);
 }
 
 /*创建水池
@@ -708,6 +711,7 @@ abgularVelocity 齿轮旋转角速度，这里扇面竖直，通过角速度PxVec3(0,0,z)中z的大小控
 void createGear(const PxTransform& t, PxVec3 v, float x, float y, float z, PxVec3 angularVelocity) {
 	PxTransform pos(t.transform(v));
 	PxRigidDynamic* gear = gPhysics->createRigidDynamic(pos);
+	gear->setName("");
 	PxShape* shape0 = PxRigidActorExt::createExclusiveShape(*gear, PxBoxGeometry(x, y, z), *gMaterial);
 	PxShape* shape1 = PxRigidActorExt::createExclusiveShape(*gear, PxBoxGeometry(x, y, z), *gMaterial);
 	//PxShape* shape2 = PxRigidActorExt::createExclusiveShape(*ferrisWheel, PxBoxGeometry(x, y, z), *gMaterial);
@@ -745,6 +749,7 @@ void createFerrisWheel(const PxTransform& t, PxVec3 v, float x, float y, float z
 	shape0->setQueryFilterData(collisionGroup);
 	shape1->setQueryFilterData(collisionGroup);
 	shape2->setQueryFilterData(collisionGroup);
+	ferrisWheel->setName("");
 	ferrisWheel->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
 	ferrisWheel->setAngularVelocity(angularVelocity);
 	ferrisWheel->setAngularDamping(0.f);
@@ -827,6 +832,7 @@ void createFerrisWheel(const PxTransform& t, PxVec3 v, float x, float y, float z
 	gScene->addActor(*ferrisWheel1);
 	ferrisWheel1->setMass(0.f);
 	ferrisWheel1->setMassSpaceInertiaTensor(PxVec3(0.f));
+	ferrisWheel1->setName("");
 	//另一中心球体
 	PxRigidDynamic* sphere1 = createDynamicSphere(pos1, PxVec3(0, 0, 0), 2 * y);
 	PxFixedJointCreate(*gPhysics, ferrisWheel1, center, sphere1, center);
@@ -849,15 +855,24 @@ float createFanRoadLevel(const PxTransform& t, PxVec3 v, float x, float y, float
 	return v.z + fanPos2.z;
 }
 
-void createPrismatic(const PxTransform& t, PxVec3 v,PxTransform& pose) {
-	PxRigidDynamic* actor1 = createDynamicBox(false, t, v, 3.0, 1.0, 4.0, pose, OrganType::prismaticRoad,PxVec3(0, 0, 0));
+void createPrismatic(const PxTransform& t, PxVec3 v, const char* name, float x, float y, float z, PxVec3 startPos, PxVec3 endPos, PxTransform& pose) {
+	PxRigidDynamic* actor1 = createDynamicBox(false, t, v, x, y, z, pose, OrganType::prismaticRoad,PxVec3(0, 0, 0));
 	PxVec3 position = actor1->getGlobalPose().p;
-	PrismaticRoad* prismaticRoad = new PrismaticRoad("平移路面", position, 3.0, 1.0, 4.0, actor1);
+	PrismaticRoad* prismaticRoad = new PrismaticRoad("平移路面", position, x, y, z, startPos, endPos, actor1);
 	actor1->userData = prismaticRoad;
-	actor1->setName("PrismaticRoad");
+	actor1->setName(name);
 	actor1->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
 	actor1->setMass(0.f);
 	actor1->setMassSpaceInertiaTensor(PxVec3(0.f));
+}
+
+void createSyntheticLevel(const PxTransform& t, PxVec3 v, float halfExtend, float roadblock_length, float roadblock_width, float sideSeesaw_length, float sideSeesaw_Height, float sideSeesaw_width, PxTransform& pose) {
+	PxTransform pos(t.transform(PxTransform(v)));
+	createPendulum(pos, PxVec3(0, boxHeight + halfExtend + 0.5, 0), halfExtend, 0.6, 10.0, 0.6, "Pendulum0", pose, PxVec3(0, 0, -1));
+	createSideSeesaw(pos, PxVec3(-halfExtend - 0.5 * dx, 0, -roadblock_width - dz), sideSeesaw_width, 1.0, sideSeesaw_length, pose);
+	createPendulum(pos, PxVec3(0.5 * dx + 2 * halfExtend, boxHeight + halfExtend + 0.5, 0), halfExtend, 0.6, 10.0, 0.6, "Pendulum1", pose, PxVec3(0, 0, 0.5));
+	createPendulum(pos, PxVec3(dx + 4 * halfExtend, boxHeight + halfExtend + 0.5, 0), halfExtend, 0.6, 10.0, 0.6, "Pendulum2", pose, PxVec3(0, 0, 1));
+	createSideSeesaw(pos, PxVec3(dx + 4 * halfExtend + 0.5 * dx, 0, -roadblock_width - dz), sideSeesaw_width, 1.0, sideSeesaw_length, pose);
 }
 
 //创建游戏场景
@@ -910,13 +925,16 @@ void createGameScene(const PxTransform& t) {
 	totalCheckpoint++;
 	checkpoints.push_back(t.transform(PxVec3(center_x - 2 * stairsLength, centerHeight - 2 * boxHeight + 7.0, center_z)));
 
-	//悬空路段
-	float roadblock_length = 3.0;
+	//悬空路段/改版平移路段+摆锤
+	float roadblock_length = 5.0;
 	float roadblock_width = 6.0;  //4
-	float rb_x = center_x - stairsLength + dx + roadblock_length;
+	//平移路段初始相对位置 PrismaticRoad1
+	float rb_x = center_x - stairsLength + 0.7 * dx + roadblock_length;
 	float rb_y = centerHeight - 2 * boxHeight;
 	float rb_z = center_z;
+	std::cout << "摆锤关卡平移路段初始x值" << t.transform(PxVec3(rb_x, rb_y, rb_z)).x << endl;
 	//createRoad(t, PxVec3(rb_x, rb_y, rb_z), roadblock_length, boxHeight, roadblock_width, defaultPose);
+	/*原悬空路段+摆锤关卡
 	for (int i = 0; i < 3; i++) {
 		createRoad(t, PxVec3(rb_x, rb_y, rb_z), roadblock_length, boxHeight, roadblock_width, defaultPose);
 		if (i % 2 == 0) {
@@ -928,17 +946,30 @@ void createGameScene(const PxTransform& t) {
 		}
 		rb_x = rb_x + 2 * roadblock_length + dx;
 	}
-
 	//最后一块悬空路段的中心点（rb_x-2 * roadblock_length - dx, rb_y, rb_z）
-	std::cout << "最后一块悬空路段的中心点相对场景原点的坐标为:" << rb_x - 2 * roadblock_length - dx << "," << rb_y << "," << rb_z << endl;
+	std::cout << "最后一块悬空路段的中心点相对场景原点的坐标为:" << rb_x - 2 * roadblock_length - dx << "," << rb_y << "," << rb_z << endl;*/
+	//摆锤+跷跷板综合关卡
+	float syn_x = center_x - 2 * stairsLength + 4 * dx + 2 * roadblock_length;
+	float syn_y = rb_y;
+	float syn_z = rb_z;
+	createSyntheticLevel(t, PxVec3(syn_x, syn_y, syn_z), 5.0, roadblock_length, roadblock_width, 16.0, 1.0, 5.0, defaultPose);
 	
 	//第一块跷板的坐标
-	float seesawpos_x = rb_x - roadblock_length + 0.5 * dx;
+	/*float seesawpos_x = rb_x + roadblock_length + 3.5 * dx;*/
+	float seesawpos_x = rb_x + roadblock_length + 13.5 * dx;
 	float seesawpos_y = rb_y;
 	float seesawpos_z = rb_z;
 	float sx = 5.0;
 	float sy = 1.0;
 	float sz = 15.0;
+	float rb_x1 = seesawpos_x - sx - 2 * sy - 0.5 - 0.7 * dx - roadblock_length;
+	//平移路段始末位置(全局位置)及创建 PrismaticRoad1
+	PxVec3 pr1_startPos(t.transform(PxVec3(rb_x, rb_y, rb_z)));
+	PxVec3 pr1_endPos(t.transform(PxVec3(rb_x1, rb_y, rb_z)));
+	createPrismatic(t, PxVec3(rb_x, rb_y, rb_z), "PrismaticRoad1", roadblock_length, boxHeight, roadblock_width, pr1_startPos, pr1_endPos, defaultPose);
+	std::cout << "摆锤关卡平移路段终点x值" << t.transform(PxVec3(rb_x1, rb_y, rb_z)).x << endl;
+	std::cout << "startpos.x" << pr1_startPos.x << endl;
+	std::cout << "endpos.x" << pr1_endPos.x << endl;
 	PxVec3 seesawpos_v(seesawpos_x, seesawpos_y, seesawpos_z);
 	float lastSeesaw_x = createSeesawLevel(t, seesawpos_v, sx, sy, sz, defaultPose);
 	//最后一块跷板的中心点（lastSeesaw_x,seesawpos_y, seesawpos_z）
@@ -970,7 +1001,13 @@ void createGameScene(const PxTransform& t) {
 	float fw_x = c_8_x + r_8_l + 0.75 * fw_l;
 	float fw_y = c_8_y + fw_l;
 	float fw_z = c_8_z + seatWidth; + seatDistance + fw_w;
-	createFerrisWheel(t, PxVec3(fw_x, fw_y, fw_z), fw_l, fw_h, fw_w, seatLength, seatHeight, seatWidth, seatDistance, PxVec3(0, 0, -2));
+	if (openDynamicBall) {
+		//开启渲染圈
+		createFerrisWheel(t, PxVec3(fw_x, fw_y, fw_z), fw_l, fw_h, fw_w, seatLength, seatHeight, seatWidth, seatDistance, PxVec3(0, 0, -1));
+	}else{
+		//关闭渲染圈
+		createFerrisWheel(t, PxVec3(fw_x, fw_y, fw_z), fw_l, fw_h, fw_w, seatLength, seatHeight, seatWidth, seatDistance, PxVec3(0, 0, -2));
+	}
 
 	//#Checkpoint4
 	totalCheckpoint++;
@@ -1003,7 +1040,15 @@ void createGameScene(const PxTransform& t) {
 	float fan0_x = c_3_x;
 	float fan0_y = c_3_y;
 	float fan0_z = c_3_z + r_3_w + 0.5 * dz + fan_l;
-	float fan2_z = createFanRoadLevel(t, PxVec3(fan0_x, fan0_y, fan0_z), fan_l, fan_h, fan_w, PxVec3(0, 3, 0), defaultPose);
+	float fan2_z;
+	if (openDynamicBall) {
+		//开启渲染圈速度
+		fan2_z = createFanRoadLevel(t, PxVec3(fan0_x, fan0_y, fan0_z), fan_l, fan_h, fan_w, PxVec3(0, 1.5, 0), defaultPose);
+	}
+	else {
+		//关闭渲染圈速度
+		fan2_z = createFanRoadLevel(t, PxVec3(fan0_x, fan0_y, fan0_z), fan_l, fan_h, fan_w, PxVec3(0, 3, 0), defaultPose);
+	}
 	//最后一个旋转路的中心点（fan0_x,fan0_y,fan2_z）
 
 	//#Checkpoint5
@@ -1075,16 +1120,25 @@ void createGameScene(const PxTransform& t) {
     //最后一节台阶的中心点（center_x1+2*stairsLength,centerHeight1-2*boxHeight,center_z1）
 	
 	//平移路段0 prismaticRoad
-	//roadblock_length : 3.0
-	//roadblock_width : 4.0
+	//roadblock_length : 5.0
+	//roadblock_width : 6.0
 	float c_5_x = center_x1 + stairsLength - roadblock_length;
 	float c_5_y = centerHeight1;
 	float c_5_z = center_z1;
+	/*使用平移关节实现
 	PxVec3 pr_v0(-2.5 * roadblock_length, 0, 0);
 	PxJointLinearLimitPair limits0(-30.0, -2.5 * roadblock_length, PxSpring(20.0, 0));
 	PxVec3 velocity0((-1, 0, 0) * 30);
 	createPrismaticRoad(t, PxVec3(c_5_x, c_5_y, c_5_z), roadblock_length, boxHeight, roadblock_width, defaultPose, pr_v0, roadblock_length, boxHeight, roadblock_width, defaultPose, limits0, velocity0);
-	std::cout << "平移路段前相对场景原点的坐标为:" << c_5_x << "," << c_5_y << "," << c_5_z << endl;
+	std::cout << "平移路段前相对场景原点的坐标为:" << c_5_x << "," << c_5_y << "," << c_5_z << endl;*/
+	//根据程序运行时间改变平移路段速度
+	createRoad(t, PxVec3(c_5_x, c_5_y, c_5_z), roadblock_length, boxHeight, roadblock_width, defaultPose);
+	float pr0_x = c_5_x - 2 * roadblock_length - 0.7 * dx;
+	float pr0_y = c_5_y;
+	float pr0_z = c_5_z;
+	PxVec3 pr0_startPos(t.transform(PxVec3(pr0_x, pr0_y, pr0_z)));
+	PxVec3 pr0_endPos(t.transform(PxVec3(pr0_x - 2.0 * dx, pr0_y, pr0_z)));
+	createPrismatic(t, PxVec3(pr0_x, pr0_y, pr0_z), "PrismaticRoad0", roadblock_length, boxHeight, roadblock_width, pr0_startPos, pr0_endPos, defaultPose);
 
 	//#Checkpoint7
 	totalCheckpoint++;
@@ -1096,21 +1150,37 @@ void createGameScene(const PxTransform& t) {
 	float c_6_x = c_5_x - 45.0;
 	float c_6_y = c_5_y;
 	float c_6_z = c_5_z - roadblock_width - dz - rod_length;
-	createRoTateRodLevel(t, PxVec3(c_6_x, c_6_y, c_6_z), rod_length, rod_height, rod_width, boxHeight, defaultPose);
+	if (openDynamicBall) {
+		//开启渲染圈速度
+		createRoTateRodLevel(t, PxVec3(c_6_x, c_6_y, c_6_z), rod_length, rod_height, rod_width, boxHeight, PxVec3(0, 2, 0), defaultPose);
+	}
+	else {
+		//关闭渲染圈速度
+		createRoTateRodLevel(t, PxVec3(c_6_x, c_6_y, c_6_z), rod_length, rod_height, rod_width, boxHeight, PxVec3(0, 4, 0), defaultPose);
+	}
 	std::cout << "旋转杆关卡角落位置相对于场景原点的坐标为" << c_6_x + rod_length << "," << c_6_y << "," << c_6_z + rod_length << endl;
-
+	//旋转关卡角落坐标添加到checkpoints
 	checkpoints.push_back(t.transform(PxVec3(c_6_x + rod_length, c_6_y + 7.0, c_6_z + rod_length)));
 
+
 	//风扇关卡与水池连接齿轮
-	float gearLength = 8.0;
+	float gearLength = 10.0;
 	float gearHeight = 0.4;
 	float gearWidth = 16.0;
-	float gear0_x = c_6_x - 5 * rod_length - dx * 0.8 - gearLength;
+	float gear0_x = c_6_x - 5 * rod_length - dx * 0.5 - gearLength;
 	float gear0_y = c_6_y;
 	float gear0_z = c_6_z;
-	createGear(t, PxVec3(gear0_x, gear0_y, gear0_z), gearLength, gearHeight, gearWidth, PxVec3(0, 0, 4));
-	float gear1_x = gear0_x - 2 * gearLength - dx * 0.8;
-	createGear(t, PxVec3(gear1_x, gear0_y, gear0_z), gearLength, gearHeight, gearWidth, PxVec3(0, 0, 4));
+	float gear1_x = gear0_x - 2 * gearLength - dx * 0.5;
+	if (openDynamicBall) {
+		//开启渲染圈速度
+		createGear(t, PxVec3(gear0_x, gear0_y, gear0_z), gearLength, gearHeight, gearWidth, PxVec3(0, 0, 2));
+		createGear(t, PxVec3(gear1_x, gear0_y, gear0_z), gearLength, gearHeight, gearWidth, PxVec3(0, 0, 2));
+	}
+	else {
+		//关闭渲染圈速度
+		createGear(t, PxVec3(gear0_x, gear0_y, gear0_z), gearLength, gearHeight, gearWidth, PxVec3(0, 0, 4));
+		createGear(t, PxVec3(gear1_x, gear0_y, gear0_z), gearLength, gearHeight, gearWidth, PxVec3(0, 0, 4));
+	}
 
 	//水池
 	float poolLength = 50.0;
@@ -1124,7 +1194,7 @@ void createGameScene(const PxTransform& t) {
 	//全局位置 t.transform(PxTransform(localPose)).p
 
 
-	//createPrismatic(t, PxVec3(-2, 20, 0), defaultPose);
+	
 	//createRoad(t, PxVec3(-4, 20, -6), 4.0, 1.0, 2.0, defaultPose);
 	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
 	//createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
