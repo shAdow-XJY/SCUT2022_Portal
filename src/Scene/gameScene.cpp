@@ -932,8 +932,8 @@ void createGameScene(const PxTransform& t) {
 	PxTransform defaultPose(PxQuat(0, PxVec3(0, 1, 0)));  //刚体默认pose
 	
 	//地面 接触判定死亡用
-	PxRigidStatic* ground = createStaticBox(t, PxVec3(50, 1.0, 300), 500, 1.0, 500, defaultPose,OrganType::ground);
-	ground->setName("Over");
+	/*PxRigidStatic* ground = createStaticBox(t, PxVec3(50, 1.0, 300), 500, 1.0, 500, defaultPose,OrganType::ground);
+	ground->setName("Over");*/
 
 
 	//#Checkpoint1
@@ -1247,7 +1247,6 @@ void createGameScene(const PxTransform& t) {
 	//水池底部的相对于场景原点t的位置 PxVec3 localPose(bottom_x,bottom_y,bottom_z)
 	//全局位置 t.transform(PxTransform(localPose)).p
 
-	createRoad(t, PxVec3(-2, 30, 0), 4.0, 1.0, 2.0, defaultPose);
 	//createNewPendulum(t, PxVec3(-2, 40, 0), 5.0, 0.6, 10.0, 0.6, "newPendulum0", defaultPose, PxVec3(0,0,-1));
 	//createRoad(t, PxVec3(-4, 20, -6), 4.0, 1.0, 2.0, defaultPose);
 	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
