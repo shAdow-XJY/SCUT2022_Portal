@@ -117,7 +117,7 @@ void Role::setFootPosition(PxVec3 position) {
 **/
 void Role::updatePosition() {
 	PxExtendedVec3 position = this->roleController->getFootPosition();
-	this->lastPostion = PxVec3(this->nowPostion.x, this->nowPostion.y, this->nowPostion.z);
+	//this->lastPostion = PxVec3(this->nowPostion.x, this->nowPostion.y, this->nowPostion.z);
 	this->nowPostion = PxVec3(position.x, position.y, position.z);
 }
 
@@ -386,13 +386,13 @@ bool Role::useKeyObj() {
 * @brief 角色四周射线检测
 **/
 void Role::rayAround() {
-	PxVec3 origin = this->getPosition() - PxVec3(0, -0.2f, 0);
+	PxVec3 origin = nowPostion + PxVec3(0, 3.5f, 0);
 	PxRigidActor* actor = NULL;
 	//向四周发送射线
 	for (int i = -1; i < 2; i++) {
 		for (int j = -1; j < 2; j++) {
 			if (i == 0 && j == 0) continue;
-			PxVec3 dir = PxVec3(i, 0, j).getNormalized() * 2.0f;
+			PxVec3 dir = PxVec3(i, 0, j).getNormalized() * 4.0f;
 			actor = RayCast(origin, dir);
 			if (actor) {
 				GameSceneBasic* gsb = (GameSceneBasic*)actor->userData;
@@ -403,9 +403,9 @@ void Role::rayAround() {
 						Pendulum* pendulem = (Pendulum*)gsb;
 						int flag = pendulem->getPendulumActor()->getAngularVelocity().x > 0 ? 1 : -1;
 						if (!this->stimulateObj) {
-							PxShape* shape = gPhysics->createShape(PxCapsuleGeometry(0.05, 0.5), *gMaterial);
+							PxShape* shape = gPhysics->createShape(PxCapsuleGeometry(0.01, 0.1), *gMaterial);
 							//偏移值为测试计算出来，该值的准确值有待商榷
-							PxVec3 pos = this->getPosition() + PxVec3(0, 0, 2) * flag;
+							PxVec3 pos = this->getPosition() + PxVec3(0, 0, -2) * flag;
 							PxRigidDynamic* dynamic = gPhysics->createRigidDynamic(PxTransform(pos));
 							dynamic->attachShape(*shape);
 							dynamic->setName("");
@@ -506,6 +506,10 @@ void Role::move() {
 		}
 		PxControllerCollisionFlags flag = roleController->move(moveSpeed * deltaClock, PxF32(0.00001), deltaClock, NULL);
 	}
+	//TODO：
+	//BUG 人物模型朝向与faceDir脱节了，出现条件跳跃后再按侧向键，
+	//faceDir正确的，但是人物模型没转过来this->getFaceDir() 
+	//printPxVecFun(this->getFaceDir());
 	//this->updatePosition();
 }
 
@@ -546,8 +550,8 @@ void Role::move(GLint key, bool status, bool free) {
 	//弹起
 	else
 	{
-		if (!this->isJump && !this->isFall) {
-			this->faceDir = this->lastPressDir; //更新为最后一次移动的面朝方向
+		this->faceDir = this->lastPressDir; //更新为最后一次移动的面朝方向
+		if (!this->isJump && !this->isFall) {		
 			if (!free && this->rotateMoveDir) {
 				this->dir = this->faceDir;//抬起的时候才更新角色朝向，确保持续移动
 			}
@@ -617,6 +621,7 @@ void Role::simulationGravity() {
 				prismaticRoad->updateDistance(this->getFootPosition());
 				if (!this->isJump && !this->isFall) {
 					this->setFootPosition(prismaticRoad->getStaticPosition());
+					updatePosition();
 				}
 				else
 				{

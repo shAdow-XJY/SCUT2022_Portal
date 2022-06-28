@@ -61,7 +61,6 @@ bool changePendulum0DirFlag = true;
 int changePendulum1Dir = 0;
 bool changePendulum1DirFlag = true;
 
-namespace
 
 bool cameraMove = false;
 
