@@ -47,13 +47,21 @@ extern SoundTool soundtool;
 //动态渲染圈
 PxVec3 roleWorldPosition = PxVec3(0);
 //是否开启动态渲染圈（场景机关据此设置不同速度）
-bool openDynamicBall = true;
+bool openDynamicBall = false;
 DynamicBall dynamicBall = DynamicBall(openDynamicBall);
 
 
 extern Animation animation;
 extern void renderGameOver();
 
+//控制摆锤0摆动
+int changePendulum0Dir = 0;
+bool changePendulum0DirFlag = true;
+//控制摆锤1摆动
+int changePendulum1Dir = 0;
+bool changePendulum1DirFlag = true;
+
+namespace
 
 bool cameraMove = false;
 
@@ -328,20 +336,16 @@ namespace Callbacks
 					GameSceneBasic* gsb = (GameSceneBasic*)actor->userData;
 					PrismaticRoad* pr = (PrismaticRoad*)gsb;
 					if (actor->getGlobalPose().p.x <= pr->getEndPosition().x) {
-						if (openDynamicBall) {
+						actor->setLinearVelocity(PxVec3(0.4, 0, 0) * deltaClock);
+						/*if (openDynamicBall) {
 							actor->setLinearVelocity(PxVec3(15, 0, 0));
 						}
 						else {
 							actor->setLinearVelocity(PxVec3(40, 0, 0));
-						}
+						}*/
 					}
 					else if (actor->getGlobalPose().p.x >= pr->getStartPosition().x) {
-						if (openDynamicBall) {
-							actor->setLinearVelocity(PxVec3(-15, 0, 0));
-						}
-						else {
-							actor->setLinearVelocity(PxVec3(-40, 0, 0));
-						}
+						actor->setLinearVelocity(PxVec3(-0.4, 0, 0) * deltaClock);
 					}
 				}
 				//摆锤处平移路段
@@ -350,20 +354,48 @@ namespace Callbacks
 					GameSceneBasic* gsb = (GameSceneBasic*)actor->userData;
 					PrismaticRoad* pr = (PrismaticRoad*)gsb;
 					if (actor->getGlobalPose().p.x <= pr->getStartPosition().x) {
-						if (openDynamicBall) {
-							actor->setLinearVelocity(PxVec3(15, 0, 0));
+						actor->setLinearVelocity(PxVec3(0.4, 0, 0)* deltaClock);
+						/*if (openDynamicBall) {
+							actor->setLinearVelocity(PxVec3(15, 0, 0)* deltaClock);
 						}
 						else {
-							actor->setLinearVelocity(PxVec3(30, 0, 0));
-						}
+							actor->setLinearVelocity(PxVec3(30, 0, 0)* deltaClock);
+						}*/
 					}
 					else if (actor->getGlobalPose().p.x >= pr->getEndPosition().x) {
-						if (openDynamicBall) {
-							actor->setLinearVelocity(PxVec3(-15, 0, 0));
+						actor->setLinearVelocity(PxVec3(-0.4, 0, 0)* deltaClock);
+					}
+				}
+				else if (actors[i]->getName() == "Pendulum0") {
+					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
+					if (actor->getGlobalPose().q.getAngle() >= PxHalfPi/2 && changePendulum0DirFlag) {
+						if (changePendulum0Dir % 2 == 0) {
+							actor->setLinearVelocity(PxVec3(0, -cos(PxHalfPi / 2), sin(PxHalfPi / 2)) * 2 * deltaClock);
 						}
 						else {
-							actor->setLinearVelocity(PxVec3(-30, 0, 0));
+							actor->setLinearVelocity(PxVec3(0, -cos(PxHalfPi / 2), -sin(PxHalfPi / 2)) * 2 * deltaClock);
 						}
+						changePendulum0Dir++;
+						changePendulum0DirFlag = false;
+					}
+					else if (actor->getGlobalPose().q.getAngle() < PxHalfPi / 2) {
+						changePendulum0DirFlag = true;
+					}
+				}
+				else if (actors[i]->getName() == "Pendulum1") {
+					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
+					if (actor->getGlobalPose().q.getAngle() >= PxHalfPi / 2 && changePendulum1DirFlag) {
+						if (changePendulum1Dir % 2 == 0) {
+							actor->setLinearVelocity(PxVec3(0, -cos(PxHalfPi / 2), -sin(PxHalfPi / 2)) * 2 * deltaClock);
+						}
+						else {
+							actor->setLinearVelocity(PxVec3(0, -cos(PxHalfPi / 2), sin(PxHalfPi / 2)) * 2 * deltaClock);
+						}
+						changePendulum1Dir++;
+						changePendulum1DirFlag = false;
+					}
+					else if (actor->getGlobalPose().q.getAngle() < PxHalfPi / 2) {
+						changePendulum1DirFlag = true;
 					}
 				}
 
