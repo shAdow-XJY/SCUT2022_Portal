@@ -568,6 +568,25 @@ PxRigidStatic* createStaticSphere(const PxTransform& t, const PxVec3& v, PxReal 
 	return sceneBox;
 }
 
+
+/*创建球体形状的粒子
+halfExtend球体半径
+velocity 刚体的初始速度，默认为0*/
+PxRigidDynamic* createParticleSphere(const PxVec3& v, PxReal halfExtend, const PxVec3& velocity = PxVec3(0)) {
+	PxTransform local(v);
+	PxShape* shape = gPhysics->createShape(PxSphereGeometry(halfExtend), *gMaterial);
+	shape->setQueryFilterData(collisionGroup);
+	PxRigidDynamic* sceneBox = gPhysics->createRigidDynamic(local);
+	sceneBox->attachShape(*shape);
+	sceneBox->setAngularDamping(1.0f);
+	sceneBox->setLinearVelocity(velocity);
+	sceneBox->setName("");
+	PxRigidBodyExt::updateMassAndInertia(*sceneBox, 10.0f);
+	gScene->addActor(*sceneBox);
+	return sceneBox;
+}
+
+
 /*摆锤
 halfExtend 摆锤底部球体的半径
 rod_x,rod_y,rod_z 连接杆的长高宽
@@ -907,7 +926,6 @@ void createSyntheticLevel(const PxTransform& t, PxVec3 v, float halfExtend, floa
 	createPendulum(pos, PxVec3(0.5 * dx + 2 * halfExtend, boxHeight + halfExtend + 0.5, 0), halfExtend, 0.6, 10.0, 0.6, "Pendulum1", pose, PxVec3(0, 0, 0.5));
 	createPendulum(pos, PxVec3(dx + 4 * halfExtend, boxHeight + halfExtend + 0.5, 0), halfExtend, 0.6, 10.0, 0.6, "Pendulum2", pose, PxVec3(0, 0, 1));
 	createSideSeesaw(pos, PxVec3(dx + 4 * halfExtend + 0.5 * dx, 0, -roadblock_width - dz), sideSeesaw_width, 1.0, sideSeesaw_length, pose);
-	createStaticBox(pos, PxVec3(0, 1.0 + poolHeight, 1.0 + poolWidth), poolLength, poolHeight, 1.0, pose);
 }
 
 
@@ -991,10 +1009,7 @@ void createParticles(PxVec3 v)
 				// access particle position
 				const PxVec3& position = *positionIt;
 
-				glBegin(GL_POINTS);
-				glColor4f(1, 1, 1, 1);
-				glVertex3f(position.x, position.y, position.z);
-				glEnd();
+				createParticleSphere(position, 0.01f);
 			}
 		}
 		// return ownership of the buffers back to the SDK
