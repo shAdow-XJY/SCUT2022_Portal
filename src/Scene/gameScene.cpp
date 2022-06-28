@@ -20,6 +20,7 @@ extern PxMaterial* gMaterial;
 extern PxPhysics* gPhysics;
 extern vector<PxVec3> checkpoints;
 extern int primaryJumpHeight;
+extern clock_t deltaClock;
 //设定的最大跳跃高度，可调整
 float maxJumpHeight = 6.0;
 //场景道路盒子的半高

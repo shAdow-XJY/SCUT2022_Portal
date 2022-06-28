@@ -88,8 +88,6 @@ void Model::processSingleMesh(aiMesh* mesh, const aiScene* scene) {
 			Texture tex;
 			aiString as;
 			material->GetTexture(aiTextureType_DIFFUSE, 0, &as);
-			// TODO：真正导入纹理文件的实现
-			// 已经include了BMPLoader，剩下就是创建一个实例然后导入
 			CBMPLoader loader;
 			tex.filename = as.C_Str();
 			string::size_type pos = tex.filename.find_first_of('\\');

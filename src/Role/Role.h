@@ -186,7 +186,7 @@ public:
 
 	// 获取游戏信息
 	int getCheckpoint() {
-		return this->arrivedCheckpoint;
+		return this->nowCheckpoint;
 	}
 	int getHealth() {
 		return this->life;
