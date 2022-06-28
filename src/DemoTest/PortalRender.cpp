@@ -54,8 +54,12 @@ DynamicBall dynamicBall = DynamicBall(openDynamicBall);
 extern Animation animation;
 extern void renderGameOver();
 
-int changePendulumDir = 0;
-bool changePendulumDirFlag = true;
+//控制摆锤0摆动
+int changePendulum0Dir = 0;
+bool changePendulum0DirFlag = true;
+//控制摆锤1摆动
+int changePendulum1Dir = 0;
+bool changePendulum1DirFlag = true;
 
 namespace
 {
@@ -285,14 +289,34 @@ void renderCallback()
 				}
 				else if (actors[i]->getName() == "Pendulum0") {
 					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
-					if (actor->getGlobalPose().q.getAngle() >= PxHalfPi/2 && changePendulumDirFlag) {
-						std::cout << "达到45度" << endl;
-						actor->setLinearVelocity(PxVec3(0, -cos(PxHalfPi / 2), sin(PxHalfPi / 2)) * 10 * deltaClock);
-						changePendulumDir++;
-						changePendulumDirFlag = false;
+					if (actor->getGlobalPose().q.getAngle() >= PxHalfPi/2 && changePendulum0DirFlag) {
+						if (changePendulum0Dir % 2 == 0) {
+							actor->setLinearVelocity(PxVec3(0, -cos(PxHalfPi / 2), sin(PxHalfPi / 2)) * 2 * deltaClock);
+						}
+						else {
+							actor->setLinearVelocity(PxVec3(0, -cos(PxHalfPi / 2), -sin(PxHalfPi / 2)) * 2 * deltaClock);
+						}
+						changePendulum0Dir++;
+						changePendulum0DirFlag = false;
 					}
 					else if (actor->getGlobalPose().q.getAngle() < PxHalfPi / 2) {
-						changePendulumDirFlag = true;
+						changePendulum0DirFlag = true;
+					}
+				}
+				else if (actors[i]->getName() == "Pendulum1") {
+					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
+					if (actor->getGlobalPose().q.getAngle() >= PxHalfPi / 2 && changePendulum1DirFlag) {
+						if (changePendulum1Dir % 2 == 0) {
+							actor->setLinearVelocity(PxVec3(0, -cos(PxHalfPi / 2), -sin(PxHalfPi / 2)) * 2 * deltaClock);
+						}
+						else {
+							actor->setLinearVelocity(PxVec3(0, -cos(PxHalfPi / 2), sin(PxHalfPi / 2)) * 2 * deltaClock);
+						}
+						changePendulum1Dir++;
+						changePendulum1DirFlag = false;
+					}
+					else if (actor->getGlobalPose().q.getAngle() < PxHalfPi / 2) {
+						changePendulum1DirFlag = true;
 					}
 				}
 				

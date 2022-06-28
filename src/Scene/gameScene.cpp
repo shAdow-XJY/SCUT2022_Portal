@@ -597,6 +597,28 @@ void createPendulum(const PxTransform& t, PxVec3 v, float halfExtend, float rod_
 	spherical->setSphericalJointFlag(PxSphericalJointFlag::eLIMIT_ENABLED, true);
 }
 
+void createNewPendulum(const PxTransform& t, PxVec3 v, float halfExtend, float rod_x, float rod_y, float rod_z, const char* name, PxTransform& pose, PxVec3 velocity) {
+	PxTransform pos(t.transform(PxTransform(v)));
+	PxRigidDynamic* newPendulum = gPhysics->createRigidDynamic(pos);
+	PxShape* shape0 = PxRigidActorExt::createExclusiveShape(*newPendulum, PxSphereGeometry(halfExtend), *gMaterial);
+	PxShape* shape1 = PxRigidActorExt::createExclusiveShape(*newPendulum, PxBoxGeometry(rod_x, rod_y, rod_z), *gMaterial);
+	shape1->setLocalPose(PxTransform(PxVec3(0, halfExtend + rod_y - 2.0, 0)));
+	shape0->setQueryFilterData(collisionGroup);
+	shape1->setQueryFilterData(collisionGroup);
+	newPendulum->setMass(1.0f);
+	newPendulum->setAngularDamping(0.f);
+	Pendulum* pendulum = new Pendulum("摆锤", newPendulum->getGlobalPose().p, halfExtend, newPendulum);
+	newPendulum->setName(name);
+	newPendulum->userData = pendulum;
+	newPendulum->setLinearVelocity(velocity * 35);
+	PxRigidStatic* actor2 = createStaticSphere(pos, PxVec3(0, halfExtend + rod_y * 2 + rod_x - 3, 0), rod_x * 2);
+	actor2->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+	PxTransform localFrame2(PxVec3(0, halfExtend + rod_y - 2.0 + rod_y + rod_x - 1.0, 0));
+	PxTransform localFrame3(PxVec3(0, 0, 0));
+	PxSphericalJoint* spherical = PxSphericalJointCreate(*gPhysics, newPendulum, localFrame2, actor2, localFrame3);
+	gScene->addActor(*newPendulum);
+}
+
 //创建平移路面 属于动态刚体(区别于road静态刚体)
 /*/void createPrismaticRoad(const PxTransform& t, PxVec3 v0, PxReal x0, PxReal y0, PxReal z0, PxTransform& pose0, PxVec3 v1, PxReal x1, PxReal y1, PxReal z1, PxTransform& pose1, PxJointLinearLimitPair& limits, const PxVec3& velocity = PxVec3(0)) {
 	PxTransform pos(t.transform(PxTransform(v0)));
@@ -899,10 +921,9 @@ void createPrismatic(const PxTransform& t, PxVec3 v, const char* name, float x, 
 
 void createSyntheticLevel(const PxTransform& t, PxVec3 v, float halfExtend, float roadblock_length, float roadblock_width, float sideSeesaw_length, float sideSeesaw_Height, float sideSeesaw_width, PxTransform& pose) {
 	PxTransform pos(t.transform(PxTransform(v)));
-	createPendulum(pos, PxVec3(0, boxHeight + halfExtend + 0.5, 0), halfExtend, 0.6, 10.0, 0.6, "Pendulum0", pose, PxVec3(0, 0, -2));
+	createNewPendulum(pos, PxVec3(0, boxHeight + halfExtend + 0.5, 0), halfExtend, 0.6, 10.0, 0.6, "Pendulum0", pose, PxVec3(0, 0, -2));
 	createSideSeesaw(pos, PxVec3(-halfExtend - 0.5 * dx, 0, -roadblock_width - dz), sideSeesaw_width, 1.0, sideSeesaw_length, pose);
-	createPendulum(pos, PxVec3(0.5 * dx + 2 * halfExtend, boxHeight + halfExtend + 0.5, 0), halfExtend, 0.6, 10.0, 0.6, "Pendulum1", pose, PxVec3(0, 0, 0.5));
-	createPendulum(pos, PxVec3(dx + 4 * halfExtend, boxHeight + halfExtend + 0.5, 0), halfExtend, 0.6, 10.0, 0.6, "Pendulum2", pose, PxVec3(0, 0, 1));
+	createNewPendulum(pos, PxVec3(dx + 4 * halfExtend, boxHeight + halfExtend + 0.5, 0), halfExtend, 0.6, 10.0, 0.6, "Pendulum1", pose, PxVec3(0, 0, 2));
 	createSideSeesaw(pos, PxVec3(dx + 4 * halfExtend + 0.5 * dx, 0, -roadblock_width - dz), sideSeesaw_width, 1.0, sideSeesaw_length, pose);
 }
 
@@ -911,8 +932,8 @@ void createGameScene(const PxTransform& t) {
 	PxTransform defaultPose(PxQuat(0, PxVec3(0, 1, 0)));  //刚体默认pose
 	
 	//地面 接触判定死亡用
-	/*PxRigidStatic* ground = createStaticBox(t, PxVec3(50, 1.0, 300), 500, 1.0, 500, defaultPose,OrganType::ground);
-	ground->setName("Over");*/
+	PxRigidStatic* ground = createStaticBox(t, PxVec3(50, 1.0, 300), 500, 1.0, 500, defaultPose,OrganType::ground);
+	ground->setName("Over");
 
 
 	//#Checkpoint1
@@ -951,7 +972,7 @@ void createGameScene(const PxTransform& t) {
 	}
 	
 	//最后一节台阶的中心点（center_x-2*stairsLength,centerHeight-2*boxHeight,center_z）
-	std::cout << "摆锤前位置相对场景原点的坐标为:" << center_x - 2 * stairsLength << "," << centerHeight - 2 * boxHeight << "," << center_z << endl;
+	cout << "摆锤前位置相对场景原点的坐标为:" << center_x - 2 * stairsLength << "," << centerHeight - 2 * boxHeight << "," << center_z << endl;
 	
 	//#Checkpoint2
 	totalCheckpoint++;
@@ -964,7 +985,7 @@ void createGameScene(const PxTransform& t) {
 	float rb_x = center_x - stairsLength + 0.7 * dx + roadblock_length;
 	float rb_y = centerHeight - 2 * boxHeight;
 	float rb_z = center_z;
-	std::cout << "摆锤关卡平移路段初始x值" << t.transform(PxVec3(rb_x, rb_y, rb_z)).x << endl;
+	cout << "摆锤关卡平移路段初始x值" << t.transform(PxVec3(rb_x, rb_y, rb_z)).x << endl;
 	//createRoad(t, PxVec3(rb_x, rb_y, rb_z), roadblock_length, boxHeight, roadblock_width, defaultPose);
 	/*原悬空路段+摆锤关卡
 	for (int i = 0; i < 3; i++) {
@@ -999,13 +1020,13 @@ void createGameScene(const PxTransform& t) {
 	PxVec3 pr1_startPos(t.transform(PxVec3(rb_x, rb_y, rb_z)));
 	PxVec3 pr1_endPos(t.transform(PxVec3(rb_x1, rb_y, rb_z)));
 	createPrismatic(t, PxVec3(rb_x, rb_y, rb_z), "PrismaticRoad1", roadblock_length, boxHeight, roadblock_width, pr1_startPos, pr1_endPos, defaultPose);
-	std::cout << "摆锤关卡平移路段终点x值" << t.transform(PxVec3(rb_x1, rb_y, rb_z)).x << endl;
-	std::cout << "startpos.x" << pr1_startPos.x << endl;
-	std::cout << "endpos.x" << pr1_endPos.x << endl;
+	cout << "摆锤关卡平移路段终点x值" << t.transform(PxVec3(rb_x1, rb_y, rb_z)).x << endl;
+	cout << "startpos.x" << pr1_startPos.x << endl;
+	cout << "endpos.x" << pr1_endPos.x << endl;
 	PxVec3 seesawpos_v(seesawpos_x, seesawpos_y, seesawpos_z);
 	float lastSeesaw_x = createSeesawLevel(t, seesawpos_v, sx, sy, sz, defaultPose);
 	//最后一块跷板的中心点（lastSeesaw_x,seesawpos_y, seesawpos_z）
-	std::cout << "最后一块跷板的中心点相对场景原点的坐标为:" << lastSeesaw_x << "," << seesawpos_y << "," << seesawpos_z << endl;
+	cout << "最后一块跷板的中心点相对场景原点的坐标为:" << lastSeesaw_x << "," << seesawpos_y << "," << seesawpos_z << endl;
 
 	//#Checkpoint3
 	totalCheckpoint++;
@@ -1061,7 +1082,7 @@ void createGameScene(const PxTransform& t) {
 	float c_3_y = fw_y + 0.8 * fw_l;
 	float c_3_z = seesawpos_z + r_3_w - 2 * seatWidth;
 	PxRigidStatic* r_3 = createRoad(t, PxVec3(c_3_x, c_3_y, c_3_z), r_3_l, boxHeight, r_3_w, defaultPose);
-	std::cout <<"连接摩天轮与旋转路关卡的路段相对场景原点的坐标:"<< c_3_x << "," << c_3_y << "," << c_3_z << endl;
+	cout <<"连接摩天轮与旋转路关卡的路段相对场景原点的坐标:"<< c_3_x << "," << c_3_y << "," << c_3_z << endl;
 
 	checkpoints.push_back(t.transform(PxVec3(c_3_x, c_3_y + 7.0, c_3_z)));
 
@@ -1090,7 +1111,7 @@ void createGameScene(const PxTransform& t) {
 	float c_7_y = fan0_y;
 	float c_7_z = fan2_z + r_7_w + 0.5 * dz + fan_l;
 	createRoad(t, PxVec3(c_7_x, c_7_y, c_7_z), r_7_l, boxHeight, r_7_w, defaultPose);
-	std::cout << "连接旋转路关卡与迷宫的路段相对场景原点的坐标:" << c_7_x << "," << c_7_y << "," << c_7_z << endl;
+	cout << "连接旋转路关卡与迷宫的路段相对场景原点的坐标:" << c_7_x << "," << c_7_y << "," << c_7_z << endl;
 
 	checkpoints.push_back(t.transform(PxVec3(c_7_x, c_7_y + 7.0, c_7_z)));
 
@@ -1133,7 +1154,7 @@ void createGameScene(const PxTransform& t) {
 	float c_4_y = mazeOut_y;
 	float c_4_z = mazeOut_z + r_4_w;
 	createRoad(t, PxVec3(c_4_x, c_4_y, c_4_z), r_4_l, boxHeight, r_4_w, defaultPose);
-	std::cout << "迷宫出口路段相对场景原点的坐标为:" <<c_4_x << "," << c_4_y << "," << c_4_z << endl;
+	cout << "迷宫出口路段相对场景原点的坐标为:" <<c_4_x << "," << c_4_y << "," << c_4_z << endl;
 	
 
 	
@@ -1191,7 +1212,7 @@ void createGameScene(const PxTransform& t) {
 		//关闭渲染圈速度
 		createRoTateRodLevel(t, PxVec3(c_6_x, c_6_y, c_6_z), rod_length, rod_height, rod_width, boxHeight, PxVec3(0, 4, 0), defaultPose);
 	}
-	std::cout << "旋转杆关卡角落位置相对于场景原点的坐标为" << c_6_x + rod_length << "," << c_6_y << "," << c_6_z + rod_length << endl;
+	cout << "旋转杆关卡角落位置相对于场景原点的坐标为" << c_6_x + rod_length << "," << c_6_y << "," << c_6_z + rod_length << endl;
 	//旋转关卡角落坐标添加到checkpoints
 	checkpoints.push_back(t.transform(PxVec3(c_6_x + rod_length, c_6_y + 7.0, c_6_z + rod_length)));
 
@@ -1226,8 +1247,8 @@ void createGameScene(const PxTransform& t) {
 	//水池底部的相对于场景原点t的位置 PxVec3 localPose(bottom_x,bottom_y,bottom_z)
 	//全局位置 t.transform(PxTransform(localPose)).p
 
-
-	
+	createRoad(t, PxVec3(-2, 30, 0), 4.0, 1.0, 2.0, defaultPose);
+	//createNewPendulum(t, PxVec3(-2, 40, 0), 5.0, 0.6, 10.0, 0.6, "newPendulum0", defaultPose, PxVec3(0,0,-1));
 	//createRoad(t, PxVec3(-4, 20, -6), 4.0, 1.0, 2.0, defaultPose);
 	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
 	//createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
