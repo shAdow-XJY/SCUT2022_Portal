@@ -12,7 +12,7 @@
 #include <time.h>
 using namespace physx;
 extern void initPhysics(bool interactive);
-extern void stepPhysics(bool interactive);	
+extern void stepPhysics(bool interactive);
 extern void cleanupPhysics(bool interactive);
 extern void keyPress(unsigned char key, const PxTransform& camera);
 extern void keyRelease(unsigned char key);
@@ -75,7 +75,7 @@ int keyBoardInputFlag = KEYBOARD_NONE;
 Snippets::Camera* sCamera;
 namespace Callbacks
 {
-	
+
 
 	void cameraInputUpdate() {
 
@@ -101,9 +101,9 @@ namespace Callbacks
 
 	void keyboardDownCallback(unsigned char key, int x, int y)
 	{
-		if(key==27)
+		if (key == 27)
 			exit(0);
-	
+
 		switch (toupper(key)) {
 		case 'W': {
 			keyBoardInputFlag |= KEYBOARD_W;
@@ -138,7 +138,7 @@ namespace Callbacks
 	void keyboardUpCallback(unsigned char key, int x, int y)
 	{
 		key = toupper(key);
-		if (key == 'W' || key == 'S'||key=='A'||key=='D') {
+		if (key == 'W' || key == 'S' || key == 'A' || key == 'D') {
 			cameraMove = false;
 		}
 		keyRelease(key);
@@ -146,8 +146,8 @@ namespace Callbacks
 
 	void specialKeyDownCallback(GLint key, GLint x, GLint y)
 	{
-		role->move(key,true,sCamera->isFree());
-	
+		role->move(key, true, sCamera->isFree());
+
 		specialKeyPress(key);
 	}
 
@@ -177,67 +177,70 @@ namespace Callbacks
 
 		string currentAnimation = animation.getCurrentAnimation();
 
-	if (currentAnimation == "idle") {
-		animation.update(0.5);
-	}
-	else if (currentAnimation == "openDoor")
-	{
-		if (animation.update(0.5, true)) {
-			animation.setAnimation("idle");
+		if (currentAnimation == "idle") {
+			animation.update(0.5);
 		}
-	}
-	else if (currentAnimation == "pickUp" || currentAnimation == "putDown" || currentAnimation == "notUseKey")
-	{
-		if (animation.update(1.2, true)) {
-			animation.setAnimation("idle");
-		}
-	}
-	else if (currentAnimation == "useKey")
-	{
-		PxVec3 tempPosition = role->keyDoorActor->getGlobalPose().p;
-		PxQuat tempQuat = role->keyDoorActor->getGlobalPose().q;
-		role->keyDoorActor->setGlobalPose(PxTransform(PxVec3(tempPosition.x, tempPosition.y + 0.25f, tempPosition.z), tempQuat),false);
-		if (animation.update(1.5, true)) {
-			animation.setAnimation("idle");
-		}
-	}
-	else if(currentAnimation == "jumping")
-	{
-		if (animation.update(1.8,true)) {
-			animation.setAnimation("idle");
-		}
-	}
-	else if (currentAnimation == "dying")
-	{
-		if (animation.update(0.5, true)) {
-			if (!role->roleOver()) {
+		else if (currentAnimation == "openDoor")
+		{
+			if (animation.update(0.5, true)) {
 				animation.setAnimation("idle");
 			}
-			else {
-				soundtool.playSound("gameOver.wav");
-				animation.setAnimation("sleeping");
+		}
+		else if (currentAnimation == "pickUp" || currentAnimation == "putDown" || currentAnimation == "notUseKey")
+		{
+			if (animation.update(1.2, true)) {
+				animation.setAnimation("idle");
 			}
 		}
-	}
-	else {
-		animation.update(1.0);
-	}
-	
+		else if (currentAnimation == "useKey")
+		{
+			PxVec3 tempPosition = role->keyDoorActor->getGlobalPose().p;
+			PxQuat tempQuat = role->keyDoorActor->getGlobalPose().q;
+			role->keyDoorActor->setGlobalPose(PxTransform(PxVec3(tempPosition.x, tempPosition.y + 0.25f, tempPosition.z), tempQuat), false);
+			if (animation.update(1.5, true)) {
+				animation.setAnimation("idle");
+			}
+		}
+		else if (currentAnimation == "jumping")
+		{
+			if (animation.update(1.8, true)) {
+				animation.setAnimation("idle");
+			}
+		}
+		else if (currentAnimation == "dying")
+		{
+			if (animation.update(0.5, true)) {
+				if (!role->roleOver()) {
+					animation.setAnimation("idle");
+				}
+				else {
+					soundtool.playSound("gameOver.wav");
+					animation.setAnimation("sleeping");
+				}
+			}
+		}
+		else {
+			animation.update(1.0);
+		}
+
 	}
 
 	void renderCallback()
 	{
-		if (soundtool.getSoundResult()!= FMOD_OK) {
+		if (soundtool.getSoundResult() != FMOD_OK) {
 			soundtool.SoundUpdate();
 		}
-	
+
 		stepPhysics(true);
 
 		if (cameraMove) {
 			cameraInputUpdate();
 		}
-	
+
 		if (!sCamera->isFree() || beginGame) {
+			//printPxVecFun(role->getPosition());
+			//role->updateScore();
+			//cout << "checkpoint" << role->nowCheckpoint << endl;
 			if (beginGame) {
 				sCamera->isChangeImmediate = true;
 				roleBackPosition = role->getFootPosition() + PxVec3(0, 32, 0) + (role->getFaceDir() * -30);
@@ -245,18 +248,18 @@ namespace Callbacks
 			}
 			//迷宫
 			if (role->nowCheckpoint == 5) {
-				
+
 				if (role->getRotateOrNot() && role->getSpeed().isZero()) {
 					role->setRotateOrNot(true);
 					sCamera->isMoving = 1;
 					role->setRotateOrNot(false);
 					role->setDir(PxVec3(0, 0, 1));
-					
+
 				}
 				roleBackPosition = role->getFootPosition() + PxVec3(0, 32, 0) + (PxVec3(0, 0, -30));
 			}
-			else  if(role->nowCheckpoint != 5){
-				
+			else  if (role->nowCheckpoint != 5) {
+
 				if (!role->getRotateOrNot() && role->getSpeed().isZero()) {
 					role->setRotateOrNot(true);
 					sCamera->isMoving = 1;
@@ -287,7 +290,7 @@ namespace Callbacks
 			dynamicBall.setCircleCenterPosition_XZ(sCamera->getEye().x, sCamera->getEye().z);
 		}
 		Snippets::startRender(sCamera->getEye(), sCamera->getDir());
-		
+
 		if (role && !timeStop) {
 			//是否重生传送
 			role->protal();
@@ -311,9 +314,9 @@ namespace Callbacks
 			}
 		}
 		PxScene* scene;
-		PxGetPhysics().getScenes(&scene,1);
+		PxGetPhysics().getScenes(&scene, 1);
 		PxU32 nbActors = scene->getNbActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC);
-		if(nbActors)
+		if (nbActors)
 		{
 			std::vector<PxRigidActor*> actors(nbActors);
 			scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
@@ -362,24 +365,24 @@ namespace Callbacks
 						}
 					}
 				}
-				
+
 			}
 			Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
 		}
-		
+
 		// 渲染模型
 		if (role->isStaticAttached()) {
 			renderVisible(*role);
 		}
-		
+
 
 		/** 绘制天空 */
 		skyBox.CreateSkyBox(-2000, -200, -2000, 1.0, 0.5, 1.0);
-		
+
 		animationRenderCallback();
 
 		Snippets::finishRender();
-		
+
 		calculateElapsedClocksFromLastFrame();
 	}
 
@@ -403,7 +406,7 @@ void reshape(int width, int height)
 	gluOrtho2D(0, GLUT_WINDOW_WIDTH, 0, GLUT_WINDOW_HEIGHT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	
+
 }
 
 
@@ -419,12 +422,12 @@ void renderLoop()
 	skyBox.Init(true);
 	animation.init();
 
-	
+
 	glutIdleFunc(Callbacks::idleCallback);
 	glutDisplayFunc(Callbacks::renderCallback);
-	Callbacks::motionCallback(0,0);
+	Callbacks::motionCallback(0, 0);
 	atexit(Callbacks::exitCallback);
-	
+
 	initPhysics(true);
 	loadTexture();
 	initGame();
@@ -432,7 +435,7 @@ void renderLoop()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.Fonts->AddFontFromFileTTF("../../src/ImGui/segoeui.ttf",23.0f);
+	io.Fonts->AddFontFromFileTTF("../../src/ImGui/segoeui.ttf", 23.0f);
 	ImGui::StyleColorsDark();
 
 	ImGui_ImplGLUT_Init();

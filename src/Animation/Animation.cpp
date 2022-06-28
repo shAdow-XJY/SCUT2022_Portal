@@ -37,7 +37,10 @@ void Animation::init()
 
 void Animation::initAssetAnimaion()
 {
-    string aniName[] = { "walk","run","jumping","dying","sleeping", "crouching","crouchedWalking","openDoor","useKey", "notUseKey", "dancing","pickUp","putDown" };
+    string aniName[] = { "walk","run","jumping","dying",
+                        "sleeping", "crouching","crouchedWalking",
+                        "openDoor","useKey", "notUseKey", "dancing",
+                        "pickUp","putDown","swimming","swimIdle"};
 
     for (string name : aniName) {
         string baseUrl = "../../src/Animation/models/" + name + ".fbx";

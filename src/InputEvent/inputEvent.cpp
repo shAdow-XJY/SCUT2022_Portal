@@ -29,6 +29,10 @@ void getAdditionalAngleRadians();
 //按键设置
 void keyPress(unsigned char key, const PxTransform& camera)
 {
+	if (role->nowCheckpoint == 8) {
+		return;
+	}
+
 	switch (toupper(key))
 	{
 		//角色跳跃按键：空格
@@ -86,6 +90,9 @@ void keyPress(unsigned char key, const PxTransform& camera)
 		animation.setAnimation("dancing");
 		break;
 	}
+	case 'H': {
+		helpMenu = !helpMenu;
+	}
 	default:
 		break;
 	}
@@ -93,6 +100,9 @@ void keyPress(unsigned char key, const PxTransform& camera)
 
 void keyRelease(unsigned char key)
 {
+	if (role->nowCheckpoint == 8) {
+		return;
+	}
 	switch (toupper(key))
 	{
 	case ' ':
@@ -109,9 +119,6 @@ void keyRelease(unsigned char key)
 		animation.setAnimation("idle");
 		role->roleNoCrouch();
 		break;
-	}
-	case 'H': {
-		helpMenu = !helpMenu;
 	}
 	default:
 		break;
@@ -137,7 +144,10 @@ void specialKeyPress(GLint key) {
 	case GLUT_KEY_RIGHT:
 	{
 		mod = glutGetModifiers();
-		if (mod == (GLUT_ACTIVE_SHIFT)) {
+		if (role->nowCheckpoint == 8) {
+			animation.setAnimation("swimming");
+		}
+		else if (mod == (GLUT_ACTIVE_SHIFT)) {
 			cout << "shift" << endl;
 			role->setSpeed(role->getSpeed() * 1.5);
 			animation.setAnimation("run");
@@ -170,7 +180,10 @@ void specialKeyRelease(GLint key) {
 	case GLUT_KEY_LEFT:
 	case GLUT_KEY_RIGHT: 
 	{	
-		if (role->getCrouch()) {
+		if (role->nowCheckpoint == 8) {
+			animation.setAnimation("swimIdle");
+		}
+		else if (role->getCrouch()) {
 			animation.setAnimation("crouching");
 		}
 		else {

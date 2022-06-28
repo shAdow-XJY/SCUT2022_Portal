@@ -65,11 +65,15 @@ public:
 					}
 				}
 			}
-			else if (name == "Over") {
+			else if (name == "Ground") {
 				if (role->getAliveStatus()) {
 					animation.setAnimation("dying");
 				}
 				//role->roleOver();
+			}
+			else if (name == "PoolWall") {
+				cout << "PoolWall" << endl;
+				role->nowCheckpoint = 8;
 			}
 		}
 

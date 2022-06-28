@@ -88,6 +88,9 @@ const char* typeMapName(OrganType type) {
 	case OrganType::poolWall: {
 		return "PoolWall";
 	}
+	case OrganType::ground: {
+		return "Ground";
+	}					
 	default:
 		return "Block";
 		break;
@@ -108,9 +111,6 @@ PxRigidStatic* createStaticBox(const PxTransform& t, const PxVec3& v, PxReal x, 
 	PxRigidStatic* sceneBox = gPhysics->createRigidStatic(t.transform(local));
 	sceneBox->attachShape(*shape);
 	sceneBox->setName(typeMapName(type));
-	int* temp = new int[1]{ totalCheckpoint };
-	sceneBox->userData = temp;
-	//cout << temp << temp[0] << endl;
 	gScene->addActor(*sceneBox);
 	return sceneBox;
 }
@@ -136,9 +136,6 @@ PxRigidDynamic* createDynamicBox(bool kinematic, const PxTransform& t, const PxV
 	if (kinematic) {
 		sceneBox->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
 	}
-	int* temp = new int[1]{ totalCheckpoint };
-	sceneBox->userData = temp;
-	//cout << temp << temp[0] << endl;
 	gScene->addActor(*sceneBox);
 	return sceneBox;
 }
@@ -914,14 +911,13 @@ void createGameScene(const PxTransform& t) {
 	PxTransform defaultPose(PxQuat(0, PxVec3(0, 1, 0)));  //刚体默认pose
 	
 	//地面 接触判定死亡用
-	/*PxRigidStatic* ground = createStaticBox(t, PxVec3(50, 1.0, 300), 500, 1.0, 500, defaultPose,OrganType::ground);
-	ground->setName("Over");*/
-
+	PxRigidStatic* ground = createStaticBox(t, PxVec3(50, 1.0, 300), 500, 1.0, 500, defaultPose,OrganType::ground);
+	ground->setName("Ground");
 
 	//#Checkpoint1
 	totalCheckpoint = 1;
 
-	float r_1_l = 6.0;  //road_1_length 4
+	float r_1_l = 10.0;  //road_1_length 4
 	float r_1_w = 20.0;  //road_1_width 15
 	float c_1_y = 5.0 + boxHeight;  //the position of the center of road_1
 	// create road_1
@@ -961,8 +957,8 @@ void createGameScene(const PxTransform& t) {
 	checkpoints.push_back(t.transform(PxVec3(center_x - 2 * stairsLength, centerHeight - 2 * boxHeight + 7.0, center_z)));
 
 	//悬空路段/改版平移路段+摆锤
-	float roadblock_length = 5.0;
-	float roadblock_width = 6.0;  //4
+	float roadblock_length = 18.0;
+	float roadblock_width = 15.0;  //4
 	//平移路段初始相对位置 PrismaticRoad1
 	float rb_x = center_x - stairsLength + 0.7 * dx + roadblock_length;
 	float rb_y = centerHeight - 2 * boxHeight;
@@ -1038,10 +1034,10 @@ void createGameScene(const PxTransform& t) {
 	float fw_z = c_8_z + seatWidth; + seatDistance + fw_w;
 	if (openDynamicBall) {
 		//开启渲染圈
-		createFerrisWheel(t, PxVec3(fw_x, fw_y, fw_z), fw_l, fw_h, fw_w, seatLength, seatHeight, seatWidth, seatDistance, PxVec3(0, 0, -1));
+		createFerrisWheel(t, PxVec3(fw_x, fw_y, fw_z), fw_l, fw_h, fw_w, seatLength*2.6, seatHeight, seatWidth*3, seatDistance, PxVec3(0, 0, -0.3));
 	}else{
 		//关闭渲染圈
-		createFerrisWheel(t, PxVec3(fw_x, fw_y, fw_z), fw_l, fw_h, fw_w, seatLength, seatHeight, seatWidth, seatDistance, PxVec3(0, 0, -2));
+		createFerrisWheel(t, PxVec3(fw_x, fw_y, fw_z), fw_l, fw_h, fw_w, seatLength*2.6, seatHeight, seatWidth*3, seatDistance, PxVec3(0, 0, -0.4));
 	}
 
 	//#Checkpoint4
@@ -1078,11 +1074,11 @@ void createGameScene(const PxTransform& t) {
 	float fan2_z;
 	if (openDynamicBall) {
 		//开启渲染圈速度
-		fan2_z = createFanRoadLevel(t, PxVec3(fan0_x, fan0_y, fan0_z), fan_l, fan_h, fan_w, PxVec3(0, 1.5, 0), defaultPose);
+		fan2_z = createFanRoadLevel(t, PxVec3(fan0_x, fan0_y, fan0_z), fan_l, fan_h, fan_w, PxVec3(0, 0.3, 0), defaultPose);
 	}
 	else {
 		//关闭渲染圈速度
-		fan2_z = createFanRoadLevel(t, PxVec3(fan0_x, fan0_y, fan0_z), fan_l, fan_h, fan_w, PxVec3(0, 3, 0), defaultPose);
+		fan2_z = createFanRoadLevel(t, PxVec3(fan0_x, fan0_y, fan0_z), fan_l, fan_h, fan_w, PxVec3(0, 0.4, 0), defaultPose);
 	}
 	//最后一个旋转路的中心点（fan0_x,fan0_y,fan2_z）
 
@@ -1198,7 +1194,7 @@ void createGameScene(const PxTransform& t) {
 	//旋转关卡角落坐标添加到checkpoints
 	checkpoints.push_back(t.transform(PxVec3(c_6_x + rod_length, c_6_y + 7.0, c_6_z + rod_length)));
 
-
+	
 	//风扇关卡与水池连接齿轮
 	float gearLength = 10.0;
 	float gearHeight = 0.4;
@@ -1218,6 +1214,9 @@ void createGameScene(const PxTransform& t) {
 		createGear(t, PxVec3(gear1_x, gear0_y, gear0_z), gearLength, gearHeight, gearWidth, PxVec3(0, 0, 4));
 	}
 
+	//#Checkpoint8
+	totalCheckpoint++;
+	
 	//水池
 	float poolLength = 50.0;
 	float poolHeight = 10.0;
@@ -1228,7 +1227,8 @@ void createGameScene(const PxTransform& t) {
 	createPool(t, PxVec3(bottom_x, bottom_y, bottom_z), poolLength, poolHeight, poolWidth, defaultPose);
 	//水池底部的相对于场景原点t的位置 PxVec3 localPose(bottom_x,bottom_y,bottom_z)
 	//全局位置 t.transform(PxTransform(localPose)).p
-
+	//泳池关卡角落坐标添加到checkpoints
+	checkpoints.push_back(t.transform(PxVec3(bottom_x, bottom_y + 1.0f , bottom_z)));
 
 	
 	//createRoad(t, PxVec3(-4, 20, -6), 4.0, 1.0, 2.0, defaultPose);

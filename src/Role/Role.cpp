@@ -680,7 +680,7 @@ bool Role::tryJump(bool release) {
 void Role::roleJump() {
 	if (isJump) {
 		float speed_y = 0.0;
-
+		this->roleController->move(this->faceDir*0.2, 0.0001, 1.0f / 120.0f, NULL);
 		if (isHanging == false) {
 			speed_y = upSpeed;
 			isHanging = true;
