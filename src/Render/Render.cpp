@@ -524,6 +524,35 @@ void renderText(int x, int y, const char text[], int len)
 
 } //namespace Snippets
 
+void renderParticles(PxParticleSystem *ps) {
+	// lock SDK buffers of *PxParticleSystem* ps for reading
+	PxParticleReadData* rd = ps->lockParticleReadData();
+
+	// access particle data from PxParticleReadData
+	if (rd)
+	{
+		PxStrideIterator<const PxParticleFlags> flagsIt(rd->flagsBuffer);
+		PxStrideIterator<const PxVec3> positionIt(rd->positionBuffer);
+
+		for (unsigned i = 0; i < rd->validParticleRange; ++i, ++flagsIt, ++positionIt)
+		{
+			if (*flagsIt & PxParticleFlag::eVALID)
+			{
+				// access particle position
+				const PxVec3& position = *positionIt;
+
+				glBegin(GL_POINTS);
+				glColor4f(1,1,1,1);
+				glVertex3f(position.x, position.y, position.z);
+				glEnd();
+			}
+		}
+		// return ownership of the buffers back to the SDK
+		rd->unlock();
+	}
+
+}
+
 
 void renderGameOver() {
 	const char* msg = "Game Over!";

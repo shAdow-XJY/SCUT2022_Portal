@@ -11,6 +11,9 @@
 #include <glut.h>
 #include <Render/BMPLoader.h>
 #include <map>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace physx;
 
@@ -760,19 +763,19 @@ void createParticles(PxVec3 v)
 	// create particle system in PhysX SDK
 	PxParticleSystem* ps = gPhysics->createParticleSystem(maxParticles, perParticleRestOffset);
 
-	PxParticleExt::IndexPool* indexPool = PxParticleExt::createIndexPool(maxParticles);
-
-
 	PxParticleCreationData particleCreationData;
 	particleCreationData.numParticles = 1000;
 	PxVec3* p = createPositions(v);
 	PxU32* indic = createParticleIndices(maxParticles);
 	particleCreationData.indexBuffer = PxStrideIterator<const PxU32>(indic);
-	//PxU32 numAllocated = indexPool->allocateIndices(particleCreationData.numParticles, PxStrideIterator<PxU32>(indic));
 	particleCreationData.positionBuffer = PxStrideIterator<const PxVec3>(p);
 
 	// create particles in *PxParticleSystem* ps
 	bool success = ps->createParticles(particleCreationData);
+
+	float aspect = GLdouble(glutGet(GLUT_WINDOW_WIDTH)) / GLdouble(glutGet(GLUT_WINDOW_HEIGHT));
+	float fovy = 60.0;
+	float pointScale = 1.0f * GLdouble(glutGet(GLUT_WINDOW_WIDTH)) / aspect * (1.0f / tanf(glm::radians(fovy) * 0.5f));
 
 	// lock SDK buffers of *PxParticleSystem* ps for reading
 	PxParticleReadData* rd = ps->lockParticleReadData();
@@ -789,23 +792,25 @@ void createParticles(PxVec3 v)
 			{
 				// access particle position
 				const PxVec3& position = *positionIt;
-				
+
 				glBegin(GL_POINTS);
+				glColor4f(1, 1, 1, 1);
 				glVertex3f(position.x, position.y, position.z);
 				glEnd();
 			}
 		}
-
 		// return ownership of the buffers back to the SDK
 		rd->unlock();
 	}
-
 
 	// add particle system to scene, in case creation was successful
 	if (ps)
 		gScene->addActor(*ps);
 
 }
+
+
+
 
 
 //创建游戏场景
