@@ -92,7 +92,6 @@ private:
 
 	// 是否已绑定静态模型
 	bool staticAttached = false;
-
 public:
 	Role();
 	~Role() {
@@ -211,6 +210,7 @@ public:
 	bool isJumping();
 	void setDir(PxVec3 dir);
 	void setFaceDir(PxVec3 dir);
+
 };
 
 #endif // !__ROLE_H__

@@ -2,7 +2,6 @@
 #include "cmath"
 #include <iostream>
 #include <Role/RoleHitCallback.h>
-
 extern void printPxVecFun(const PxVec3& vec);
 extern clock_t deltaClock;
 
@@ -53,6 +52,7 @@ bool Role::attachModel(const char* path) {
 * @brief 计算角色的移动方向
 **/
 PxVec3 Role::roleHandleKey(GLint key, bool free) {
+
 	PxVec3 dir;
 	if (!free && this->rotateMoveDir) dir = this->faceDir; //非自由镜头以人物朝向为前进方向
 	else dir = this->dir; //自由镜头以摄像机正前方为前进方向
@@ -419,6 +419,10 @@ void Role::rayAround() {
 					else if (gsb->getType() == OrganType::rotateRod) {
 						RotateRod* rotateRod = (RotateRod*)gsb;
 						this->roleController->move(PxVec3(0, 1.5f, 0), 0.0001, 1.0f / 120.0f, NULL);
+						return;
+					}
+					else if (gsb->getType() == OrganType::ground) {
+						cout << "ground" << endl;
 						return;
 					}
 				}

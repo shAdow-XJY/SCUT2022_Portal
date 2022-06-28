@@ -159,6 +159,9 @@ void Animation::display()
     else if (this->current_animation == "crouching") {
         translate = PxMat44(PxTransform(PxVec3(0.0f, -2.0f, 0.0f)));
     }
+    else if (this->current_animation == "swimming" || this->current_animation == "swimIdle") {
+        translate = PxMat44(PxTransform(PxVec3(0.0f, -10.0f, 0.0f)));
+    }
     renderDisplay(this->scene, this->scene->mRootNode, std::map<int, int>(), modelMatrix * rotate * translate *yRotate);
 
 }

@@ -722,8 +722,9 @@ poolLength, poolHeight, poolWidth为杆的长、高、宽
 pose刚体初始姿态*/
 void createPool(const PxTransform& t, PxVec3 bottom, float poolLength, float poolHeight,float poolWidth, PxTransform& pose) {
 	PxTransform pos(t.transform(PxTransform(bottom)));
+	PxTransform rotate = PxTransform(PxQuat(PxHalfPi / 10, PxVec3(0, 0, -1.0f)));
 	//底部
-	createStaticBox(pos, PxVec3(0, 0, 0), poolLength + 2.0, 1.0, poolWidth + 2.0, pose,OrganType::poolWall);
+	createStaticBox(pos, PxVec3(0, poolHeight + 3.0f, 0), poolLength + 2.0, 1.0, poolWidth + 2.0, rotate, OrganType::poolWall);
 	//左侧
 	createStaticBox(pos, PxVec3(1.0 + poolLength, 1.0 + poolHeight, 0), 1.0, poolHeight, poolWidth + 2.0, pose, OrganType::poolWall);
 	//右侧
@@ -1228,7 +1229,7 @@ void createGameScene(const PxTransform& t) {
 	//水池底部的相对于场景原点t的位置 PxVec3 localPose(bottom_x,bottom_y,bottom_z)
 	//全局位置 t.transform(PxTransform(localPose)).p
 	//泳池关卡角落坐标添加到checkpoints
-	checkpoints.push_back(t.transform(PxVec3(bottom_x, bottom_y + 1.0f , bottom_z)));
+	checkpoints.push_back(t.transform(PxVec3(bottom_x, bottom_y + 4.0f , bottom_z)));
 
 	
 	//createRoad(t, PxVec3(-4, 20, -6), 4.0, 1.0, 2.0, defaultPose);
