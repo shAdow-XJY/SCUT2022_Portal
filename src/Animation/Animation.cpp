@@ -174,8 +174,9 @@ void Animation::attachRole(Role& role) {
     this->attachedRole = &role;
     PxShape* cap;
     role.getActor()->getShapes(&cap, 1);
+    // 设为false就能只作为碰撞体而不渲染出来
     cap->setFlag(PxShapeFlag::eVISUALIZATION, false);
-    
+
 }
 
 void Animation::changeOrientation(const PxQuat& orientation)

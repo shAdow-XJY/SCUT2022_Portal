@@ -8,6 +8,7 @@
 #include <Render/DynamicBall.h>
 using namespace std;
 #include "../LoadModel/Model.h"
+#include "../Render/Camera.h"
 using namespace physx;
 
 static float gCylinderData[]={
@@ -41,13 +42,34 @@ extern bool press;
 extern int mouseX;
 extern int mouseY;
 extern int textX, textY;
-
+extern Role* role;
 //材质贴图ID数组
 extern std::map<string, unsigned int> textureMap;
 unsigned int textureID;
 //动态渲染圈
 extern DynamicBall dynamicBall;
-//GL绘制盒子加纹理
+
+bool helpMenu = false;
+
+extern void reshape(int width, int height);
+extern Snippets::Camera* sCamera;
+
+namespace Callbacks {
+	extern void idleCallback();
+	extern void renderCallback();
+	extern void keyboardUpCallback(unsigned char key, int x, int y);
+	extern void specialKeyDownCallback(GLint key, GLint x, GLint y);
+	extern void specialKeyUpCallback(GLint key, GLint x, GLint y);
+	extern void mouseCallback(int button, int state, int x, int y);
+	extern void idleCallback();
+	extern void animationRenderCallback();
+	extern void renderCallback();
+	extern void exitCallback(void);
+	extern void keyboardDownCallback(unsigned char key, int x, int y);
+	extern void motionCallback(int x, int y);
+}
+
+
 static void drawBox(GLfloat x, GLfloat y, GLfloat z,bool shadow)
 {
 	static GLfloat n[6][3] =
@@ -299,129 +321,211 @@ void renderGeometry(const PxGeometryHolder& h, string name,bool shadow)
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-extern void reshape(int width, int height);
+//extern void reshape(int width, int height);
+
+bool defaultWindow = false;
+bool fps = false;
+bool welcome = true;
 
 namespace Snippets
 {
-    void setupDefaultWindow(const char *name)
-{
-	char* namestr = new char[strlen(name)+1];
-	strcpy(namestr, name);
-	int argc = 1;
-	char* argv[1] = { namestr };
+	// 点击开始游戏后再进行键鼠回调函数的注册
+	void installPlayFunc() {
+		glutKeyboardFunc(Callbacks::keyboardDownCallback);
+		glutKeyboardUpFunc(Callbacks::keyboardUpCallback);
+		glutSpecialFunc(Callbacks::specialKeyDownCallback);
+		glutSpecialUpFunc(Callbacks::specialKeyUpCallback);
+		glutMouseFunc(Callbacks::mouseCallback);
+		glutMotionFunc(Callbacks::motionCallback);
+		glutReshapeFunc(reshape);
 
-	glutInit(&argc, argv);
+	}
+
+	void textCentered(string text) {
+		auto windowWidth = ImGui::GetWindowSize().x;
+		auto textWidth = ImGui::CalcTextSize(text.c_str()).x;
+
+		ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
+		ImGui::Text(text.c_str());
+	}
+
+	void menuButtonCentered2(string button1, string button2) {
+		float windowWidth = ImGui::GetWindowSize().x;
+		float button1Width = ImGui::CalcTextSize(button1.c_str()).x;
+		float button2Width = ImGui::CalcTextSize(button2.c_str()).x;
+		
+		float space = (windowWidth - button1Width - button2Width) / 3.f;
+		ImGui::SetCursorPosX(space);
+		if (ImGui::Button(button1.c_str())) {
+			welcome = false;
+			defaultWindow = true;
+			fps = true;
+			installPlayFunc();
+		}
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(2 * space + button1Width);
+		
+		if (ImGui::Button(button2.c_str())) {
+			exit(0);
+		}
+	}
+
+    void setupDefaultWindow(const char *name)
+	{
+		char* namestr = new char[strlen(name)+1];
+		strcpy(namestr, name);
+		int argc = 1;
+		char* argv[1] = { namestr };
+
+		glutInit(&argc, argv);
 	
-	glutInitWindowSize(1024, 768);
-	glutInitDisplayMode(GLUT_RGB|GLUT_DOUBLE|GLUT_DEPTH);
-	int mainHandle = glutCreateWindow(name);
-	glutSetWindow(mainHandle);
-	glutReshapeFunc(reshape);
-	
-	delete[] namestr;
-}
+		glutInitWindowSize(1024, 768);
+		glutInitDisplayMode(GLUT_RGB|GLUT_DOUBLE|GLUT_DEPTH);
+		int mainHandle = glutCreateWindow(name);
+		glutSetWindow(mainHandle);
+
+		delete[] namestr;
+	}
 
 	void setupDefaultRenderState()
-{
-	// Setup default render states 初始化设置
-	glClearColor(0.7f, 0.9f, 0.86f, 1.0);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_COLOR_MATERIAL);
-	// Setup lighting 光照设置
-	glEnable(GL_LIGHTING);
-	PxReal ambientColor[]	= { 0.0f, 0.1f, 0.2f, 0.0f };
-	PxReal diffuseColor[]	= { 1.0f, 1.0f, 1.0f, 0.0f };		
-	PxReal specularColor[]	= { 0.0f, 0.0f, 0.0f, 0.0f };		
-	PxReal position[]		= { 50.0f, 50.0f, 200.0f, 1.0f };		
-	glLightfv(GL_LIGHT0, GL_AMBIENT, ambientColor);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseColor);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, specularColor);
-	glLightfv(GL_LIGHT0, GL_POSITION, position);
-	glEnable(GL_LIGHT0);
-	/** 启用纹理 */
-	glEnable(GL_TEXTURE_2D);
-	//模型纹理贴图内嵌，开启法向量
-	glEnable(GL_NORMALIZE);
-	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-}
+	{
+		// Setup default render states 初始化设置
+		glClearColor(0.7f, 0.9f, 0.86f, 1.0);
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_COLOR_MATERIAL);
+		// Setup lighting 光照设置
+		glEnable(GL_LIGHTING);
+		PxReal ambientColor[]	= { 0.0f, 0.1f, 0.2f, 0.0f };
+		PxReal diffuseColor[]	= { 1.0f, 1.0f, 1.0f, 0.0f };		
+		PxReal specularColor[]	= { 0.0f, 0.0f, 0.0f, 0.0f };		
+		PxReal position[]		= { 50.0f, 50.0f, 200.0f, 1.0f };		
+		glLightfv(GL_LIGHT0, GL_AMBIENT, ambientColor);
+		glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseColor);
+		glLightfv(GL_LIGHT0, GL_SPECULAR, specularColor);
+		glLightfv(GL_LIGHT0, GL_POSITION, position);
+		glEnable(GL_LIGHT0);
+		/** 启用纹理 */
+		glEnable(GL_TEXTURE_2D);
+		//模型纹理贴图内嵌，开启法向量
+		glEnable(GL_NORMALIZE);
+		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+	}
+	
+	
 
 	void renderImGui() {
+		ImGuiWindowFlags window_flags = 0;
+		window_flags |= ImGuiWindowFlags_NoBackground;
+		window_flags |= ImGuiWindowFlags_NoTitleBar;
+	
+		if (welcome) {
+			ImGui::Begin(" ", &welcome, window_flags - 128);
+			ImGui::NewLine();
+			textCentered("Welcome to Portal's game");
+			ImGui::NewLine();
+			menuButtonCentered2("Play", "Exit");
+				
+			ImGui::End();
+		}
 
-	{
-		static float f = 0.0f;
-		static int counter = 0;
 
-		ImGui::Begin("Monitoring");                         
+		if (defaultWindow) {
+			//ImGui::ShowDemoWindow(&demo);
 
-		//ImGui::Text("ImGui successfully deployed.");           
+			ImGui::Begin("Monitoring", &defaultWindow, window_flags);
 
-		//ImGui::SameLine();
-		ImGui::Text("clickX = %d", textX);
-		ImGui::Text("clickY = %d", textY);
+			//ImGui::Text("ImGui successfully deployed.");           
 
-		ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
-		ImGui::End();
+			//ImGui::SameLine();
+			ImGui::Text("Press H to open help menu.");
+			ImGui::Text("Checkpoint: %d", role->getCheckpoint());
+			ImGui::Text("Life: %d", role->getHealth());
+			ImGui::Text("Score: %d", role->getScore());
+			if (!sCamera->isFree()) {
+				ImGui::Text("Camera is locked.");
+			}
+			//ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
+			ImGui::End();
+		}
+		
+		if(helpMenu)
+		{
+			ImGui::Begin("Play Guide");
+			ImGui::Text("Arraw keys: Move the player");
+			ImGui::Text("T: Unlock/Lock camera");
+			ImGui::Text("Hold/Release space: Charge/Jump");
+			ImGui::Text("WASD: Free camera");
+			ImGui::End();
+		}
+			
+	
+		if (fps) {
+			ImGui::Begin("FPS check", &fps, window_flags);
+			ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
+			ImGui::End();
+		}
+		
+		// 3. Show another simple window.
+		if (show_another_window)
+		{
+		
+			ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+			ImGui::Text("Hello from another window!");
+			if (ImGui::Button("Close Me"))
+				show_another_window = false;
+			ImGui::End();
+		}
+
+		ImGui::Render();
+		ImGuiIO& io = ImGui::GetIO();
+		ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 	}
-
-	// 3. Show another simple window.
-	if (show_another_window)
-	{
-		ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-		ImGui::Text("Hello from another window!");
-		if (ImGui::Button("Close Me"))
-			show_another_window = false;
-		ImGui::End();
-	}
-
-	ImGui::Render();
-	ImGuiIO& io = ImGui::GetIO();
-	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
-}
 
 	void startRender(const PxVec3& cameraEye, const PxVec3& cameraDir, PxReal clipNear, PxReal clipFar)
-{
-	/*ImGui_ImplOpenGL2_NewFrame();
-	ImGui_ImplGLUT_NewFrame();*/
-	lastTime = currTime;
-	currTime = clock();
-	 
-	if (press == true) {
-		textShouldRaster = true;
+	{
+	
+		ImGui_ImplOpenGL2_NewFrame();
+		ImGui_ImplGLUT_NewFrame();
 		lastTime = currTime;
-		rasterTime = (double)0.;
-		press = false;
+		currTime = clock();
+	 
+		if (press == true) {
+			textShouldRaster = true;
+			lastTime = currTime;
+			rasterTime = (double)0.;
+			press = false;
+		}
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// Setup camera
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(60.0, GLdouble(glutGet(GLUT_WINDOW_WIDTH)) / GLdouble(glutGet(GLUT_WINDOW_HEIGHT)), GLdouble(clipNear), GLdouble(clipFar));
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		gluLookAt(GLdouble(cameraEye.x), GLdouble(cameraEye.y), GLdouble(cameraEye.z), GLdouble(cameraEye.x + cameraDir.x), GLdouble(cameraEye.y + cameraDir.y), GLdouble(cameraEye.z + cameraDir.z), 0.0, 1.0, 0.0);
+		//gluLookAt(-0.5, 600.5, 1300.5, -0.5, 200, 1.5, 0, 1, 0);
+		glColor4f(0.4f, 0.4f, 0.4f, 1.0f);
 	}
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// Setup camera
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(60.0, GLdouble(glutGet(GLUT_WINDOW_WIDTH)) / GLdouble(glutGet(GLUT_WINDOW_HEIGHT)), GLdouble(clipNear), GLdouble(clipFar));
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(GLdouble(cameraEye.x), GLdouble(cameraEye.y), GLdouble(cameraEye.z), GLdouble(cameraEye.x + cameraDir.x), GLdouble(cameraEye.y + cameraDir.y), GLdouble(cameraEye.z + cameraDir.z), 0.0, 1.0, 0.0);
-	//gluLookAt(-0.5, 600.5, 1300.5, -0.5, 200, 1.5, 0, 1, 0);
-	glColor4f(0.4f, 0.4f, 0.4f, 1.0f);
-}
-
-void renderGameOver(const char text[], int len) 
-{
-	renderText(190,250,text,len);
-}
-
-void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, const PxVec3 & color)/*渲染actor*/
-{
-	PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
-	for(PxU32 i=0;i<numActors;i++)
+	void renderGameOver(const char text[], int len) 
 	{
-		const PxU32 nbShapes = actors[i]->getNbShapes();
-		PX_ASSERT(nbShapes <= MAX_NUM_ACTOR_SHAPES);
-		actors[i]->getShapes(shapes, nbShapes);
-		bool sleeping = actors[i]->is<PxRigidDynamic>() ? actors[i]->is<PxRigidDynamic>()->isSleeping() : false; 
-		/*这里以后会用到来判断每一杆的行动机会，sleeping则可以行动，不是sleeping状态说明还在运动*/
+		renderText(190,250,text,len);
+	}
+
+	void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, const PxVec3 & color)/*渲染actor*/
+	{
+		PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
+		for(PxU32 i=0;i<numActors;i++)
+		{
+			const PxU32 nbShapes = actors[i]->getNbShapes();
+			PX_ASSERT(nbShapes <= MAX_NUM_ACTOR_SHAPES);
+			actors[i]->getShapes(shapes, nbShapes);
+			bool sleeping = actors[i]->is<PxRigidDynamic>() ? actors[i]->is<PxRigidDynamic>()->isSleeping() : false; 
+			/*这里以后会用到来判断每一杆的行动机会，sleeping则可以行动，不是sleeping状态说明还在运动*/
 
 		PxVec3 actorWorldPosition = actors[i]->getGlobalPose().p;
 		if (nbShapes > 0 && !dynamicBall.isInCircle(actorWorldPosition.x, actorWorldPosition.z)) {
@@ -457,72 +561,72 @@ void renderActors(PxRigidActor** actors, const PxU32 numActors, bool shadows, co
 					renderGeometry(h, "Block", false);
 				}			
 
-				glPopMatrix();
+					glPopMatrix();
+				}
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+				if (shapes[j]->getFlags() & PxShapeFlag::eVISUALIZATION && shadows)/*阴影*/
+				{
+					const PxVec3 shadowDir(0.0f, -0.7071067f, -0.7071067f);
+					const PxReal shadowMat[] = { 1,0,0,0, -shadowDir.x / shadowDir.y,0,-shadowDir.z / shadowDir.y,0, 0,0,1,0, 0,0,0,1 };
+					glPushMatrix();
+					glMultMatrixf(shadowMat);
+					glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
+					//开启表⾯剔除(默认背⾯剔除)
+					glEnable(GL_CULL_FACE);
+					glDisable(GL_LIGHTING);
+					glColor4f(0.1f, 0.2f, 0.3f, 1.0f);
+					renderGeometry(h, "Block",true);
+					glDisable(GL_CULL_FACE);
+					glEnable(GL_LIGHTING);
+					glPopMatrix();
+				}	
 			}
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-			if (shapes[j]->getFlags() & PxShapeFlag::eVISUALIZATION && shadows)/*阴影*/
-			{
-				const PxVec3 shadowDir(0.0f, -0.7071067f, -0.7071067f);
-				const PxReal shadowMat[] = { 1,0,0,0, -shadowDir.x / shadowDir.y,0,-shadowDir.z / shadowDir.y,0, 0,0,1,0, 0,0,0,1 };
-				glPushMatrix();
-				glMultMatrixf(shadowMat);
-				glMultMatrixf(reinterpret_cast<const float*>(&shapePose));
-				//开启表⾯剔除(默认背⾯剔除)
-				glEnable(GL_CULL_FACE);
-				glDisable(GL_LIGHTING);
-				glColor4f(0.1f, 0.2f, 0.3f, 1.0f);
-				renderGeometry(h, "Block",true);
-				glDisable(GL_CULL_FACE);
-				glEnable(GL_LIGHTING);
-				glPopMatrix();
-			}	
-		}
-
-	}
-}
-
-void finishRender()
-{
-	 //把ui渲染放在这里 是为了其能显示在最上层
-	//renderImGui();
-	if (textShouldRaster == true) {
-		rasterTime += double(currTime - lastTime)/CLOCKS_PER_SEC;
-		if (rasterTime >= 3) {
-			textShouldRaster = false;
-		}
-		else {
-			// TextX的范围[0,90], textY的范围[0,100]
-			// 这里的1024和768是窗口尺寸，后续应考虑换成变量表示
-			textX = ((float)mouseX / 1024) * 90;
-			textY= ((float)mouseY / 768) * 100;
-			renderText(textX, 100-textY, "Test Text.", 10);
 		}
 	}
+
+	void finishRender()
+	{
+		 //把ui渲染放在这里 是为了其能显示在最上层
+		renderImGui();
+		if (textShouldRaster == true) {
+			rasterTime += double(currTime - lastTime)/CLOCKS_PER_SEC;
+			if (rasterTime >= 3) {
+				textShouldRaster = false;
+			}
+			else {
+				// TextX的范围[0,90], textY的范围[0,100]
+				// 这里的1024和768是窗口尺寸，后续应考虑换成变量表示
+				textX = ((float)mouseX / 1024) * 90;
+				textY= ((float)mouseY / 768) * 100;
+				renderText(textX, 100-textY, "Test Text.", 10);
+			}
+		}
 	
-	glutSwapBuffers();
-}
-
-void renderText(int x, int y, const char text[], int len)
-{
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	gluOrtho2D(0, GLUT_WINDOW_WIDTH, 0, GLUT_WINDOW_HEIGHT);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-
-	glLoadIdentity();
-	glRasterPos2i(x, y);
-	for (int i = 0; i < len; i++) {
-		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, text[i]);
-
+		glutSwapBuffers();
 	}
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glMatrixMode(GL_MODELVIEW);
-}
+
+	void renderText(int x, int y, const char text[], int len)
+	{
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+		glLoadIdentity();
+		gluOrtho2D(0, GLUT_WINDOW_WIDTH, 0, GLUT_WINDOW_HEIGHT);
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+
+		glLoadIdentity();
+		glRasterPos2i(x, y);
+		for (int i = 0; i < len; i++) {
+			glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, text[i]);
+
+		}
+		glPopMatrix();
+		glMatrixMode(GL_PROJECTION);
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
+	}
 
 } //namespace Snippets
 

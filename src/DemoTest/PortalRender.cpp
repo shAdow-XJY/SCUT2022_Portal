@@ -54,57 +54,128 @@ DynamicBall dynamicBall = DynamicBall(openDynamicBall);
 extern Animation animation;
 extern void renderGameOver();
 
-namespace
-{
-	Snippets::Camera*	sCamera;
+bool cameraMove = false;
 
-void motionCallback(int x, int y)
-{
-	sCamera->handleMotion(x, y);
-}
-void keyboardDownCallback(unsigned char key, int x, int y)
-{
-	if(key==27)
-		exit(0);
-	if(!sCamera->handleKey(key, x, y))
-		keyPress(key, sCamera->getTransform());
-}
-void keyboardUpCallback(unsigned char key, int x, int y)
-{
-	keyRelease(key);
-}
+enum keyBoardInputFlags {
+	KEYBOARD_NONE = 0,
+	KEYBOARD_W = 1 << 0,
+	KEYBOARD_A = 1 << 1,
+	KEYBOARD_S = 1 << 2,
+	KEYBOARD_D = 1 << 3,
+	KEYBOARD_UP = 1 << 5,
+	KEYBOARD_DOWN = 1 << 6,
+	KEYBOARD_LEFT = 1 << 7,
+	KEYBOARD_RIGHT = 1 << 8,
+	KEYBOARD_T = 1 << 9
+};
 
-void specialKeyDownCallback(GLint key, GLint x, GLint y)
+int keyBoardInputFlag = KEYBOARD_NONE;
+
+
+Snippets::Camera* sCamera;
+namespace Callbacks
 {
-	role->move(key,true,sCamera->isFree());
 	
-	specialKeyPress(key);
-}
 
-void specialKeyUpCallback(GLint key, GLint x, GLint y)
-{
-	role->move(key, false, sCamera->isFree());
-	if (role->getRotateOrNot()) {
-		sCamera->calDirMoving(key);
+	void cameraInputUpdate() {
+
+		if (keyBoardInputFlag & KEYBOARD_W) {
+			sCamera->handleKey('W');
+		}
+		else if (keyBoardInputFlag & KEYBOARD_A) {
+			sCamera->handleKey('A');
+		}
+		else if (keyBoardInputFlag & KEYBOARD_S) {
+			sCamera->handleKey('S');
+		}
+		else if (keyBoardInputFlag & KEYBOARD_D) {
+			sCamera->handleKey('D');
+		}
+		keyBoardInputFlag = 0;
 	}
-	specialKeyRelease(key);
-}
 
-void mouseCallback(int button, int state, int x, int y)
-{
-	sCamera->handleMouse(button, state, x, y);
-	mousePress(button, state, x, y);
-}
+	void motionCallback(int x, int y)
+	{
+		sCamera->handleMotion(x, y);
+	}
 
-void idleCallback()
-{
-	glutPostRedisplay();
-}
+	void keyboardDownCallback(unsigned char key, int x, int y)
+	{
+		if(key==27)
+			exit(0);
+	
+		switch (toupper(key)) {
+		case 'W': {
+			keyBoardInputFlag |= KEYBOARD_W;
+			cameraMove = true;
+			break;
+		}
+		case 'A': {
+			keyBoardInputFlag |= KEYBOARD_A;
+			cameraMove = true;
+			break;
+		}
+		case 'S': {
+			keyBoardInputFlag |= KEYBOARD_S;
+			cameraMove = true;
+			break;
+		}
+		case 'D': {
+			keyBoardInputFlag |= KEYBOARD_D;
+			cameraMove = true;
+			break;
+		}
+		case 'T': {
+			sCamera->handleKey('T');
+			break;
+		}
+		default: {
+			keyPress(key, sCamera->getTransform());
+		}
+		}
 
-void animationRenderCallback() {
-	animation.display();
+	}
+	void keyboardUpCallback(unsigned char key, int x, int y)
+	{
+		key = toupper(key);
+		if (key == 'W' || key == 'S'||key=='A'||key=='D') {
+			cameraMove = false;
+		}
+		keyRelease(key);
+	}
 
-	string currentAnimation = animation.getCurrentAnimation();
+	void specialKeyDownCallback(GLint key, GLint x, GLint y)
+	{
+		role->move(key,true,sCamera->isFree());
+	
+		specialKeyPress(key);
+	}
+
+	void specialKeyUpCallback(GLint key, GLint x, GLint y)
+	{
+		role->move(key, false, sCamera->isFree());
+		if (role->getRotateOrNot()) {
+			sCamera->calDirMoving(key);
+		}
+		specialKeyRelease(key);
+	}
+
+	void mouseCallback(int button, int state, int x, int y)
+	{
+		sCamera->handleMouse(button, state, x, y);
+		mousePress(button, state, x, y);
+
+	}
+
+	void idleCallback()
+	{
+		glutPostRedisplay();
+	}
+
+	void animationRenderCallback() {
+		animation.display();
+
+		string currentAnimation = animation.getCurrentAnimation();
 
 	if (currentAnimation == "idle") {
 		animation.update(0.5);
@@ -152,17 +223,20 @@ void animationRenderCallback() {
 		animation.update(1.0);
 	}
 	
-}
-
-void renderCallback()
-{
-	if (soundtool.getSoundResult()!= FMOD_OK) {
-		soundtool.SoundUpdate();
 	}
-	
-	stepPhysics(true);
 
-		
+	void renderCallback()
+	{
+		if (soundtool.getSoundResult()!= FMOD_OK) {
+			soundtool.SoundUpdate();
+		}
+	
+		stepPhysics(true);
+
+		if (cameraMove) {
+			cameraInputUpdate();
+		}
+	
 		if (!sCamera->isFree() || beginGame) {
 			if (beginGame) {
 				sCamera->isChangeImmediate = true;
@@ -309,7 +383,7 @@ void renderCallback()
 		calculateElapsedClocksFromLastFrame();
 	}
 
-void exitCallback(void)
+	void exitCallback(void)
 	{
 		delete sCamera;
 		cleanupPhysics(true);
@@ -321,13 +395,15 @@ void exitCallback(void)
 **/
 void reshape(int width, int height)
 {
+	cout << "New width: " << width << " " << "New height: " << height << endl;
+	ImGui_ImplGLUT_ReshapeFunc(width, height);
 	glViewport(0, 0, width, height);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluOrtho2D(0, GLUT_WINDOW_WIDTH, 0, GLUT_WINDOW_HEIGHT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-
+	
 }
 
 
@@ -343,31 +419,27 @@ void renderLoop()
 	skyBox.Init(true);
 	animation.init();
 
+	
+	glutIdleFunc(Callbacks::idleCallback);
+	glutDisplayFunc(Callbacks::renderCallback);
+	Callbacks::motionCallback(0,0);
+	atexit(Callbacks::exitCallback);
+	
+	initPhysics(true);
+	loadTexture();
+	initGame();
+
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.Fonts->AddFontFromFileTTF("../../src/ImGui/segoeui.ttf",23.0f);
 	ImGui::StyleColorsDark();
 
 	ImGui_ImplGLUT_Init();
 	ImGui_ImplGLUT_InstallFuncs();
 	ImGui_ImplOpenGL2_Init();
 
-	glutIdleFunc(idleCallback);
-	glutDisplayFunc(renderCallback);
-	glutKeyboardFunc(keyboardDownCallback);
-	glutKeyboardUpFunc(keyboardUpCallback);
-	glutSpecialFunc(specialKeyDownCallback);
-	glutSpecialUpFunc(specialKeyUpCallback);
-	glutMouseFunc(mouseCallback);
-	glutMotionFunc(motionCallback);
-	glutReshapeFunc(reshape);
-	motionCallback(0,0);
-	atexit(exitCallback);
-	
 
-	initPhysics(true);
-	loadTexture();
-	initGame();
 	glutMainLoop();
 
 	ImGui_ImplOpenGL2_Shutdown();

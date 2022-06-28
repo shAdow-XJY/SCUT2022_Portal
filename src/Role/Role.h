@@ -188,6 +188,18 @@ public:
 	bool getRotateOrNot();
 	void setRotateOrNot(bool);
 
+	// 获取游戏信息
+	int getCheckpoint() {
+		return this->nowCheckpoint;
+	}
+	int getHealth() {
+		return this->life;
+	}
+	int getScore() {
+		return this->score;
+	}
+
+
 	//重构部分
 	PxVec3 roleHandleKey(GLint key, bool free);
 	void touchGround();

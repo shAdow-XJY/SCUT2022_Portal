@@ -13,6 +13,7 @@ extern Animation animation;
 // 右键鼠标按下
 bool press = false;
 
+extern bool helpMenu;
 
 // 鼠标点击时的坐标
 int mouseX, mouseY;
@@ -109,6 +110,9 @@ void keyRelease(unsigned char key)
 		role->roleNoCrouch();
 		break;
 	}
+	case 'H': {
+		helpMenu = !helpMenu;
+	}
 	default:
 		break;
 	}
@@ -152,7 +156,7 @@ void specialKeyPress(GLint key) {
 		return;
 	}
 	}
-}
+	}
 
 void specialKeyRelease(GLint key) {
 
