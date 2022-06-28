@@ -8,11 +8,12 @@
 #include "../Block/Door.h"
 #include "../LoadModel/Model.h"
 #include "../Block/Seesaw.h"
-#include "../Sound/SoundTools.h"
 #include "../Block/PrismaticRoad.h"
 #include "../Block/RotateRod.h"
 #include <glut.h>
 using namespace physx;
+
+
 
 extern PxScene* gScene;
 extern PxMaterial* gMaterial;
@@ -20,13 +21,11 @@ extern PxPhysics* gPhysics;
 extern PxControllerManager* cManager;
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
 extern PxRigidActor* RayCast(PxVec3 origin, PxVec3 unitDir);
-extern void renderGameOver();
 const float primaryUpSpeed = 0.10;
 
-extern SoundTool soundtool;
+
 extern vector<PxVec3> checkpoints;
 static GameSceneBasic* errorGameSceneBasic = new GameSceneBasic();
-
 
 class Role {
 private:
@@ -37,7 +36,7 @@ private:
 	/// <summary>
 	/// 角色属性
 	/// </summary>
-	PxF32 roleRadius = 1.5f;
+	PxF32 roleRadius = 3.0f;
 	PxF32 roleHeight = 10.0f;
 	//人物速度
 	PxVec3 speed = PxVec3(0, 0, 0);
@@ -71,6 +70,7 @@ private:
 	bool equiped = false;
 	bool standingOnBlock = true;
 	bool isRebirthing = false;
+	bool isCrouch = false;
 	//冰面滑动
 	bool slide = false;
 	//边缘滑动
@@ -86,7 +86,9 @@ private:
 	int life = 5;
 	//得分
 	int score = 0;
-	
+
+	//视角是否随面朝方向移动
+	bool rotateMoveDir = true;
 
 	// 是否已绑定静态模型
 	bool staticAttached = false;
@@ -112,8 +114,9 @@ public:
 		return this->role;
 	}
 	bool getAliveStatus();
-	bool gameOver();
+	bool roleOver();
 
+	
 	//角色位置信息
 	void setFootPosition(PxVec3 position);
 	PxVec3 getFootPosition();
@@ -123,7 +126,6 @@ public:
 
 	//速度相关
 	PxVec3 getSpeed();
-	bool isSpeedZero();
 	void setSpeed(PxVec3 speed);
 
 	//相机朝向
@@ -134,10 +136,10 @@ public:
 	//角色移动相关
 	void move();
 	void move(GLint key, bool status, bool free);
-	void stopMoving();
 
 	//人物站立的方块基类
 	GameSceneBasic* standingBlock = errorGameSceneBasic;
+	PxRigidActor* keyDoorActor;
 
 	//放置物体
 	void setEquiped(bool equip = true);
@@ -151,6 +153,7 @@ public:
 
 
 	//下蹲
+	bool getCrouch();
 	void roleCrouch();
 	void roleNoCrouch();
 
@@ -163,6 +166,8 @@ public:
 	bool pickUpObj();
 	//放置物体
 	bool layDownObj();
+	//使用道具
+	bool useKeyObj();
 
 	//角色滑动
 	void roleSlide();
@@ -180,68 +185,32 @@ public:
 	//更新角色得分
 	void updateScore();
 	bool getRebirthing();
+	bool getRotateOrNot();
+	void setRotateOrNot(bool);
+
+	// 获取游戏信息
+	int getCheckpoint() {
+		return this->nowCheckpoint;
+	}
+	int getHealth() {
+		return this->life;
+	}
+	int getScore() {
+		return this->score;
+	}
 
 
 	//重构部分
-	PxVec3 roleHandleKey(GLint key,bool free);
+	PxVec3 roleHandleKey(GLint key, bool free);
 	void touchGround();
 	PxVec3 getHorizontalVelocity();
 	void resetStatus();
 	
-
-};
-
-class RoleHitCallback :public PxUserControllerHitReport {
-public:
-	void onShapeHit(const PxControllerShapeHit& hit) {
-	}
-	void onControllerHit(const PxControllersHit& hit) {
-	}
-	void  onObstacleHit(const PxControllerObstacleHit& hit) {
-	}
-};
-
-/**
-* @brief 角色碰撞判定，用于角色撞物体和推物体
-**/
-class RoleHitBehaviorCallback :public PxControllerBehaviorCallback {
-private:
-	Role* role = NULL;
-public:
-	RoleHitBehaviorCallback(Role* role) :role(role) {};
-	PxControllerBehaviorFlags getBehaviorFlags(const PxShape& shape, const PxActor& actor) {
-		////是否接触到地面
-		//if (actor.getName() != "Ground") {
-		//	this->role->stopMoving();
-		//}
-		string name(actor.getName());
-		if (name == "Door") {
-			Door* door = (Door*)actor.userData;
-			float scale = 9000.0f;
-			door->addPForce(role->getFaceDir() * scale);
-
-			if (door->canOpen()) {
-				if (!door->getDoorStauts()) {
-					soundtool.playSound("openDoorSlowly.wav", true);
-					door->setDoorStatus(true);
-				}
-			}
-		}
-		else if (name == "Over") {
-			if (this->role->gameOver()) {
-				const char* msg = "游戏结束";
-				//渲染游戏结束
-				renderGameOver();
-			}
-		}
-		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
-	}
-	PxControllerBehaviorFlags getBehaviorFlags(const PxController& controller) {
-		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
-	}
-	PxControllerBehaviorFlags getBehaviorFlags(const PxObstacle& obstacle) {
-		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
-	}
+	int nowCheckpoint = 1;
+	int lastCheckpoint = 1;
+	bool isJumping();
+	void setDir(PxVec3 dir);
+	void setFaceDir(PxVec3 dir);
 };
 
 #endif // !__ROLE_H__

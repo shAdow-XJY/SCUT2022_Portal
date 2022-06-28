@@ -37,7 +37,10 @@ void Animation::init()
 
 void Animation::initAssetAnimaion()
 {
-    string aniName[] = {"walk","run","jump","dying","turnRight","turnLeft","turnBack"};
+    string aniName[] = { "walk","run","jumping","dying",
+                        "sleeping", "crouching","crouchedWalking",
+                        "openDoor","useKey", "notUseKey", "dancing",
+                        "pickUp","putDown","swimming","swimIdle"};
 
     for (string name : aniName) {
         string baseUrl = "../../src/Animation/models/" + name + ".fbx";
@@ -147,7 +150,14 @@ void Animation::display()
     
     PxMat44 modelMatrix(PxShapeExt::getGlobalPose(*attachedRole->getShape(), *attachedRole->getActor()));
     PxMat44 rotate(PxQuat(-PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
-    PxMat44 translate(PxTransform(PxVec3(0.0f, -1.0f, 0.0f)));
+    
+    PxMat44 translate = PxMat44(PxTransform(PxVec3(0.0f, -3.8f, 0.0f)));
+    if (this->current_animation == "crouchedWalking") {
+        translate = PxMat44(PxTransform(PxVec3(0.0f, 0.0f, 0.0f)));
+    }
+    else if (this->current_animation == "crouching") {
+        translate = PxMat44(PxTransform(PxVec3(0.0f, -2.0f, 0.0f)));
+    }
     renderDisplay(this->scene, this->scene->mRootNode, std::map<int, int>(), modelMatrix * rotate * translate *yRotate);
 
 }
@@ -166,8 +176,9 @@ void Animation::attachRole(Role& role) {
     this->attachedRole = &role;
     PxShape* cap;
     role.getActor()->getShapes(&cap, 1);
+    // 设为false就能只作为碰撞体而不渲染出来
     cap->setFlag(PxShapeFlag::eVISUALIZATION, false);
-    
+
 }
 
 void Animation::changeOrientation(const PxQuat& orientation)

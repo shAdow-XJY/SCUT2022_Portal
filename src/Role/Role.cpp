@@ -1,6 +1,8 @@
 #include "Role.h"
 #include "cmath"
 #include <iostream>
+#include <Role/RoleHitCallback.h>
+
 extern void printPxVecFun(const PxVec3& vec);
 extern clock_t deltaClock;
 
@@ -52,8 +54,9 @@ bool Role::attachModel(const char* path) {
 **/
 PxVec3 Role::roleHandleKey(GLint key, bool free) {
 	PxVec3 dir;
-	if (!free) dir = this->faceDir; //非自由镜头以人物朝向为前进方向
+	if (!free && this->rotateMoveDir) dir = this->faceDir; //非自由镜头以人物朝向为前进方向
 	else dir = this->dir; //自由镜头以摄像机正前方为前进方向
+
 	//移动方向计算
 	switch (key) {
 	case GLUT_KEY_UP: {
@@ -153,20 +156,28 @@ void Role::roleSlide() {
 }
 
 /**
+* @brief 角色下蹲状态
+**/
+bool Role::getCrouch(){
+	return this->isCrouch;
+}
+
+/**
 * @brief 角色下蹲
 **/
 void Role::roleCrouch() {
 	if (!isJump && !isFall) {
+		this->isCrouch = true;
 		this->roleController->resize(roleHeight / 2.5);
 	}
 }
-
 
 /**
 * @brief 角色下蹲恢复阶段
 **/
 void Role::roleNoCrouch() {
 	this->roleController->resize(roleHeight + roleRadius);
+	this->isCrouch = false;
 }
 
 /**
@@ -223,7 +234,7 @@ bool Role::getAliveStatus() {
 /**
 * @brief 角色死亡
 **/
-bool Role::gameOver() {
+bool Role::roleOver() {
 	this->resetStatus();
 	if (this->stimulateObj) {
 		this->stimulateObj->release();
@@ -239,6 +250,7 @@ bool Role::gameOver() {
 	return false;
 
 }
+
 
 /**
 * @brief 角色是否可以移动
@@ -268,9 +280,9 @@ void Role::edgeSliding() {
 **/
 bool Role::pickUpObj() {
 	//cout << this->faceDir.x<<" " << this->faceDir.y <<" "<< this->faceDir.z<<" " << endl;
-	PxVec3 origin = this->getPosition() - PxVec3(0, 0.2f, 0);
+	PxVec3 origin = this->getFootPosition() + PxVec3(0, 0.5f, 0);
 	//确定role的前方方向
-	PxVec3 forwardDir = this->getFaceDir() * 2;
+	PxVec3 forwardDir = this->getFaceDir()*5;
 	PxRigidActor* actor = NULL;
 	if (actor = RayCast(origin, forwardDir)) {
 		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
@@ -298,7 +310,7 @@ bool Role::pickUpObj() {
 bool Role::layDownObj() {
 	PxVec3 origin = this->getPosition() - PxVec3(0, 0.2f, 0);
 	//确定role的前方方向
-	PxVec3 forwardDir = PxVec3(this->getFaceDir().x * 1.5f, -3, this->getFaceDir().z * 1.5f);
+	PxVec3 forwardDir = PxVec3(this->getFaceDir().x * 1.5f, -20.0f, this->getFaceDir().z * 1.5f);
 	PxRigidActor* actor = NULL;
 	if (actor = RayCast(origin, forwardDir)) {
 		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
@@ -307,13 +319,59 @@ bool Role::layDownObj() {
 			extern void createPorp(const PxTransform & t, const PxVec3 & v, PxReal x, PxReal y, PxReal z);
 			//cout << role->getPosition().x << " " << role->getPosition().y << " " << role->getPosition().z << endl;
 			//cout << role->getFaceDir().x << " " << role->getFaceDir().y << " " << role->getFaceDir().z << endl;
-			createPorp(PxTransform(PxVec3(0, 0, 0)), this->getPosition() + this->getFaceDir() * 2.5, boxHeight, boxHeight, boxHeight);
+			createPorp(PxTransform(PxVec3(0, 0, 0)), this->getFootPosition() + PxVec3(this->getFaceDir().x * 3.5f, 1.0f, this->getFaceDir().z * 3.5f), 1.0, 1.0, 1.0);
 			std::cout << "放置道具成功" << std::endl;
 			return true;
 		}
 		else
 		{
 			std::cout << "不是可放置道具的地方" << std::endl;
+		}
+	}
+	else
+	{
+		std::cout << "射线没有找到目标" << std::endl;
+	}
+	return false;
+}
+
+/**
+* @brief 角色道具使用
+**/
+bool Role::useKeyObj() {
+	PxVec3 origin = this->getPosition();
+	//确定role的前方方向
+	PxRigidActor* actor = NULL;
+	if (actor = RayCast(origin, this->getFaceDir()*5.0f)) {
+		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
+		if (basic->getType() == OrganType::keyDoor) {
+			Door* door = (Door*)actor->userData;;
+			if (this->equiped) {
+				if (door->getNeedKey()) {
+					if (door->getHasKey()) {
+						std::cout << "该门已被使用道具" << std::endl;
+					}
+					else {
+						door->setHasKey(true);
+						this->equiped = false;
+						std::cout << "使用道具成功" << std::endl;
+						this->keyDoorActor = actor;
+						//door->setPosition();
+						return true;
+					}
+				}
+				else {
+					cout << "不是可使用道具的门" << endl;
+				}
+			}
+			else
+			{
+				std::cout << "角色没有装备道具" << std::endl;
+			}
+		}
+		else
+		{
+			std::cout << "不是门" << std::endl;
 		}
 	}
 	else
@@ -375,6 +433,9 @@ void Role::rayAround() {
 void Role::stimulate() {
 	if (this->stimulateObj) {
 		const PxVec3 pos = this->stimulateObj->getGlobalPose().p;
+		if (pos.y < 1.0f) {
+			this->roleOver();
+		}
 		this->roleController->setPosition(PxExtendedVec3(pos.x, pos.y, pos.z));
 	}
 }
@@ -403,11 +464,15 @@ void Role::updateScore() {
 	if (actor = RayCast(origin, unitDir)) {
 		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
 		if (basic) {
-			int checkpoint = basic->getCheckpoint();
+			int checkpoint = basic->getCheckpoint();		
 			if (this->arrivedCheckpoint < checkpoint) {
 				this->arrivedCheckpoint = checkpoint;
 				this->score += 100;
 			}
+			if (checkpoint != nowCheckpoint) {
+				lastCheckpoint = nowCheckpoint;
+			}
+			nowCheckpoint = checkpoint;
 		}
 	}
 }
@@ -479,7 +544,7 @@ void Role::move(GLint key, bool status, bool free) {
 	{
 		if (!this->isJump && !this->isFall) {
 			this->faceDir = this->lastPressDir; //更新为最后一次移动的面朝方向
-			if (!free) {
+			if (!free && this->rotateMoveDir) {
 				this->dir = this->faceDir;//抬起的时候才更新角色朝向，确保持续移动
 			}
 			if (standingBlock->getType() == OrganType::iceroad) {
@@ -513,7 +578,6 @@ void Role::fall() {
 	}
 
 }
-
 
 /**
 * @brief 角色底部发送射线
@@ -569,7 +633,7 @@ void Role::simulationGravity() {
 				else
 				{
 					//防止CCT边缘卡住模拟滑动一下
-					PxVec3 slide = this->getFaceDir().getNormalized() * 0.04;
+					PxVec3 slide = this->getFaceDir().getNormalized() * 0.045;
 					roleController->move(slide * deltaClock, PxF32(0.00001), deltaClock, NULL);
 
 				}
@@ -616,7 +680,7 @@ bool Role::tryJump(bool release) {
 void Role::roleJump() {
 	if (isJump) {
 		float speed_y = 0.0;
-
+		this->roleController->move(this->faceDir*0.2, 0.0001, 1.0f / 120.0f, NULL);
 		if (isHanging == false) {
 			speed_y = upSpeed;
 			isHanging = true;
@@ -643,6 +707,8 @@ void Role::roleFall() {
 	}
 }
 
+
+
 /**
 * @brief 重置角色状态
 **/
@@ -660,4 +726,25 @@ void Role::resetStatus() {
 **/
 PxVec3 Role::getHorizontalVelocity() {
 	return PxVec3(this->speed.x, 0, this->speed.z);
+}
+
+
+bool Role::getRotateOrNot() {
+	return this->rotateMoveDir;
+}
+
+void Role::setRotateOrNot(bool flag) {
+	this->rotateMoveDir = flag;
+}
+
+bool Role::isJumping() {
+	return this->isJump || this->isFall;
+}
+
+void Role::setDir(PxVec3 dir) {
+	this->dir = dir;
+}
+
+void Role::setFaceDir(PxVec3 dir){
+	this->faceDir = dir;
 }

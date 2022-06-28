@@ -13,6 +13,7 @@ extern Animation animation;
 // 右键鼠标按下
 bool press = false;
 
+extern bool helpMenu;
 
 // 鼠标点击时的坐标
 int mouseX, mouseY;
@@ -28,6 +29,10 @@ void getAdditionalAngleRadians();
 //按键设置
 void keyPress(unsigned char key, const PxTransform& camera)
 {
+	if (role->nowCheckpoint == 8) {
+		return;
+	}
+
 	switch (toupper(key))
 	{
 		//角色跳跃按键：空格
@@ -41,7 +46,11 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	//角色下蹲按键：Z
 	case 'Z':
 	{
-		role->roleCrouch();
+		if (!role->getCrouch()) {
+			animation.setAnimation("crouching");
+			role->roleCrouch();
+		}
+		
 		break;
 	}
 	//角色拾取/放置道具：E
@@ -50,23 +59,39 @@ void keyPress(unsigned char key, const PxTransform& camera)
 		if (role->getEquiped()) {
 			if (role->layDownObj()) {
 				soundtool.playSound("pickProp.wav",true);
+				animation.setAnimation("putDown");
 			}
 		}
 		else {
 			if (role->pickUpObj()) {
 				soundtool.playSound("pickProp.wav", true);
+				animation.setAnimation("pickUp");
 			}
 		}
 
 		break;
 	}
+	case 'R':
+	{
+		
+		if (role->useKeyObj()) {
+			soundtool.playSound("pickProp.wav", true);
+			animation.setAnimation("useKey");
+		}
+		else
+		{
+			animation.setAnimation("notUseKey");
+		}
+		break;
+	}
 	//角色切换动画；暂时
 	case 'Q':
 	{
-		//animation.
-		animation.update(1.0);
-		animationTick++;
+		animation.setAnimation("dancing");
 		break;
+	}
+	case 'H': {
+		helpMenu = !helpMenu;
 	}
 	default:
 		break;
@@ -75,6 +100,9 @@ void keyPress(unsigned char key, const PxTransform& camera)
 
 void keyRelease(unsigned char key)
 {
+	if (role->nowCheckpoint == 8) {
+		return;
+	}
 	switch (toupper(key))
 	{
 	case ' ':
@@ -82,12 +110,13 @@ void keyRelease(unsigned char key)
 		//soundtool.pauseSound();
 		if (role->tryJump(true)) {
 			soundtool.playSound("jump.wav");
-			animation.setAnimation("jump");
+			animation.setAnimation("jumping");
 		}
 		break;
 	}
 	case 'Z':
 	{
+		animation.setAnimation("idle");
 		role->roleNoCrouch();
 		break;
 	}
@@ -98,30 +127,71 @@ void keyRelease(unsigned char key)
 
 //特殊键设置
 void specialKeyPress(GLint key) {
+
+	if (animation.getCurrentAnimation() == "jumping") {
+		return;
+	}
+	else if (animation.getCurrentAnimation() == "openDoor") {
+		role->setSpeed(role->getSpeed() * 0.08);
+		return;
+	}
+
+	int mod;
 	switch (key) {
-	case GLUT_KEY_UP:
+	case GLUT_KEY_UP: 
 	case GLUT_KEY_DOWN:
 	case GLUT_KEY_LEFT:
 	case GLUT_KEY_RIGHT:
-		animation.setAnimation("walk");
+	{
+		mod = glutGetModifiers();
+		if (role->nowCheckpoint == 8) {
+			animation.setAnimation("swimming");
+		}
+		else if (mod == (GLUT_ACTIVE_SHIFT)) {
+			cout << "shift" << endl;
+			role->setSpeed(role->getSpeed() * 1.5);
+			animation.setAnimation("run");
+		}else if (role->getCrouch()) {
+			role->setSpeed(role->getSpeed() * 0.8);
+			animation.setAnimation("crouchedWalking");
+		}
+		else
+		{
+			animation.setAnimation("walk");
+		}
 		getAdditionalAngleRadians();
-		animation.update(1.0);
 		break;
+	}
 	default: {
 		return;
 	}
 	}
-}
+	}
 
 void specialKeyRelease(GLint key) {
+
+	if (animation.getCurrentAnimation() == "jumping") {
+		return;
+	}
+
 	switch (key) {
 	case GLUT_KEY_UP: 
 	case GLUT_KEY_DOWN:
 	case GLUT_KEY_LEFT:
 	case GLUT_KEY_RIGHT: 
-		//getAdditionalAngleRadians();
-		animation.setAnimation("idle");
+	{	
+		if (role->nowCheckpoint == 8) {
+			animation.setAnimation("swimIdle");
+		}
+		else if (role->getCrouch()) {
+			animation.setAnimation("crouching");
+		}
+		else {
+			animation.setAnimation("idle");
+		}
+		
 		break;
+	}
 	default: {
 		return;
 	}
@@ -155,6 +225,7 @@ void mousePress(int button, int state, int x, int y) {
 	}
 }
 
+//角色转动时，模型也跟随角色face Dir 向量方向旋转
 void getAdditionalAngleRadians() {
 	//cout << role->getFaceDir().x << "？？" << role->getFaceDir().y << "!!" << role->getFaceDir().z << endl;
 	

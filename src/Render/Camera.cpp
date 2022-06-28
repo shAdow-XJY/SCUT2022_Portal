@@ -3,7 +3,9 @@
 #include <ctype.h>
 #include <iostream>
 #include "foundation/PxMat33.h"
+#include <Render/DynamicBall.h>
 
+extern DynamicBall dynamicBall;
 using namespace physx;
 extern clock_t deltaClock;
 extern PxVec3 roleBackPosition;
@@ -28,8 +30,6 @@ namespace Snippets
 		switch (button)
 		{
 		case 0: {
-			if (state == 1) {
-			}
 			break;
 		}
 		case 2: {
@@ -52,10 +52,10 @@ void Camera::goFront(float speed)
 	mEye.z -= speed;
 }
 
-bool Camera::handleKey(unsigned char key, int x, int y,float speed)
+bool Camera::handleKey(unsigned char key, /*int x, int y,*/float speed)
 {
-	PX_UNUSED(x);
-	PX_UNUSED(y);
+	/*PX_UNUSED(x);
+	PX_UNUSED(y);*/
 
 	PxVec3 viewY = mDir.cross(PxVec3(0, 1, 0)).getNormalized();
 	switch (toupper(key))
@@ -72,6 +72,13 @@ bool Camera::handleKey(unsigned char key, int x, int y,float speed)
 		this->free = !this->free; ;
 		this->isChangeImmediate = true;
 		this->mDir = this->mDir.getNormalized();
+		if (this->free) {
+			dynamicBall.setRadius(200);
+		}
+		else
+		{
+			dynamicBall.setRadius(100);
+		}
 		//if (!this->free) this->mDir = dir.getNormalized(); //朝物体下方看
 		break;
 	}

@@ -8,6 +8,7 @@ SoundTool::SoundTool() {
 	result = systemA->init(32, FMOD_INIT_NORMAL, NULL);
 	result = systemA->createSound("../../sounds/bgm.wav", FMOD_LOOP_NORMAL, 0, &soundA);
 	result = systemA->playSound(soundA, 0, 0, &channelA);
+	//channelA->setVolume(0);
 	SoundInit();
 }
 
@@ -21,9 +22,9 @@ SoundTool::~SoundTool() {
 void SoundTool::SoundInit() {
 	addSound("jumpLoading.wav", true);
 	addSound("jump.wav", false);
-	addSound("rain.wav", false);
+	//addSound("rain.wav", false);
 	addSound("openDoorSlowly.wav", false);
-	addSound("openDoorQuickly.wav", false);
+	//addSound("openDoorQuickly.wav", false);
 	addSound("gameOver.wav", false);
 	addSound("passLevel.wav", false);
 	addSound("pickProp.wav", false);
@@ -65,6 +66,14 @@ void SoundTool::SoundUpdate()
 
 FMOD_RESULT SoundTool::playSound(string filename, bool interrupt)
 {
+	if (filename == "gameOver.wav") {
+		cout << "gameOver.wav play" << endl;
+		pauseSound();
+		result = channelA->stop();
+		result = systemA->playSound(soundMap[filename], 0, 0, &channelA);
+		return result;
+	}
+
 	FMOD::Sound* currentsound = 0;
 	channelB->getCurrentSound(&currentsound);
 

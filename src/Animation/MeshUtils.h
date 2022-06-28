@@ -2,7 +2,7 @@
 #ifndef MESH_UTILS_H
 #define MESH_UTILS_H
 
-#include "../Role/Role.h"
+
 #include <Animation/assimp_extras.h>
 #include <vector>
 #include <map>

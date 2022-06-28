@@ -49,13 +49,14 @@
 #include "../ImGui/imgui.h"
 #include "../ImGui/imgui_impl_glut.h"
 #include "../ImGui/imgui_impl_opengl2.h"
+#include "../Role/Role.h"
 namespace Snippets
 {
 void setupDefaultWindow(const char* name);
 void setupDefaultRenderState();
 
 void startRender(const physx::PxVec3& cameraEye, const physx::PxVec3& cameraDir, physx::PxReal nearClip = 1.f, physx::PxReal farClip = 10000.f);
-void renderActors(physx::PxRigidActor** actors, const physx::PxU32 numActors, bool shadows = false, const physx::PxVec3 & color = physx::PxVec3(0.0f, 0.75f, 0.0f));
+void renderActors(physx::PxRigidActor** actors, const physx::PxU32 numActors, bool shadows = false, const physx::PxVec3& color = physx::PxVec3(0.0f, 0.75f, 0.0f));
 void finishRender();
 void renderText(int x, int y, const char text[], int len);
 void renderGameOver(const char text[], int len);

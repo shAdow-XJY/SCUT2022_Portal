@@ -8,6 +8,9 @@ private:
 	PxRevoluteJoint* joint;
 	//可以开的门是开还是关的状态
 	bool doorStatus = false;
+	//可开门是否需要key
+	bool needKey = false;
+	bool hasKey = false;
 public:
 	Door() {
 
@@ -22,6 +25,13 @@ public:
 		this->open = canOpen;
 		this->joint = revolute;
 	}
+	Door(std::string name, PxVec3 position, PxReal halfX, PxReal halfY, PxReal halfZ, PxRigidDynamic* door, PxRevoluteJoint* revolute, bool needKey = true)
+		:Block(name, position, halfX, halfY, halfZ, OrganType::keyDoor) {
+		this->door = door;
+		this->joint = revolute;
+		this->open = true;
+		this->needKey = needKey;
+	}
 
 	void attachDoorActor(PxRigidDynamic* door);
 	PxRigidDynamic* getDoorActor();
@@ -33,4 +43,8 @@ public:
 	//可以开的门的当前状态
 	void setDoorStatus(bool doorstatus);
 	bool getDoorStauts();
+	//需要钥匙状态
+	bool getNeedKey();
+	void setHasKey(bool haskey);
+	bool getHasKey();
 };

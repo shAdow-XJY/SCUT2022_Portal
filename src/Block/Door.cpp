@@ -36,3 +36,13 @@ bool Door::getDoorStauts()
 	}
 	return false;
 }
+//需要钥匙状态
+bool Door::getNeedKey() {
+	return this->needKey;
+}
+void Door::setHasKey(bool haskey) {
+	this->hasKey = hasKey;
+}
+bool Door::getHasKey() {
+	return this->hasKey;
+}
