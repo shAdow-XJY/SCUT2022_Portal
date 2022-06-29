@@ -439,9 +439,12 @@ namespace Snippets
 			//ImGui::Text("ImGui successfully deployed.");           
 
 			//ImGui::SameLine();
-			for (int i = 0; i <= role->getHealth(); ++i) {
+			
+			auto count = role->getHealth();
+			while (count >= 0 && !role->isOver()) {
 				ImGui::Text(u8"♥");
 				ImGui::SameLine();
+				--count;
 			}
 			ImGui::NewLine();
 			ImGui::Text("Checkpoint: %d", role->getCheckpoint());
@@ -452,7 +455,6 @@ namespace Snippets
 				ImGui::PushFont(emojiFont);
 				ImGui::Text("Camera is locked");
 				ImGui::PopFont();
-				
 			}
 			//ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
 			ImGui::End();
@@ -467,8 +469,8 @@ namespace Snippets
 
 			ImGui::Begin("Play Guide", &helpMenu, flags - 128);
 			ImGui::Text("Arraw keys: Move the player");
-			ImGui::Text("T: Unlock/Lock camera");
 			ImGui::Text("Hold/Release space: Charge/Jump");
+			ImGui::Text("T: Unlock/Lock camera");
 			ImGui::Text("WASD: Free camera");
 			ImGui::End();
 

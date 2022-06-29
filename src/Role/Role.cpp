@@ -457,6 +457,7 @@ void Role::move() {
 		PxControllerCollisionFlags flag = roleController->move(moveSpeed * deltaClock, PxF32(0.00001), deltaClock, NULL);
 	}
 	//this->updatePosition();
+
 }
 
 /**
@@ -701,4 +702,10 @@ void Role::setDir(PxVec3 dir) {
 
 void Role::setFaceDir(PxVec3 dir){
 	this->faceDir = dir;
+}
+
+
+bool Role::isOver()
+{
+	return !this->isAlive;
 }
