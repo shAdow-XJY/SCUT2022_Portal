@@ -131,7 +131,7 @@ void keyRelease(unsigned char key)
 //ÌØÊâ¼üÉèÖÃ
 void specialKeyPress(GLint key) {
 	
-	if (animation.getCurrentAnimation() == "jumping" || !roleCannotOperate()) {
+	if (!roleCannotOperate()) {
 		return;
 	}
 	else if (animation.getCurrentAnimation() == "openDoor") {
@@ -158,8 +158,10 @@ void specialKeyPress(GLint key) {
 			role->setSpeed(role->getSpeed() * 0.8);
 			animation.setAnimation("crouchedWalking");
 		}
-		else
+		else if(animation.getCurrentAnimation() == "jumping")
 		{
+		}
+		else {
 			animation.setAnimation("walk");
 		}
 		getAdditionalAngleRadians();
