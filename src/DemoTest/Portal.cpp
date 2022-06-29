@@ -18,7 +18,6 @@
 #include<map>
 
 
-
 using namespace physx;
 //默认的内存管理和错误报告器
 PxDefaultAllocator		gAllocator;
@@ -77,7 +76,7 @@ void loadTexture() {
 	for (auto name : texture) {
 		string baseUrl = "../../texture/";
 		CBMPLoader* BMPLoader = new CBMPLoader();
-		unsigned int id = BMPLoader->generateID((baseUrl + name + ".bmp").c_str());
+		unsigned int id = BMPLoader->generateModelID((baseUrl + name + ".bmp").c_str());
 		textureMap.insert(std::pair<string, unsigned int>(name, id));
 		std::cout << id << std::endl;
 	}
@@ -93,7 +92,7 @@ void initGame() {
 	//初始位置
 	//role->setFootPosition(checkpoints[0]);
 	//摆锤前位置
-	role->setFootPosition(checkpoints[1]);
+    role->setFootPosition(checkpoints[1]);
 	//摩天轮前位置
 	//role->setFootPosition(checkpoints[2]);
 	//旋转路关卡前位置
