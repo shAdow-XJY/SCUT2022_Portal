@@ -979,8 +979,8 @@ void createGameScene(const PxTransform& t) {
 	checkpoints.push_back(t.transform(PxVec3(center_x - 2 * stairsLength, centerHeight - 2 * boxHeight + 7.0, center_z)));
 
 	//悬空路段/改版平移路段+摆锤
-	float roadblock_length = 12.0;
-	float roadblock_width = 10.0;
+	float roadblock_length = 10.0;
+	float roadblock_width = 8.0;
 	//平移路段初始相对位置 PrismaticRoad1
 	float rb_x = center_x - stairsLength + 0.7 * dx + roadblock_length;
 	float rb_y = centerHeight - 2 * boxHeight;
