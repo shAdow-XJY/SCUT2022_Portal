@@ -211,6 +211,7 @@ public:
 	void setDir(PxVec3 dir);
 	void setFaceDir(PxVec3 dir);
 
+	bool isOver();
 };
 
 #endif // !__ROLE_H__
