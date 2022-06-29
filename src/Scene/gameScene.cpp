@@ -928,12 +928,12 @@ void createSyntheticLevel(const PxTransform& t, PxVec3 v, float halfExtend, floa
 	createSideSeesaw(pos, PxVec3(dx + 4 * halfExtend + 0.5 * dx, 0, -roadblock_width - dz), sideSeesaw_width, 1.0, sideSeesaw_length, pose);
 }
 
-
+PxVec3 positions[1000];
 //为每一个粒子生成坐标信息
 PxVec3* createPositions(PxVec3 &p)
 {
 	int t = 0;
-	PxVec3 positions[1000];
+
 	for (int x = 0; x < 1000; x++)
 	{
 		positions[x] = p;
@@ -956,11 +956,11 @@ PxVec3* createPositions(PxVec3 &p)
 	return positions;
 }
 
-
+PxU32 indices[5000];
 //为每一个粒子生成索引
 PxU32* createParticleIndices(PxU32 num)
 {
-	PxU32 indices[5000];
+	
 	for (PxU32 k = 0; k < num; k++)
 	{
 		indices[k] = k;
@@ -988,10 +988,12 @@ void createParticles(PxVec3 v)
 
 	// create particles in *PxParticleSystem* ps
 	bool success = ps->createParticles(particleCreationData);
+	std::cout << "创建粒子成功！" << std::endl;
 
 	float aspect = GLdouble(glutGet(GLUT_WINDOW_WIDTH)) / GLdouble(glutGet(GLUT_WINDOW_HEIGHT));
 	float fovy = 60.0;
 	float pointScale = 1.0f * GLdouble(glutGet(GLUT_WINDOW_WIDTH)) / aspect * (1.0f / tanf(glm::radians(fovy) * 0.5f));
+
 
 	// lock SDK buffers of *PxParticleSystem* ps for reading
 	PxParticleReadData* rd = ps->lockParticleReadData();
@@ -1002,19 +1004,21 @@ void createParticles(PxVec3 v)
 		PxStrideIterator<const PxParticleFlags> flagsIt(rd->flagsBuffer);
 		PxStrideIterator<const PxVec3> positionIt(rd->positionBuffer);
 
-		for (unsigned i = 0; i < rd->validParticleRange; ++i, ++flagsIt, ++positionIt)
+		for (unsigned i = 0; i < rd->validParticleRange; ++i, ++positionIt)
 		{
 			if (*flagsIt & PxParticleFlag::eVALID)
 			{
 				// access particle position
 				const PxVec3& position = *positionIt;
-
+				std::cout << position.x << "," << position.y << "," << position.z << std::endl;
 				createParticleSphere(position, 0.01f);
 			}
 		}
+
 		// return ownership of the buffers back to the SDK
 		rd->unlock();
 	}
+
 
 	// add particle system to scene, in case creation was successful
 	if (ps)
@@ -1354,5 +1358,8 @@ void createGameScene(const PxTransform& t) {
 	//createRoad(t, PxVec3(-4, 20, -6), 4.0, 1.0, 2.0, defaultPose);
 	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
 	//createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
+
+
+	createParticles(PxVec3(bottom_x, bottom_y+5.0f, bottom_z));
 
 }
