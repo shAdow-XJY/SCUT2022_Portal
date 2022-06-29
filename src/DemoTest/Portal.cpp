@@ -93,9 +93,9 @@ void initGame() {
 	//初始位置
 	//role->setFootPosition(checkpoints[0]);
 	//摆锤前位置
-	role->setFootPosition(checkpoints[1]);
+	//role->setFootPosition(checkpoints[1]);
 	//摩天轮前位置
-	//role->setFootPosition(checkpoints[2]);
+	role->setFootPosition(checkpoints[2]);
 	//旋转路关卡前位置
 	//role->setFootPosition(checkpoints[3]);
 	//迷宫前位置
