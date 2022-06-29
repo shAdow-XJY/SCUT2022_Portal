@@ -102,7 +102,7 @@ void initGame() {
 	//迷宫出口位置 
 	//role->setFootPosition(checkpoints[5]);
 	//旋转杆关卡角落位置
-	//role->setFootPosition(checkpoints[6]);
+	role->setFootPosition(checkpoints[6]);
 	//游泳池位置
 	//role->setFootPosition(checkpoints[7]);
 	role->fall();

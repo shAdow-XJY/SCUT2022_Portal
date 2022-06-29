@@ -13,7 +13,7 @@ Role::Role() {
 	desc.height = roleHeight;
 	desc.material = gMaterial;
 	desc.climbingMode = PxCapsuleClimbingMode::eCONSTRAINED;
-	desc.stepOffset = 0.5f;
+	desc.stepOffset = 2.0f; //该offset可以兼容爬楼梯不卡住和风车正常
 	desc.contactOffset = 0.1;
 	desc.upDirection = PxVec3(0.0, 1.0, 0.0);
 
@@ -235,7 +235,6 @@ bool Role::getAliveStatus() {
 * @brief 角色死亡
 **/
 bool Role::roleOver() {
-	this->resetStatus();
 	if (this->stimulateObj) {
 		this->stimulateObj->release();
 	}
@@ -389,11 +388,12 @@ void Role::rayAround() {
 	PxVec3 origin = nowPostion + PxVec3(0, 3.5f, 0);
 	PxRigidActor* actor = NULL;
 	//向四周发送射线
-	for (int i = -1; i < 2; i++) {
-		for (int j = -1; j < 2; j++) {
+	for (float i = -1; i < 2; i+=0.5) {
+		for (float j = -1; j < 2; j+=0.5) {
 			if (i == 0 && j == 0) continue;
-			PxVec3 dir = PxVec3(i, 0, j).getNormalized() * 4.0f;
-			actor = RayCast(origin, dir);
+			//摆锤碰撞若检测不灵则调节此处即可！
+			PxVec3 dir = PxVec3(i, 0, j).getNormalized() * 3.2f;
+			actor = RayCast(origin, dir);		
 			if (actor) {
 				GameSceneBasic* gsb = (GameSceneBasic*)actor->userData;
 				if (gsb) {
@@ -436,11 +436,13 @@ void Role::rayAround() {
 **/
 void Role::stimulate() {
 	if (this->stimulateObj) {
+		this->canMove = false;
 		const PxVec3 pos = this->stimulateObj->getGlobalPose().p;
-		if (pos.y < 1.0f) {
+		if (pos.y < 2.0f) {
 			this->roleOver();
 		}
 		this->roleController->setPosition(PxExtendedVec3(pos.x, pos.y, pos.z));
+		this->updatePosition();
 	}
 }
 
@@ -452,7 +454,9 @@ void Role::protal() {
 		srand((int)time(0));
 		int protalCheckpoint = rand() % this->arrivedCheckpoint;
 		this->setFootPosition(checkpoints[protalCheckpoint]);
+		this->updatePosition();
 		this->life--;
+		this->resetStatus();
 		this->isRebirthing = false;
 	}
 }
@@ -493,7 +497,7 @@ bool Role::getRebirthing() {
 * @desc 每帧回调
 **/
 void Role::move() {
-	if (!this->isAlive) return;
+	if (!this->isAlive && !canMove) return;
 	PxVec3 moveSpeed = PxVec3(0, 0, 0);
 	if (!this->stimulateObj) {
 		if (this->getHorizontalVelocity().isZero()) {
@@ -506,11 +510,6 @@ void Role::move() {
 		}
 		PxControllerCollisionFlags flag = roleController->move(moveSpeed * deltaClock, PxF32(0.00001), deltaClock, NULL);
 	}
-	//TODO：
-	//BUG 人物模型朝向与faceDir脱节了，出现条件跳跃后再按侧向键，
-	//faceDir正确的，但是人物模型没转过来this->getFaceDir() 
-	//printPxVecFun(this->getFaceDir());
-	//this->updatePosition();
 
 }
 
@@ -600,6 +599,17 @@ void Role::simulationGravity() {
 		if (isFall) {
 			this->touchGround();
 		}
+		//死亡逻辑
+		if (actor->getName()) {
+			string name(actor->getName());
+			if (name == "Over" || name == "Ground") {
+				this->canMove = false;
+				if (this->isAlive) {
+					animation.setAnimation("dying");
+				}
+				return;
+			}
+		}
 		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
 		this->sliceDir = PxVec3(0, 0, 0);
 		if (basic != NULL) {
@@ -640,13 +650,12 @@ void Role::simulationGravity() {
 					std::cout << "边缘滑动" << endl;
 					//this->edgeSliding();
 				}
-				else
-				{
-					//防止CCT边缘卡住模拟滑动一下
-					PxVec3 slide = this->getFaceDir().getNormalized() * 0.045;
-					roleController->move(slide * deltaClock, PxF32(0.00001), deltaClock, NULL);
-
-				}
+				//else
+				//{
+				//	//防止CCT边缘卡住模拟滑动一下
+				//	PxVec3 slide = this->getFaceDir().getNormalized() * 0.045;
+				//	roleController->move(slide * deltaClock, PxF32(0.00001), deltaClock, NULL);
+				//}
 			}
 			this->standingBlock = errorGameSceneBasic;
 			this->standingOnBlock = false;
@@ -661,7 +670,7 @@ void Role::simulationGravity() {
 * @brief 角色跳跃
 **/
 bool Role::tryJump(bool release) {
-	if (!this->isAlive) return false;
+	if (!this->isAlive && !canMove) return false;
 	if (!isJump && !isFall) {
 		if (!release) {
 			//蓄力跳
@@ -690,7 +699,6 @@ bool Role::tryJump(bool release) {
 void Role::roleJump() {
 	if (isJump) {
 		float speed_y = 0.0;
-		this->roleController->move(this->faceDir*0.2, 0.0001, 1.0f / 120.0f, NULL);
 		if (isHanging == false) {
 			speed_y = upSpeed;
 			isHanging = true;
@@ -723,10 +731,15 @@ void Role::roleFall() {
 * @brief 重置角色状态
 **/
 void Role::resetStatus() {
+	if (this->stimulateObj) {
+		this->stimulateObj->release();
+		this->stimulateObj = NULL;
+	}
 	this->speed = PxVec3(0, 0, 0);
-	this->inertiaSpeed = PxVec3(0, 0, 0);
+	this->inertiaSpeed = PxVec3(0, 0, 0);	
 	this->slide = false;
 	this->standingOnBlock = false;
+	this->canMove = true;
 	this->standingBlock = errorGameSceneBasic;
 
 }
