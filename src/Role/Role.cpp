@@ -511,6 +511,7 @@ void Role::move() {
 	//faceDir正确的，但是人物模型没转过来this->getFaceDir() 
 	//printPxVecFun(this->getFaceDir());
 	//this->updatePosition();
+
 }
 
 /**
@@ -756,4 +757,10 @@ void Role::setDir(PxVec3 dir) {
 
 void Role::setFaceDir(PxVec3 dir){
 	this->faceDir = dir;
+}
+
+
+bool Role::isOver()
+{
+	return !this->isAlive;
 }
