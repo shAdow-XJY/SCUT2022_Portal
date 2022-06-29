@@ -65,14 +65,14 @@ public:
 					}
 				}
 			}
-			else if (name == "Ground") {
+			else if (name == "Over" || name == "Ground") {
 				if (role->getAliveStatus()) {
 					animation.setAnimation("dying");
 				}
 				//role->roleOver();
 			}
 			else if (name == "PoolWall") {
-				cout << "PoolWall" << endl;
+				//cout << "PoolWall" << endl;
 				role->nowCheckpoint = 8;
 			}
 		}
@@ -86,4 +86,4 @@ public:
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
 	}
 };
-#endif // !__ROLE_H__
+#endif

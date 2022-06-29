@@ -26,6 +26,9 @@ int animationTick = 0;
 //计算由于角色旋转需要的附加旋转角度
 void getAdditionalAngleRadians();
 
+//角色不能操作移动的状态
+bool roleCannotOperate();
+
 //按键设置
 void keyPress(unsigned char key, const PxTransform& camera)
 {
@@ -127,8 +130,8 @@ void keyRelease(unsigned char key)
 
 //特殊键设置
 void specialKeyPress(GLint key) {
-
-	if (animation.getCurrentAnimation() == "jumping") {
+	
+	if (!roleCannotOperate()) {
 		return;
 	}
 	else if (animation.getCurrentAnimation() == "openDoor") {
@@ -155,8 +158,10 @@ void specialKeyPress(GLint key) {
 			role->setSpeed(role->getSpeed() * 0.8);
 			animation.setAnimation("crouchedWalking");
 		}
-		else
+		else if(animation.getCurrentAnimation() == "jumping")
 		{
+		}
+		else {
 			animation.setAnimation("walk");
 		}
 		getAdditionalAngleRadians();
@@ -170,7 +175,7 @@ void specialKeyPress(GLint key) {
 
 void specialKeyRelease(GLint key) {
 
-	if (animation.getCurrentAnimation() == "jumping") {
+	if (animation.getCurrentAnimation() == "jumping" || !roleCannotOperate()) {
 		return;
 	}
 
@@ -247,4 +252,16 @@ void getAdditionalAngleRadians() {
 		PxTransform rotate = PxTransform(PxQuat(PxHalfPi, PxVec3(0, 1, 0)));
 		animation.changeOrientation(PxQuat(-PxHalfPi, PxVec3(0, 1, 0)));
 	}
+}
+
+//角色不能操作移动的状态
+bool roleCannotOperate() {
+	if (animation.getCurrentAnimation() == "dying" || animation.getCurrentAnimation() == "sleeping"
+		|| animation.getCurrentAnimation() == "useKey" || animation.getCurrentAnimation() == "notUseKey"
+		|| animation.getCurrentAnimation() == "dancing"
+		|| animation.getCurrentAnimation() == "pickUp" || animation.getCurrentAnimation() == "putDown") 
+	{
+		return false;
+	}
+	return true;
 }
