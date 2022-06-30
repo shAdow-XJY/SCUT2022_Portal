@@ -150,7 +150,12 @@ void renderGeometry(const PxGeometryHolder& h, string name,bool shadow)
 	case PxGeometryType::eSPHERE:		
 		{
 		if (name == "Particle") {
-			glColor4f(1.f, 1.f, 1.f, 0.1);
+			//glColor4f(1.f, 1.f, 1.f, 0.5);
+			float black[3] = { 0, 0, 0 };
+			glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, black);
+			glEnable(GL_COLOR_MATERIAL);
+			glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 		}
 		else
 		{
@@ -416,6 +421,19 @@ namespace Snippets
 		glLightfv(GL_LIGHT0, GL_SPECULAR, specularColor);
 		glLightfv(GL_LIGHT0, GL_POSITION, position);
 		glEnable(GL_LIGHT0);
+		// Setup lighting 光照设置
+		glEnable(GL_LIGHTING);
+		PxReal ambientColor1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		PxReal diffuseColor1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		PxReal specularColor1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		PxReal position1[] = { -137.841f, 155.0f,228.381f, 1.0f };
+		glLightfv(GL_LIGHT1, GL_AMBIENT, ambientColor1);
+		glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseColor1);
+		glLightfv(GL_LIGHT1, GL_SPECULAR, specularColor1);
+		glLightfv(GL_LIGHT1, GL_POSITION, position1);
+		glEnable(GL_LIGHT1);
+		//X:-137.841 Y : 149.557 Z : 228.381
+
 		/** 启用纹理 */
 		glEnable(GL_TEXTURE_2D);
 		//模型纹理贴图内嵌，开启法向量
