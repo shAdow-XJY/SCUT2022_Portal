@@ -346,7 +346,7 @@ namespace Snippets
 		glutKeyboardUpFunc(Callbacks::keyboardUpCallback);
 		glutSpecialFunc(Callbacks::specialKeyDownCallback);
 		glutSpecialUpFunc(Callbacks::specialKeyUpCallback);
-		//glutMouseFunc(Callbacks::mouseCallback);
+		glutMouseFunc(Callbacks::mouseCallback);
 		glutMotionFunc(Callbacks::motionCallback);
 		glutReshapeFunc(reshape);
 

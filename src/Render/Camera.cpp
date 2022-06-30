@@ -97,6 +97,9 @@ bool Camera::handleKey(unsigned char key, /*int x, int y,*/float speed)
 
 	void Camera::handleMotion(int x, int y)
 	{
+		if (!this->free) {
+			return;
+		}
 		int dx = mMouseX - x;/*鼠标每次移动带来的视角变换*/
 		int dy = mMouseY - y;
 		float sensitivity = 0.3;/*鼠标灵敏度[0,1]即可*/

@@ -106,7 +106,7 @@ void initGame() {
 	//Ðý×ª¸Ë¹Ø¿¨½ÇÂäÎ»ÖÃ
 	//role->setFootPosition(checkpoints[6]);
 	//ÓÎÓ¾³ØÎ»ÖÃ
-	role->setFootPosition(checkpoints[7]);
+	//role->setFootPosition(checkpoints[7]);
 	role->fall();
 
 	animation.attachRole(*role);
