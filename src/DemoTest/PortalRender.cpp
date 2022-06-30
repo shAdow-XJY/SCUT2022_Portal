@@ -347,8 +347,9 @@ namespace Callbacks
 			std::vector<PxRigidActor*> actors(nbActors);
 			scene->getActors(PxActorTypeFlag::eRIGID_DYNAMIC | PxActorTypeFlag::eRIGID_STATIC, reinterpret_cast<PxActor**>(&actors[0]), nbActors);
 			for (int i = 0; i < nbActors; i++) {
+				GameSceneBasic* gsb = (GameSceneBasic*)actors[i]->userData;
 				//迷宫处平移路段
-				if (actors[i]->getName() == "PrismaticRoad0") {
+				if (actors[i]->getName() == "PrismaticRoad0" || (gsb && gsb->getName() == "PrismaticRoad0")) {
 					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
 					GameSceneBasic* gsb = (GameSceneBasic*)actor->userData;
 					PrismaticRoad* pr = (PrismaticRoad*)gsb;
@@ -360,7 +361,7 @@ namespace Callbacks
 					}
 				}
 				//摆锤处平移路段
-				else if (actors[i]->getName() == "PrismaticRoad1") {
+				else if (actors[i]->getName() == "PrismaticRoad1" || (gsb && gsb->getName() == "PrismaticRoad1")) {
 					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
 					GameSceneBasic* gsb = (GameSceneBasic*)actor->userData;
 					PrismaticRoad* pr = (PrismaticRoad*)gsb;
@@ -371,7 +372,7 @@ namespace Callbacks
 						actor->setLinearVelocity(PxVec3(-1, 0, 0) * 0.4 * deltaClock);
 					}
 				}
-				else if (actors[i]->getName() == "PrismaticRoad2") {
+				else if (actors[i]->getName() == "PrismaticRoad2" || (gsb && gsb->getName() == "PrismaticRoad2")) {
 					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
 					GameSceneBasic* gsb = (GameSceneBasic*)actor->userData;
 					PrismaticRoad* pr = (PrismaticRoad*)gsb;
@@ -383,7 +384,7 @@ namespace Callbacks
 					}
 				}
 				//摆锤
-				else if (actors[i]->getName() == "Pendulum0") {
+				else if (actors[i]->getName() == "Pendulum0" || (gsb && gsb->getName() == "Pendulum0")) {
 					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
 					if (actor->getGlobalPose().q.getAngle() >= PxHalfPi/2 && changePendulum0DirFlag) {
 						if (changePendulum0Dir % 2 == 0) {
@@ -399,7 +400,7 @@ namespace Callbacks
 						changePendulum0DirFlag = true;
 					}
 				}
-				else if (actors[i]->getName() == "Pendulum1") {
+				else if (actors[i]->getName() == "Pendulum1" || (gsb && gsb->getName() == "Pendulum1")) {
 					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
 					if (actor->getGlobalPose().q.getAngle() >= PxHalfPi / 2 && changePendulum1DirFlag) {
 						if (changePendulum1Dir % 2 == 0) {
@@ -416,17 +417,17 @@ namespace Callbacks
 					}
 				}
 				//摩天轮
-				else if (actors[i]->getName() == "FerrisWheel") {
+				else if (actors[i]->getName() == "FerrisWheel" || (gsb && gsb->getName() == "FerrisWheel")) {
 					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
 					actor->setAngularVelocity(PxVec3(0, 0, -1) * 0.04 * deltaClock);
 				}
 				//旋转路关卡与旋转杆关卡
-				else if (actors[i]->getName() == "RotateRod") {
+				else if (actors[i]->getName() == "RotateRod" || (gsb && gsb->getName() == "RotateRod")) {
 					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
 					actor->setAngularVelocity(PxVec3(0, 1, 0) * 0.04 * deltaClock);
 				}
 				//连接旋转杆与水池的齿轮（滚筒）
-				else if (actors[i]->getName() == "Gear") {
+				else if (actors[i]->getName() == "Gear" || (gsb && gsb->getName() == "Gear")) {
 					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
 					actor->setAngularVelocity(PxVec3(0, 0, 1) * 0.08 * deltaClock);
 				}

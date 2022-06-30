@@ -7,6 +7,7 @@
 #include "../Block/Seesaw.h"
 #include "../Block/RotateRod.h"
 #include "../Block/PrismaticRoad.h"
+#include "../Block/FerrisWheel.h"
 #include<vector>
 #include<iostream>
 #include <glut.h>
@@ -639,7 +640,7 @@ void createNewPendulum(const PxTransform& t, PxVec3 v, float halfExtend, float r
 	shape1->setQueryFilterData(collisionGroup);
 	newPendulum->setMass(1.0f);
 	newPendulum->setAngularDamping(0.f);
-	Pendulum* pendulum = new Pendulum("摆锤", newPendulum->getGlobalPose().p, halfExtend, newPendulum);
+	Pendulum* pendulum = new Pendulum(name, newPendulum->getGlobalPose().p, halfExtend, newPendulum);
 	newPendulum->setName(name);
 	newPendulum->userData = pendulum;
 	newPendulum->setLinearVelocity(velocity * 35);
@@ -694,7 +695,7 @@ void createRotateRod(const PxTransform& t, PxVec3 v, PxReal halfExtend, PxTransf
 	PxReal rod1_y = 1.0;
 	PxReal rod1_z = 1.0;
 	PxRigidDynamic* rod1 = createDynamicBox(false, pos, PxVec3(0, 2 * halfExtend, 0), rod1_x, rod1_y, rod1_z, pose);
-	RotateRod* rotateRod1 = new RotateRod("转杆", rod1->getGlobalPose().p, rod1_x, rod1_y, rod1_z, rod1);
+	RotateRod* rotateRod1 = new RotateRod("RotateRod", rod1->getGlobalPose().p, rod1_x, rod1_y, rod1_z, rod1);
 	rod1->setName("RotateRod");
 	rod1->userData = rotateRod1;
 	rod1->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
@@ -726,7 +727,7 @@ void createFan(const PxTransform& t, PxVec3 v, float x, float y, float z, PxVec3
 	gScene->addActor(*fan);
 	fan->setMass(0.f);
 	fan->setMassSpaceInertiaTensor(PxVec3(0.f));
-	RotateRod* rotateRod = new RotateRod("转杆", fan->getGlobalPose().p, x,y,z, fan);
+	RotateRod* rotateRod = new RotateRod("RotateRod", fan->getGlobalPose().p, x,y,z, fan);
     fan->setName("RotateRod");
 	fan->userData = rotateRod;
 	PxRigidStatic* sphere = createStaticSphere(pos, PxVec3(0, 0, 0), 2*y);
@@ -829,9 +830,8 @@ void createGear(const PxTransform& t, PxVec3 v, float x, float y, float z, PxVec
 	gScene->addActor(*gear);
 	gear->setMass(0.f);
 	gear->setMassSpaceInertiaTensor(PxVec3(0.f));
-	/*RotateRod* rotateRod = new RotateRod("转杆", fan->getGlobalPose().p, 25.0, 1.0, 1.0, fan);
-	fan->setName("RotateRod");
-	fan->userData = rotateRod;*/
+	RotateRod* rotateRod = new RotateRod("Gear", gear->getGlobalPose().p, 25.0, 1.0, 1.0, gear);
+	gear->userData = rotateRod;
 }
 
 /*创建摩天轮
@@ -843,22 +843,25 @@ distance为骨架与踏板间缝隙大小
 abgularVelocity 摩天轮旋转角速度，这里扇面竖直，通过角速度PxVec3(0,0,z)中z的大小控制其旋转速度*/
 void createFerrisWheel(const PxTransform& t, PxVec3 v, float x, float y, float z, float seatLength, float seatHeight, float seatWidth, float distance, PxVec3 angularVelocity) {
 	PxTransform pos(t.transform(v));
-	PxRigidDynamic* ferrisWheel = gPhysics->createRigidDynamic(pos);
-	PxShape* shape0 = PxRigidActorExt::createExclusiveShape(*ferrisWheel, PxBoxGeometry(x, y, z), *gMaterial);
-	PxShape* shape1 = PxRigidActorExt::createExclusiveShape(*ferrisWheel, PxBoxGeometry(x, y, z), *gMaterial);
-	PxShape* shape2 = PxRigidActorExt::createExclusiveShape(*ferrisWheel, PxBoxGeometry(x, y, z), *gMaterial);
+	PxRigidDynamic* ferrisWheelActor = gPhysics->createRigidDynamic(pos);
+	PxShape* shape0 = PxRigidActorExt::createExclusiveShape(*ferrisWheelActor, PxBoxGeometry(x, y, z), *gMaterial);
+	PxShape* shape1 = PxRigidActorExt::createExclusiveShape(*ferrisWheelActor, PxBoxGeometry(x, y, z), *gMaterial);
+	PxShape* shape2 = PxRigidActorExt::createExclusiveShape(*ferrisWheelActor, PxBoxGeometry(x, y, z), *gMaterial);
 	shape1->setLocalPose(PxTransform(PxQuat(PxPi / 3, PxVec3(0, 0, 1))));
 	shape2->setLocalPose(PxTransform(PxQuat(2 * PxPi / 3, PxVec3(0, 0, 1))));
 	shape0->setQueryFilterData(collisionGroup);
 	shape1->setQueryFilterData(collisionGroup);
 	shape2->setQueryFilterData(collisionGroup);
-	ferrisWheel->setName("FerrisWheel");
-	ferrisWheel->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
-	ferrisWheel->setAngularVelocity(angularVelocity);
-	ferrisWheel->setAngularDamping(0.f);
-	gScene->addActor(*ferrisWheel);
-	ferrisWheel->setMass(0.f);
-	ferrisWheel->setMassSpaceInertiaTensor(PxVec3(0.f));
+	ferrisWheelActor->setName("FerrisWheel");
+	FerrisWheel* ferrisWheel = new FerrisWheel("FerrisWheel", ferrisWheelActor->getGlobalPose().p, x, y, z, ferrisWheelActor);
+	ferrisWheelActor->userData = ferrisWheel;
+	//这里加一个ferrisWheel类或者用现有的的绑到userdata里面即可，把userdata的类的name设为angularVelocity即可在release识别
+	ferrisWheelActor->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+	ferrisWheelActor->setAngularVelocity(angularVelocity);
+	ferrisWheelActor->setAngularDamping(0.f);
+	gScene->addActor(*ferrisWheelActor);
+	ferrisWheelActor->setMass(0.f);
+	ferrisWheelActor->setMassSpaceInertiaTensor(PxVec3(0.f));
 	PxTransform pose(PxVec3(0));
 	//seat0左
 	PxRigidDynamic* seat0 = createDynamicBox(false, pos, PxVec3(0.9 * x, -2.0, -z - seatWidth - distance), seatLength, seatHeight, seatWidth, pose, OrganType::prismaticRoad);
@@ -866,7 +869,7 @@ void createFerrisWheel(const PxTransform& t, PxVec3 v, float x, float y, float z
 	seat0->setMassSpaceInertiaTensor(PxVec3(0.f));
 	PxTransform fw0(PxVec3(0.9 * x, 0, -z - seatWidth - distance));
 	PxTransform s0(PxVec3(0, 2.0, 0));
-	PxDistanceJoint* d0 = PxDistanceJointCreate(*gPhysics, ferrisWheel, fw0, seat0, s0);
+	PxDistanceJoint* d0 = PxDistanceJointCreate(*gPhysics, ferrisWheelActor, fw0, seat0, s0);
 	/*d0->setMaxDistance(2.0f);
 	d0->setDistanceJointFlag(PxDistanceJointFlag::eMAX_DISTANCE_ENABLED, true);*/
 	//seat1右
@@ -875,7 +878,7 @@ void createFerrisWheel(const PxTransform& t, PxVec3 v, float x, float y, float z
 	seat1->setMassSpaceInertiaTensor(PxVec3(0.f));
 	PxTransform fw1(PxVec3(-0.9 * x, 0, -z - seatWidth - distance));
 	PxTransform s1(PxVec3(0, 2.0, 0));
-	PxDistanceJoint* d1 = PxDistanceJointCreate(*gPhysics, ferrisWheel, fw1, seat1, s1);
+	PxDistanceJoint* d1 = PxDistanceJointCreate(*gPhysics, ferrisWheelActor, fw1, seat1, s1);
 	/*d1->setMaxDistance(2.0f);
 	d1->setDistanceJointFlag(PxDistanceJointFlag::eMAX_DISTANCE_ENABLED, true);*/
 	//seat2左上
@@ -884,7 +887,7 @@ void createFerrisWheel(const PxTransform& t, PxVec3 v, float x, float y, float z
 	seat2->setMassSpaceInertiaTensor(PxVec3(0.f));
 	PxTransform fw2(PxVec3(0.9 * x * cos(PxPi / 3), 0.9 * x * sin(PxPi / 3), -z - seatWidth - distance));
 	PxTransform s2(PxVec3(0, 2.0, 0));
-	PxDistanceJoint* d2 = PxDistanceJointCreate(*gPhysics, ferrisWheel, fw2, seat2, s2);
+	PxDistanceJoint* d2 = PxDistanceJointCreate(*gPhysics, ferrisWheelActor, fw2, seat2, s2);
 	/*d2->setMaxDistance(2.0f);
 	d2->setDistanceJointFlag(PxDistanceJointFlag::eMAX_DISTANCE_ENABLED, true);*/
 	//seat3右上
@@ -893,7 +896,7 @@ void createFerrisWheel(const PxTransform& t, PxVec3 v, float x, float y, float z
 	seat3->setMassSpaceInertiaTensor(PxVec3(0.f));
 	PxTransform fw3(PxVec3(-0.9 * x * cos(PxPi / 3), 0.9 * x * sin(PxPi / 3), -z - seatWidth - distance));
 	PxTransform s3(PxVec3(0, 2.0, 0));
-	PxDistanceJoint* d3 = PxDistanceJointCreate(*gPhysics, ferrisWheel, fw3, seat3, s3);
+	PxDistanceJoint* d3 = PxDistanceJointCreate(*gPhysics, ferrisWheelActor, fw3, seat3, s3);
 	/*d3->setMaxDistance(2.0f);
 	d3->setDistanceJointFlag(PxDistanceJointFlag::eMAX_DISTANCE_ENABLED, true);*/
 	//seat4左下
@@ -902,7 +905,7 @@ void createFerrisWheel(const PxTransform& t, PxVec3 v, float x, float y, float z
 	seat4->setMassSpaceInertiaTensor(PxVec3(0.f));
 	PxTransform fw4(PxVec3(0.9 * x * cos(PxPi / 3), -0.9 * x * sin(PxPi / 3), -z - seatWidth - distance));
 	PxTransform s4(PxVec3(0, 2.0, 0));
-	PxDistanceJoint* d4 = PxDistanceJointCreate(*gPhysics, ferrisWheel, fw4, seat4, s4);
+	PxDistanceJoint* d4 = PxDistanceJointCreate(*gPhysics, ferrisWheelActor, fw4, seat4, s4);
 	/*d4->setMaxDistance(2.0f);
 	d4->setDistanceJointFlag(PxDistanceJointFlag::eMAX_DISTANCE_ENABLED, true);*/
 	//seat5右下
@@ -911,34 +914,36 @@ void createFerrisWheel(const PxTransform& t, PxVec3 v, float x, float y, float z
 	seat5->setMassSpaceInertiaTensor(PxVec3(0.f));
 	PxTransform fw5(PxVec3(-0.9 * x * cos(PxPi / 3), -0.9 * x * sin(PxPi / 3), -z - seatWidth - distance));
 	PxTransform s5(PxVec3(0, 2.0, 0));
-	PxDistanceJoint* d5 = PxDistanceJointCreate(*gPhysics, ferrisWheel, fw5, seat5, s5);
+	PxDistanceJoint* d5 = PxDistanceJointCreate(*gPhysics, ferrisWheelActor, fw5, seat5, s5);
 	/*d5->setMaxDistance(2.0f);
 	d5->setDistanceJointFlag(PxDistanceJointFlag::eMAX_DISTANCE_ENABLED, true);*/
 	//中心球体
 	PxRigidDynamic* sphere = createDynamicSphere(pos, PxVec3(0, 0, 0), 2 * y);
 	PxTransform center(PxVec3(0));
-	PxFixedJointCreate(*gPhysics, ferrisWheel, center, sphere, center);
+	PxFixedJointCreate(*gPhysics, ferrisWheelActor, center, sphere, center);
 	//对称骨架
 	PxTransform pos1(pos.transform(PxTransform(PxVec3(0, 0, -2 * z - 2 * distance - 2 * seatWidth))));
-	PxRigidDynamic* ferrisWheel1 = gPhysics->createRigidDynamic(pos1);
-	PxShape* shape3 = PxRigidActorExt::createExclusiveShape(*ferrisWheel1, PxBoxGeometry(x, y, z), *gMaterial);
-	PxShape* shape4 = PxRigidActorExt::createExclusiveShape(*ferrisWheel1, PxBoxGeometry(x, y, z), *gMaterial);
-	PxShape* shape5 = PxRigidActorExt::createExclusiveShape(*ferrisWheel1, PxBoxGeometry(x, y, z), *gMaterial);
+	PxRigidDynamic* ferrisWheelActor1 = gPhysics->createRigidDynamic(pos1);
+	PxShape* shape3 = PxRigidActorExt::createExclusiveShape(*ferrisWheelActor1, PxBoxGeometry(x, y, z), *gMaterial);
+	PxShape* shape4 = PxRigidActorExt::createExclusiveShape(*ferrisWheelActor1, PxBoxGeometry(x, y, z), *gMaterial);
+	PxShape* shape5 = PxRigidActorExt::createExclusiveShape(*ferrisWheelActor1, PxBoxGeometry(x, y, z), *gMaterial);
 	shape4->setLocalPose(PxTransform(PxQuat(PxPi / 3, PxVec3(0, 0, 1))));
 	shape5->setLocalPose(PxTransform(PxQuat(2 * PxPi / 3, PxVec3(0, 0, 1))));
 	shape3->setQueryFilterData(collisionGroup);
 	shape4->setQueryFilterData(collisionGroup);
 	shape5->setQueryFilterData(collisionGroup);
-	ferrisWheel1->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
-	ferrisWheel1->setAngularVelocity(angularVelocity);
-	ferrisWheel1->setAngularDamping(0.f);
-	gScene->addActor(*ferrisWheel1);
-	ferrisWheel1->setMass(0.f);
-	ferrisWheel1->setMassSpaceInertiaTensor(PxVec3(0.f));
-	ferrisWheel1->setName("FerrisWheel");
+	ferrisWheelActor1->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+	ferrisWheelActor1->setAngularVelocity(angularVelocity);
+	ferrisWheelActor1->setAngularDamping(0.f);
+	gScene->addActor(*ferrisWheelActor1);
+	ferrisWheelActor1->setMass(0.f);
+	ferrisWheelActor1->setMassSpaceInertiaTensor(PxVec3(0.f));
+	ferrisWheelActor1->setName("FerrisWheel");
+	FerrisWheel* ferrisWheel1 = new FerrisWheel("FerrisWheel", ferrisWheelActor1->getGlobalPose().p, x, y, z, ferrisWheelActor1);
+	ferrisWheelActor1->userData = ferrisWheel1;
 	//另一中心球体
 	PxRigidDynamic* sphere1 = createDynamicSphere(pos1, PxVec3(0, 0, 0), 2 * y);
-	PxFixedJointCreate(*gPhysics, ferrisWheel1, center, sphere1, center);
+	PxFixedJointCreate(*gPhysics, ferrisWheelActor1, center, sphere1, center);
 }
 
 /*旋转路段关卡（由fan组件构成）
@@ -964,7 +969,7 @@ float createFanRoadLevel(const PxTransform& t, PxVec3 v, float x, float y, float
 void createPrismatic(const PxTransform& t, PxVec3 v, const char* name, float x, float y, float z, PxVec3 startPos, PxVec3 endPos, PxTransform& pose) {
 	PxRigidDynamic* actor1 = createDynamicBox(false, t, v, x, y, z, pose, OrganType::prismaticRoad,PxVec3(0, 0, 0));
 	PxVec3 position = actor1->getGlobalPose().p;
-	PrismaticRoad* prismaticRoad = new PrismaticRoad("平移路面", position, x, y, z, startPos, endPos, actor1);
+	PrismaticRoad* prismaticRoad = new PrismaticRoad(name, position, x, y, z, startPos, endPos, actor1);
 	actor1->userData = prismaticRoad;
 	actor1->setName(name);
 	actor1->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);

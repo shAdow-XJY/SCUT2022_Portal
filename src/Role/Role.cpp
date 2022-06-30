@@ -267,7 +267,7 @@ void Role::changeCanMove(bool flag) {
 
 
 /**
-* @brief 角色边缘滑动
+* @brief 角色跷跷板边缘滑动
 **/
 void Role::edgeSliding() {
 	if (this->standingBlock->getType() == OrganType::seesaw) {
@@ -505,7 +505,7 @@ bool Role::getRebirthing() {
 * @desc 每帧回调
 **/
 void Role::move() {
-	if (!this->isAlive && !canMove) return;
+	if (!this->isAlive || !canMove) return;
 	PxVec3 moveSpeed = PxVec3(0, 0, 0);
 	if (!this->stimulateObj) {
 		if (this->getHorizontalVelocity().isZero()) {
@@ -607,6 +607,19 @@ void Role::simulationGravity() {
 		if (isFall) {
 			this->touchGround();
 		}
+		////死亡逻辑 跑不到这段代码
+		//if (actor->getName()) {
+		//	string name(actor->getName());
+		//	if (name == "Over" || name == "Ground0") {
+		//		this->canMove = false;
+		//		cout << name << endl;
+		//		if (this->isAlive) {
+		//			animation.setAnimation("dying");
+		//		}
+		//		return;
+		//	}
+		//}
+
 		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
 		this->sliceDir = PxVec3(0, 0, 0);
 		if (basic != NULL) {
@@ -644,6 +657,7 @@ void Role::simulationGravity() {
 			if (this->standingBlock->getType() != OrganType::error) {
 				//再次检测避免出现更新延迟
 				if (!RayCast(origin, PxVec3(0, -5.0f, 0))) {
+					std::cout << "边缘滑动" << endl;
 					this->edgeSliding();
 				}
 			}
@@ -660,7 +674,7 @@ void Role::simulationGravity() {
 * @brief 角色跳跃
 **/
 bool Role::tryJump(bool release) {
-	if (!this->isAlive && !canMove) return false;
+	if (!this->isAlive || !canMove) return false;
 	if (!isJump && !isFall) {
 		if (!release) {
 			//蓄力跳
