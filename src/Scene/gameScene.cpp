@@ -970,7 +970,7 @@ void createSyntheticLevel(const PxTransform& t, PxVec3 v, float halfExtend, floa
 	createSideSeesaw(pos, PxVec3(dx + 4 * halfExtend + 0.5 * dx, 0, -roadblock_width - dz), sideSeesaw_width, 1.0, sideSeesaw_length, pose);
 }
 
-PxVec3 positions[5000];
+PxVec3 positions[20000];
 //为每一个粒子生成坐标信息
 PxVec3* createPositions(PxVec3 &p)
 {
@@ -980,12 +980,12 @@ PxVec3* createPositions(PxVec3 &p)
 	{
 		positions[x] = p;
 	}
-	while(t<=1000)
-	for (float l = -20; l <= 20; l+=5.0)
+	while(t<=10000)
+	for (float l = -20; l <= 20; l+=1.0)
 	{
-		for (float m = -5; m <= 15; m+=5.0)
+		for (float m = -5; m <= 15; m+=1.0)
 		{
-			for (float n = -50; n <= 45; n+=5.0)
+			for (float n = -50; n <= 45; n+=1.0)
 			{
 					positions[t].x += n;
 					positions[t].y += m;
@@ -998,7 +998,7 @@ PxVec3* createPositions(PxVec3 &p)
 	return positions;
 }
 
-PxU32 indices[5000];
+PxU32 indices[20000];
 //为每一个粒子生成索引
 PxU32* createParticleIndices(PxU32 num)
 {
@@ -1014,14 +1014,14 @@ PxU32* createParticleIndices(PxU32 num)
 void createParticles(PxVec3 v)
 {
 	// set immutable properties.
-	PxU32 maxParticles = 2048;
+	PxU32 maxParticles = 10000;
 	bool perParticleRestOffset = false;
 
 	// create particle system in PhysX SDK
 	PxParticleSystem* ps = gPhysics->createParticleSystem(maxParticles, perParticleRestOffset);
 
 	PxParticleCreationData particleCreationData;
-	particleCreationData.numParticles = 1000;
+	particleCreationData.numParticles = 10000;
 	PxVec3* p = createPositions(v);
 	PxU32* indic = createParticleIndices(maxParticles);
 	particleCreationData.indexBuffer = PxStrideIterator<const PxU32>(indic);
