@@ -830,8 +830,7 @@ void createGear(const PxTransform& t, PxVec3 v, float x, float y, float z, PxVec
 	gScene->addActor(*gear);
 	gear->setMass(0.f);
 	gear->setMassSpaceInertiaTensor(PxVec3(0.f));
-	//
-	RotateRod* rotateRod = new RotateRod("gear", gear->getGlobalPose().p, 25.0, 1.0, 1.0, gear);
+	RotateRod* rotateRod = new RotateRod("Gear", gear->getGlobalPose().p, 25.0, 1.0, 1.0, gear);
 	gear->userData = rotateRod;
 }
 
