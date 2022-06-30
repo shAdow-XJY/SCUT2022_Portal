@@ -771,7 +771,7 @@ void createPool(const PxTransform& t, PxVec3 bottom, float poolLength, float poo
 	PxTransform pos(t.transform(PxTransform(bottom)));
 	//PxTransform rotate = PxTransform(PxQuat(PxHalfPi / 10, PxVec3(0, 0, -1.0f)));
 	//底部
-	createStaticBox(pos, PxVec3(0, poolHeight + 3.0f, 0), poolLength + 2.0, 1.0, poolWidth + 2.0, pose, OrganType::poolWall);
+	createStaticBox(pos, PxVec3(0, poolHeight + 6.0f, 0), poolLength + 2.0, 1.0, poolWidth + 2.0, pose, OrganType::poolWall);
 	//左侧
 	createStaticBox(pos, PxVec3(1.0 + poolLength, 1.0 + poolHeight, 0), 1.0, poolHeight, poolWidth + 2.0, pose, OrganType::poolWall);
 	//右侧
@@ -980,8 +980,8 @@ PxVec3* createPositions(PxVec3 &p)
 	{
 		positions[x] = p;
 	}
-	while(t<=3000)
-	for (float m = -2; m <= 10; m += 1.6)
+	while(t<=4000)
+	for (float m = -2; m <= 5; m += 1.6)
 	{
 		for (float l = -18; l <= 15; l += 1.6)
 		{
@@ -1021,7 +1021,7 @@ void createParticles(PxVec3 v)
 	PxParticleSystem* ps = gPhysics->createParticleSystem(maxParticles, perParticleRestOffset);
 
 	PxParticleCreationData particleCreationData;
-	particleCreationData.numParticles = 3000;
+	particleCreationData.numParticles = 4000;
 	PxVec3* p = createPositions(v);
 	PxU32* indic = createParticleIndices(maxParticles);
 	particleCreationData.indexBuffer = PxStrideIterator<const PxU32>(indic);
@@ -1394,7 +1394,7 @@ void createGameScene(const PxTransform& t) {
 	//水池底部的相对于场景原点t的位置 PxVec3 localPose(bottom_x,bottom_y,bottom_z)
 	//全局位置 t.transform(PxTransform(localPose)).p
 	//泳池关卡角落坐标添加到checkpoints
-	checkpoints.push_back(t.transform(PxVec3(bottom_x - 1.0f, bottom_y + 16.0f, bottom_z - 1.0f)));
+	checkpoints.push_back(t.transform(PxVec3(bottom_x - 35.0f, bottom_y + 16.0f, bottom_z - 1.0f)));
 
 	
 	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
