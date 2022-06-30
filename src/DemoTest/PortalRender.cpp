@@ -418,7 +418,7 @@ namespace Callbacks
 				//摩天轮
 				else if (actors[i]->getName() == "FerrisWheel") {
 					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
-					actor->setAngularVelocity(PxVec3(0, 0, -1) * 0.06 * deltaClock);
+					actor->setAngularVelocity(PxVec3(0, 0, -1) * 0.04 * deltaClock);
 				}
 				//旋转路关卡与旋转杆关卡
 				else if (actors[i]->getName() == "RotateRod") {

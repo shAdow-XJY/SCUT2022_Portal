@@ -951,9 +951,12 @@ float createFanRoadLevel(const PxTransform& t, PxVec3 v, float x, float y, float
 	PxTransform pos(t.transform(v));
 	float scale = 1.15;
 	createFan(pos, PxVec3(0), x, y, z, angularVelocity);
-	PxVec3 fanPos1(scale * 2 * x * cos(PxHalfPi / 2), 0, scale * 2 * x * cos(PxHalfPi / 2));
+	/*PxVec3 fanPos1(scale * 2 * x * cos(PxHalfPi / 2), 0, scale * 2 * x * cos(PxHalfPi / 2));
 	createFan(pos, fanPos1, x, y, z, -angularVelocity);
 	PxVec3 fanPos2(0, 0, scale * 4 * x * cos(PxHalfPi / 2));
+	createFan(pos, fanPos2, x, y, z, angularVelocity);
+	return v.z + fanPos2.z;*/
+	PxVec3 fanPos2(0, 0, scale * 2.7 * x * cos(PxHalfPi / 2));
 	createFan(pos, fanPos2, x, y, z, angularVelocity);
 	return v.z + fanPos2.z;
 }
@@ -972,9 +975,9 @@ void createPrismatic(const PxTransform& t, PxVec3 v, const char* name, float x, 
 void createSyntheticLevel(const PxTransform& t, PxVec3 v, float halfExtend, float roadblock_length, float roadblock_width, float sideSeesaw_length, float sideSeesaw_Height, float sideSeesaw_width, PxTransform& pose) {
 	PxTransform pos(t.transform(PxTransform(v)));
 	createNewPendulum(pos, PxVec3(0, boxHeight + halfExtend + 0.5, 0), halfExtend, 0.6, 10.0, 0.6, "Pendulum0", pose, PxVec3(0, 0, -2));
-	createSideSeesaw(pos, PxVec3(-halfExtend - 0.5 * dx, 0, -roadblock_width - dz), sideSeesaw_width, 1.0, sideSeesaw_length, pose);
+	createSideSeesaw(pos, PxVec3(-halfExtend - 0.7 * dx, 0, -roadblock_width - 0.7*dz), sideSeesaw_width, 1.0, sideSeesaw_length, pose);
 	createNewPendulum(pos, PxVec3(dx + 4 * halfExtend, boxHeight + halfExtend + 0.5, 0), halfExtend, 0.6, 10.0, 0.6, "Pendulum1", pose, PxVec3(0, 0, 2));
-	createSideSeesaw(pos, PxVec3(dx + 4 * halfExtend + 0.5 * dx, 0, -roadblock_width - dz), sideSeesaw_width, 1.0, sideSeesaw_length, pose);
+	createSideSeesaw(pos, PxVec3(dx + 4 * halfExtend + 0.7 * dx, 0, -roadblock_width - 0.7*dz), sideSeesaw_width, 1.0, sideSeesaw_length, pose);
 }
 
 PxVec3 positions[20000];
@@ -1307,7 +1310,7 @@ void createGameScene(const PxTransform& t) {
 	float syn_x = center_x - 2 * stairsLength + 4 * dx + 2 * roadblock_length;
 	float syn_y = rb_y;
 	float syn_z = rb_z;
-	createSyntheticLevel(t, PxVec3(syn_x, syn_y, syn_z), 5.0, roadblock_length, roadblock_width, 16.0, 1.0, 5.0, defaultPose);
+	createSyntheticLevel(t, PxVec3(syn_x, syn_y, syn_z), 5.0, roadblock_length, roadblock_width, 20.0, 1.0, 5.0, defaultPose);
 	
 	//第一块跷板的坐标
 	/*float seesawpos_x = rb_x + roadblock_length + 3.5 * dx;*/
@@ -1382,9 +1385,9 @@ void createGameScene(const PxTransform& t) {
 	float r_3_l = 6.0;
 	float r_3_w = 10.0;
 	float c_3_x = fw_x + 0.8 * fw_l + r_3_l;
-	float c_3_y = fw_y + 0.8 * fw_l;
+	float c_3_y = fw_y + 0.7 * fw_l;
 	float c_3_z = seesawpos_z + r_3_w - 2 * seatWidth;
-	PxRigidStatic* r_3 = createRoad(t, PxVec3(c_3_x, c_3_y, c_3_z), r_3_l, boxHeight, r_3_w, defaultPose);
+	PxRigidStatic* r_3 = createRoad(t, PxVec3(c_3_x, c_3_y, c_3_z), r_3_l, boxHeight*0.5, r_3_w, defaultPose);
 	cout <<"连接摩天轮与旋转路关卡的路段相对场景原点的坐标:"<< c_3_x << "," << c_3_y << "," << c_3_z << endl;
 
 	checkpoints.push_back(t.transform(PxVec3(c_3_x, c_3_y + 7.0, c_3_z)));

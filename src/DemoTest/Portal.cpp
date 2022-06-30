@@ -92,7 +92,7 @@ void initGame() {
 	role = new Role();
 
 	//初始位置
-	role->setFootPosition(checkpoints[0]);
+	//role->setFootPosition(checkpoints[0]);
 	//摆锤前位置
     //role->setFootPosition(checkpoints[1]);
 	//摩天轮前位置
