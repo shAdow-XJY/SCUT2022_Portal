@@ -53,7 +53,7 @@ std::string texture[] = {	"Door","Wall","Road",
 							"SeesawBox","Seesaw","Ice",
 							"KeyDoor","Prop", "RotateRod",
 							"PrismaticRoad0","PrismaticRoad1","Gear",
-							"FerrisWheel","PoolWall","Ground","FinalLine"};
+							"FerrisWheel","PoolWall","Ground","FinalLine","PipeWall"};
 
 //“Ù∆µ¿‡
 SoundTool soundtool = SoundTool();

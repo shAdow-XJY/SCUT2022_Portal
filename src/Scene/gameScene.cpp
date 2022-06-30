@@ -101,6 +101,9 @@ const char* typeMapName(OrganType type) {
 	case OrganType::finalLine: {
 		return "FinalLine";
 	}
+	case OrganType::pipeWall: {
+		return "PipeWall";
+	}
 	default:
 		return "Block";
 		break;
