@@ -584,7 +584,7 @@ PxRigidDynamic* createParticleSphere(const PxVec3& v, PxReal halfExtend, const P
 	sceneBox->setAngularDamping(1.0f);
 	sceneBox->setLinearVelocity(velocity);
 	sceneBox->setName("");
-	PxRigidBodyExt::updateMassAndInertia(*sceneBox, 10.0f);
+	PxRigidBodyExt::updateMassAndInertia(*sceneBox, 5.0f);
 	gScene->addActor(*sceneBox);
 	return sceneBox;
 }
