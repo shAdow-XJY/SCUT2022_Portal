@@ -979,8 +979,8 @@ void createGameScene(const PxTransform& t) {
 	checkpoints.push_back(t.transform(PxVec3(center_x - 2 * stairsLength, centerHeight - 2 * boxHeight + 7.0, center_z)));
 
 	//悬空路段/改版平移路段+摆锤
-	float roadblock_length = 18.0;
-	float roadblock_width = 15.0;  //4
+	float roadblock_length = 10.0;
+	float roadblock_width = 8.0;
 	//平移路段初始相对位置 PrismaticRoad1
 	float rb_x = center_x - stairsLength + 0.7 * dx + roadblock_length;
 	float rb_y = centerHeight - 2 * boxHeight;
@@ -1043,24 +1043,25 @@ void createGameScene(const PxTransform& t) {
 
 	//跷板关卡后的摩天轮
 	//杆的参数
-	float fw_l = 30.0;
+	float fw_l = 40.0;//30
 	float fw_h = 0.8;
 	float fw_w = 0.8;
 	//seat参数
-	float seatLength = 4.0;
+	float seatLength = 8.0;//4
 	float seatHeight = 0.4;
-	float seatWidth = 3.0;
+	float seatWidth = 6.0;//3
 	float seatDistance = 0.4;
 	float fw_x = c_8_x + r_8_l + 0.75 * fw_l;
 	float fw_y = c_8_y + fw_l;
-	float fw_z = c_8_z + seatWidth; + seatDistance + fw_w;
-	if (openDynamicBall) {
+	float fw_z = c_8_z + seatWidth + seatDistance + fw_w;
+	createFerrisWheel(t, PxVec3(fw_x, fw_y, fw_z), fw_l, fw_h, fw_w, seatLength, seatHeight, seatWidth, seatDistance, PxVec3(0, 0, 0));
+	/*if (openDynamicBall) {
 		//开启渲染圈
-		createFerrisWheel(t, PxVec3(fw_x, fw_y, fw_z), fw_l, fw_h, fw_w, seatLength*2.6, seatHeight, seatWidth*3, seatDistance, PxVec3(0, 0, -0.3));
+		createFerrisWheel(t, PxVec3(fw_x, fw_y, fw_z), fw_l, fw_h, fw_w, seatLength, seatHeight, seatWidth, seatDistance, PxVec3(0, 0, 0));
 	}else{
 		//关闭渲染圈
-		createFerrisWheel(t, PxVec3(fw_x, fw_y, fw_z), fw_l, fw_h, fw_w, seatLength*2.6, seatHeight, seatWidth*3, seatDistance, PxVec3(0, 0, -0.4));
-	}
+		createFerrisWheel(t, PxVec3(fw_x, fw_y, fw_z), fw_l, fw_h, fw_w, seatLength, seatHeight, seatWidth, seatDistance, PxVec3(0, 0, 0));
+	}*/
 
 	//#Checkpoint4
 	totalCheckpoint++;
@@ -1094,14 +1095,15 @@ void createGameScene(const PxTransform& t) {
 	float fan0_y = c_3_y;
 	float fan0_z = c_3_z + r_3_w + 0.5 * dz + fan_l;
 	float fan2_z;
-	if (openDynamicBall) {
+	/*if (openDynamicBall) {
 		//开启渲染圈速度
 		fan2_z = createFanRoadLevel(t, PxVec3(fan0_x, fan0_y, fan0_z), fan_l, fan_h, fan_w, PxVec3(0, 0.3, 0), defaultPose);
 	}
 	else {
 		//关闭渲染圈速度
 		fan2_z = createFanRoadLevel(t, PxVec3(fan0_x, fan0_y, fan0_z), fan_l, fan_h, fan_w, PxVec3(0, 0.4, 0), defaultPose);
-	}
+	}*/
+	fan2_z = createFanRoadLevel(t, PxVec3(fan0_x, fan0_y, fan0_z), fan_l, fan_h, fan_w, PxVec3(0, 0, 0), defaultPose);
 	//最后一个旋转路的中心点（fan0_x,fan0_y,fan2_z）
 
 	//连接旋转路关卡与迷宫的路段
@@ -1155,9 +1157,7 @@ void createGameScene(const PxTransform& t) {
 	float c_4_z = mazeOut_z + r_4_w;
 	createRoad(t, PxVec3(c_4_x, c_4_y, c_4_z), r_4_l, boxHeight, r_4_w, defaultPose);
 	cout << "迷宫出口路段相对场景原点的坐标为:" <<c_4_x << "," << c_4_y << "," << c_4_z << endl;
-	
 
-	
 
 	//楼梯1
 	//stairsWidth ： 4.0
@@ -1176,23 +1176,26 @@ void createGameScene(const PxTransform& t) {
 	//平移路段0 prismaticRoad
 	//roadblock_length : 5.0
 	//roadblock_width : 6.0
-	float c_5_x = center_x1 + stairsLength - roadblock_length;
+	float c_5_l = 5.0;
+	float c_5_w = 6.0;
+	float c_5_x = center_x1 + stairsLength - c_5_l;
 	float c_5_y = centerHeight1;
 	float c_5_z = center_z1;
+	float prismaticRoad0_length = 6.0;
+	float prismaticRoad0_width = 8.0;
 	/*使用平移关节实现
 	PxVec3 pr_v0(-2.5 * roadblock_length, 0, 0);
 	PxJointLinearLimitPair limits0(-30.0, -2.5 * roadblock_length, PxSpring(20.0, 0));
 	PxVec3 velocity0((-1, 0, 0) * 30);
 	createPrismaticRoad(t, PxVec3(c_5_x, c_5_y, c_5_z), roadblock_length, boxHeight, roadblock_width, defaultPose, pr_v0, roadblock_length, boxHeight, roadblock_width, defaultPose, limits0, velocity0);
 	std::cout << "平移路段前相对场景原点的坐标为:" << c_5_x << "," << c_5_y << "," << c_5_z << endl;*/
-	//根据程序运行时间改变平移路段速度
-	createRoad(t, PxVec3(c_5_x, c_5_y, c_5_z), roadblock_length, boxHeight, roadblock_width, defaultPose);
-	float pr0_x = c_5_x - 2 * roadblock_length - 0.7 * dx;
+	createRoad(t, PxVec3(c_5_x, c_5_y, c_5_z), c_5_l, boxHeight, c_5_w, defaultPose);
+	float pr0_x = c_5_x - c_5_l - prismaticRoad0_length - 0.7 * dx;
 	float pr0_y = c_5_y;
 	float pr0_z = c_5_z;
 	PxVec3 pr0_startPos(t.transform(PxVec3(pr0_x, pr0_y, pr0_z)));
-	PxVec3 pr0_endPos(t.transform(PxVec3(pr0_x - 2.0 * dx, pr0_y, pr0_z)));
-	createPrismatic(t, PxVec3(pr0_x, pr0_y, pr0_z), "PrismaticRoad0", roadblock_length, boxHeight, roadblock_width, pr0_startPos, pr0_endPos, defaultPose);
+	PxVec3 pr0_endPos(t.transform(PxVec3(pr0_x - 4.0 * dx, pr0_y, pr0_z)));
+	createPrismatic(t, PxVec3(pr0_x, pr0_y, pr0_z), "PrismaticRoad0", prismaticRoad0_length, boxHeight, prismaticRoad0_width, pr0_startPos, pr0_endPos, defaultPose);
 
 	//#Checkpoint7
 	totalCheckpoint++;
@@ -1201,17 +1204,18 @@ void createGameScene(const PxTransform& t) {
 	float rod_length = 25.0;
 	float rod_height = 0.5;
 	float rod_width = 1.0;
-	float c_6_x = c_5_x - 45.0;
+	float c_6_x = c_5_x - 45.0 - roadblock_length;
 	float c_6_y = c_5_y;
 	float c_6_z = c_5_z - roadblock_width - dz - rod_length;
-	if (openDynamicBall) {
+	/*if (openDynamicBall) {
 		//开启渲染圈速度
 		createRoTateRodLevel(t, PxVec3(c_6_x, c_6_y, c_6_z), rod_length, rod_height, rod_width, boxHeight, PxVec3(0, 2, 0), defaultPose);
 	}
 	else {
 		//关闭渲染圈速度
 		createRoTateRodLevel(t, PxVec3(c_6_x, c_6_y, c_6_z), rod_length, rod_height, rod_width, boxHeight, PxVec3(0, 4, 0), defaultPose);
-	}
+	}*/
+	createRoTateRodLevel(t, PxVec3(c_6_x, c_6_y, c_6_z), rod_length, rod_height, rod_width, boxHeight, PxVec3(0, 0, 0), defaultPose);
 	cout << "旋转杆关卡角落位置相对于场景原点的坐标为" << c_6_x + rod_length << "," << c_6_y << "," << c_6_z + rod_length << endl;
 	//旋转关卡角落坐标添加到checkpoints
 	checkpoints.push_back(t.transform(PxVec3(c_6_x + rod_length, c_6_y + 7.0, c_6_z + rod_length)));
@@ -1225,7 +1229,9 @@ void createGameScene(const PxTransform& t) {
 	float gear0_y = c_6_y;
 	float gear0_z = c_6_z;
 	float gear1_x = gear0_x - 2 * gearLength - dx * 0.5;
-	if (openDynamicBall) {
+	createGear(t, PxVec3(gear0_x, gear0_y, gear0_z), gearLength, gearHeight, gearWidth, PxVec3(0, 0, 0));
+	createGear(t, PxVec3(gear1_x, gear0_y, gear0_z), gearLength, gearHeight, gearWidth, PxVec3(0, 0, 0));
+	/*if (openDynamicBall) {
 		//开启渲染圈速度
 		createGear(t, PxVec3(gear0_x, gear0_y, gear0_z), gearLength, gearHeight, gearWidth, PxVec3(0, 0, 2));
 		createGear(t, PxVec3(gear1_x, gear0_y, gear0_z), gearLength, gearHeight, gearWidth, PxVec3(0, 0, 2));
@@ -1234,7 +1240,7 @@ void createGameScene(const PxTransform& t) {
 		//关闭渲染圈速度
 		createGear(t, PxVec3(gear0_x, gear0_y, gear0_z), gearLength, gearHeight, gearWidth, PxVec3(0, 0, 4));
 		createGear(t, PxVec3(gear1_x, gear0_y, gear0_z), gearLength, gearHeight, gearWidth, PxVec3(0, 0, 4));
-	}
+	}*/
 
 	//#Checkpoint8
 	totalCheckpoint++;
@@ -1253,8 +1259,6 @@ void createGameScene(const PxTransform& t) {
 	checkpoints.push_back(t.transform(PxVec3(bottom_x, bottom_y + 4.0f , bottom_z)));
 
 	
-	//createRoad(t, PxVec3(-4, 20, -6), 4.0, 1.0, 2.0, defaultPose);
 	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
 	//createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
-
 }
