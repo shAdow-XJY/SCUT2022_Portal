@@ -453,6 +453,7 @@ void reshape(int width, int height)
 }
 
 ImFont* emojiFont;
+ImFont* titleFont;
 void renderLoop()
 {
 	sCamera = new Snippets::Camera(PxVec3(50.0f, 50.0f, 50.0f), PxVec3(-0.6f, -0.2f, -0.7f));
@@ -486,6 +487,7 @@ void renderLoop()
 	cfg.MergeMode = true;
 	cfg.FontBuilderFlags |= ImGuiFreeTypeBuilderFlags_LoadColor;
 	emojiFont = io.Fonts->AddFontFromFileTTF("../../src/ImGui/seguiemj.ttf", 23.0f, &cfg, ranges);
+	titleFont = io.Fonts->AddFontFromFileTTF("../../src/ImGui/showg.ttf",30.f);
 	ImGui::StyleColorsDark();
 
 	ImGui_ImplGLUT_Init();
