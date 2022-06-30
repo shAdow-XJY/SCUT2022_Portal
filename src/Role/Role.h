@@ -32,12 +32,13 @@ private:
 
 	Model* model;
 	PxRigidBody* role;
+	PxCapsuleControllerDesc desc;
 	PxController* roleController;
 	/// <summary>
 	/// 角色属性
 	/// </summary>
 	PxF32 roleRadius = 3.0f;
-	PxF32 roleHeight = 10.0f;
+	PxF32 roleHeight = 6.0f;
 	//人物速度
 	PxVec3 speed = PxVec3(0, 0, 0);
 	//人物跳跃惯性速度
@@ -155,6 +156,7 @@ public:
 	bool getCrouch();
 	void roleCrouch();
 	void roleNoCrouch();
+	float getRoleHeight();
 
 	//是否可以移动人物
 	void changeCanMove(bool);

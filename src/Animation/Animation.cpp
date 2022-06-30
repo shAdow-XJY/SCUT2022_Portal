@@ -40,7 +40,8 @@ void Animation::initAssetAnimaion()
     string aniName[] = { "walk","run","jumping","dying",
                         "sleeping", "crouching","crouchedWalking",
                         "openDoor","useKey", "notUseKey", "dancing",
-                        "pickUp","putDown","swimming","swimIdle"};
+                        "pickUp","putDown","swimming","swimIdle",
+                        "roll"};
 
     for (string name : aniName) {
         string baseUrl = "../../src/Animation/models/" + name + ".fbx";
@@ -151,15 +152,15 @@ void Animation::display()
     PxMat44 modelMatrix(PxShapeExt::getGlobalPose(*attachedRole->getShape(), *attachedRole->getActor()));
     PxMat44 rotate(PxQuat(-PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
     
-    PxMat44 translate = PxMat44(PxTransform(PxVec3(0.0f, -3.8f, 0.0f)));
+    PxMat44 translate = PxMat44(PxTransform(PxVec3(0.0f, -1.5f, 0.0f)));
     if (this->current_animation == "crouchedWalking") {
-        translate = PxMat44(PxTransform(PxVec3(0.0f, 0.0f, 0.0f)));
+        translate = PxMat44(PxTransform(PxVec3(0.0f, 0.5f, 0.0f)));
     }
     else if (this->current_animation == "crouching") {
-        translate = PxMat44(PxTransform(PxVec3(0.0f, -2.0f, 0.0f)));
+        translate = PxMat44(PxTransform(PxVec3(0.0f, -1.5f, 0.0f)));
     }
     else if (this->current_animation == "swimming" || this->current_animation == "swimIdle") {
-        translate = PxMat44(PxTransform(PxVec3(0.0f, -10.0f, 0.0f)));
+        translate = PxMat44(PxTransform(PxVec3(0.0f, -7.5f, 0.0f)));
     }
     renderDisplay(this->scene, this->scene->mRootNode, std::map<int, int>(), modelMatrix * rotate * translate *yRotate);
 

@@ -258,8 +258,7 @@ void getAdditionalAngleRadians() {
 bool roleCannotOperate() {
 	if (animation.getCurrentAnimation() == "dying" || animation.getCurrentAnimation() == "sleeping"
 		|| animation.getCurrentAnimation() == "useKey" || animation.getCurrentAnimation() == "notUseKey"
-		|| animation.getCurrentAnimation() == "dancing"
-		|| animation.getCurrentAnimation() == "pickUp" || animation.getCurrentAnimation() == "putDown") 
+		|| animation.getCurrentAnimation() == "dancing") 
 	{
 		return false;
 	}
