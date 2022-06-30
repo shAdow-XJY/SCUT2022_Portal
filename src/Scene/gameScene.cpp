@@ -769,9 +769,9 @@ poolLength, poolHeight, poolWidth为杆的长、高、宽
 pose刚体初始姿态*/
 void createPool(const PxTransform& t, PxVec3 bottom, float poolLength, float poolHeight,float poolWidth, PxTransform& pose) {
 	PxTransform pos(t.transform(PxTransform(bottom)));
-	PxTransform rotate = PxTransform(PxQuat(PxHalfPi / 10, PxVec3(0, 0, -1.0f)));
+	//PxTransform rotate = PxTransform(PxQuat(PxHalfPi / 10, PxVec3(0, 0, -1.0f)));
 	//底部
-	createStaticBox(pos, PxVec3(0, poolHeight + 3.0f, 0), poolLength + 2.0, 1.0, poolWidth + 2.0, rotate, OrganType::poolWall);
+	createStaticBox(pos, PxVec3(0, poolHeight + 3.0f, 0), poolLength + 2.0, 1.0, poolWidth + 2.0, pose, OrganType::poolWall);
 	//左侧
 	createStaticBox(pos, PxVec3(1.0 + poolLength, 1.0 + poolHeight, 0), 1.0, poolHeight, poolWidth + 2.0, pose, OrganType::poolWall);
 	//右侧
@@ -970,22 +970,22 @@ void createSyntheticLevel(const PxTransform& t, PxVec3 v, float halfExtend, floa
 	createSideSeesaw(pos, PxVec3(dx + 4 * halfExtend + 0.5 * dx, 0, -roadblock_width - dz), sideSeesaw_width, 1.0, sideSeesaw_length, pose);
 }
 
-PxVec3 positions[5000];
+PxVec3 positions[20000];
 //为每一个粒子生成坐标信息
 PxVec3* createPositions(PxVec3 &p)
 {
 	int t = 0;
 
-	for (int x = 0; x < 5000; x++)
+	for (int x = 0; x < 20000; x++)
 	{
 		positions[x] = p;
 	}
-	while(t<=1000)
-	for (float l = -20; l <= 20; l+=5.0)
+	while(t<=3000)
+	for (float m = -2; m <= 10; m += 1.6)
 	{
-		for (float m = -5; m <= 15; m+=5.0)
+		for (float l = -18; l <= 15; l += 1.6)
 		{
-			for (float n = -50; n <= 45; n+=5.0)
+			for (float n = -30; n <= 30; n+=1.6)
 			{
 					positions[t].x += n;
 					positions[t].y += m;
@@ -998,7 +998,7 @@ PxVec3* createPositions(PxVec3 &p)
 	return positions;
 }
 
-PxU32 indices[5000];
+PxU32 indices[20000];
 //为每一个粒子生成索引
 PxU32* createParticleIndices(PxU32 num)
 {
@@ -1014,14 +1014,14 @@ PxU32* createParticleIndices(PxU32 num)
 void createParticles(PxVec3 v)
 {
 	// set immutable properties.
-	PxU32 maxParticles = 2048;
+	PxU32 maxParticles = 5000;
 	bool perParticleRestOffset = false;
 
 	// create particle system in PhysX SDK
 	PxParticleSystem* ps = gPhysics->createParticleSystem(maxParticles, perParticleRestOffset);
 
 	PxParticleCreationData particleCreationData;
-	particleCreationData.numParticles = 1000;
+	particleCreationData.numParticles = 3000;
 	PxVec3* p = createPositions(v);
 	PxU32* indic = createParticleIndices(maxParticles);
 	particleCreationData.indexBuffer = PxStrideIterator<const PxU32>(indic);
@@ -1030,10 +1030,6 @@ void createParticles(PxVec3 v)
 	// create particles in *PxParticleSystem* ps
 	bool success = ps->createParticles(particleCreationData);
 	std::cout << "创建粒子成功！" << std::endl;
-
-	float aspect = GLdouble(glutGet(GLUT_WINDOW_WIDTH)) / GLdouble(glutGet(GLUT_WINDOW_HEIGHT));
-	float fovy = 60.0;
-	float pointScale = 1.0f * GLdouble(glutGet(GLUT_WINDOW_WIDTH)) / aspect * (1.0f / tanf(glm::radians(fovy) * 0.5f));
 
 	// add particle system to scene, in case creation was successful
 	if (ps)
@@ -1055,7 +1051,7 @@ void createParticles(PxVec3 v)
 				// access particle position
 				const PxVec3& position = *positionIt;
 				std::cout << position.x << "," << position.y << "," << position.z << std::endl;
-				createParticleSphere(position, 0.5);
+				createParticleSphere(position, 0.8);
 			}
 		}
 
@@ -1394,11 +1390,11 @@ void createGameScene(const PxTransform& t) {
 	float bottom_y = gear0_y + boxHeight - 2 * poolHeight - 1.0;
 	float bottom_z = gear0_z;
 	createPool(t, PxVec3(bottom_x, bottom_y, bottom_z), poolLength, poolHeight, poolWidth, defaultPose);
-	createParticleSphere(t, PxVec3(bottom_x, bottom_y + 15.0f , bottom_z), 0.6f);
+	//createParticleSphere(t, PxVec3(bottom_x, bottom_y + 15.0f , bottom_z), 0.6f);
 	//水池底部的相对于场景原点t的位置 PxVec3 localPose(bottom_x,bottom_y,bottom_z)
 	//全局位置 t.transform(PxTransform(localPose)).p
 	//泳池关卡角落坐标添加到checkpoints
-	checkpoints.push_back(t.transform(PxVec3(bottom_x - 1.0f, bottom_y + 8.0f, bottom_z - 1.0f)));
+	checkpoints.push_back(t.transform(PxVec3(bottom_x - 1.0f, bottom_y + 16.0f, bottom_z - 1.0f)));
 
 	
 	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
