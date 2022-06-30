@@ -8,7 +8,7 @@ extern clock_t deltaClock;
 #define MAX_NUM_ACTOR_SHAPES 128
 
 Role::Role() {
-	PxCapsuleControllerDesc desc;
+	
 	desc.radius = roleRadius;
 	desc.height = roleHeight;
 	desc.material = gMaterial;
@@ -401,6 +401,7 @@ void Role::rayAround() {
 					if (gsb->getType() == OrganType::pendulum) {
 						//cout << "×²µ½ÁË" << endl;
 						Pendulum* pendulem = (Pendulum*)gsb;
+						animation.setAnimation("roll");
 						int flag = pendulem->getPendulumActor()->getAngularVelocity().x > 0 ? 1 : -1;
 						if (!this->stimulateObj) {
 							PxShape* shape = gPhysics->createShape(PxCapsuleGeometry(0.01, 0.1), *gMaterial);
@@ -421,8 +422,8 @@ void Role::rayAround() {
 						this->roleController->move(PxVec3(0, 1.5f, 0), 0.0001, 1.0f / 120.0f, NULL);
 						return;
 					}
-					else if (gsb->getType() == OrganType::ground) {
-						cout << "ground" << endl;
+					else if (gsb->getType() == OrganType::poolWall) {
+						this->nowCheckpoint = 8;
 						return;
 					}
 				}
@@ -599,11 +600,12 @@ void Role::simulationGravity() {
 		if (isFall) {
 			this->touchGround();
 		}
-		//ËÀÍöÂß¼­
+		//ËÀÍöÂß¼­ ÅÜ²»µ½Õâ¶Î´úÂë
 		if (actor->getName()) {
 			string name(actor->getName());
 			if (name == "Over" || name == "Ground") {
 				this->canMove = false;
+				cout << name << endl;
 				if (this->isAlive) {
 					animation.setAnimation("dying");
 				}

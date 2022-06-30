@@ -32,6 +32,7 @@ private:
 
 	Model* model;
 	PxRigidBody* role;
+	PxCapsuleControllerDesc desc;
 	PxController* roleController;
 	/// <summary>
 	/// ½ÇÉ«ÊôÐÔ
