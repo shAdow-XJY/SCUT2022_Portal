@@ -639,7 +639,7 @@ void createNewPendulum(const PxTransform& t, PxVec3 v, float halfExtend, float r
 	shape1->setQueryFilterData(collisionGroup);
 	newPendulum->setMass(1.0f);
 	newPendulum->setAngularDamping(0.f);
-	Pendulum* pendulum = new Pendulum("摆锤", newPendulum->getGlobalPose().p, halfExtend, newPendulum);
+	Pendulum* pendulum = new Pendulum(name, newPendulum->getGlobalPose().p, halfExtend, newPendulum);
 	newPendulum->setName(name);
 	newPendulum->userData = pendulum;
 	newPendulum->setLinearVelocity(velocity * 35);
@@ -694,7 +694,7 @@ void createRotateRod(const PxTransform& t, PxVec3 v, PxReal halfExtend, PxTransf
 	PxReal rod1_y = 1.0;
 	PxReal rod1_z = 1.0;
 	PxRigidDynamic* rod1 = createDynamicBox(false, pos, PxVec3(0, 2 * halfExtend, 0), rod1_x, rod1_y, rod1_z, pose);
-	RotateRod* rotateRod1 = new RotateRod("转杆", rod1->getGlobalPose().p, rod1_x, rod1_y, rod1_z, rod1);
+	RotateRod* rotateRod1 = new RotateRod("RotateRod", rod1->getGlobalPose().p, rod1_x, rod1_y, rod1_z, rod1);
 	rod1->setName("RotateRod");
 	rod1->userData = rotateRod1;
 	rod1->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
@@ -726,7 +726,7 @@ void createFan(const PxTransform& t, PxVec3 v, float x, float y, float z, PxVec3
 	gScene->addActor(*fan);
 	fan->setMass(0.f);
 	fan->setMassSpaceInertiaTensor(PxVec3(0.f));
-	RotateRod* rotateRod = new RotateRod("转杆", fan->getGlobalPose().p, x,y,z, fan);
+	RotateRod* rotateRod = new RotateRod("RotateRod", fan->getGlobalPose().p, x,y,z, fan);
     fan->setName("RotateRod");
 	fan->userData = rotateRod;
 	PxRigidStatic* sphere = createStaticSphere(pos, PxVec3(0, 0, 0), 2*y);
@@ -829,9 +829,9 @@ void createGear(const PxTransform& t, PxVec3 v, float x, float y, float z, PxVec
 	gScene->addActor(*gear);
 	gear->setMass(0.f);
 	gear->setMassSpaceInertiaTensor(PxVec3(0.f));
-	/*RotateRod* rotateRod = new RotateRod("转杆", fan->getGlobalPose().p, 25.0, 1.0, 1.0, fan);
-	fan->setName("RotateRod");
-	fan->userData = rotateRod;*/
+	//
+	RotateRod* rotateRod = new RotateRod("gear", gear->getGlobalPose().p, 25.0, 1.0, 1.0, gear);
+	gear->userData = rotateRod;
 }
 
 /*创建摩天轮
@@ -853,6 +853,7 @@ void createFerrisWheel(const PxTransform& t, PxVec3 v, float x, float y, float z
 	shape1->setQueryFilterData(collisionGroup);
 	shape2->setQueryFilterData(collisionGroup);
 	ferrisWheel->setName("FerrisWheel");
+	//这里加一个ferrisWheel类或者用现有的的绑到userdata里面即可，把userdata的类的name设为angularVelocity即可在release识别
 	ferrisWheel->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
 	ferrisWheel->setAngularVelocity(angularVelocity);
 	ferrisWheel->setAngularDamping(0.f);
@@ -964,7 +965,7 @@ float createFanRoadLevel(const PxTransform& t, PxVec3 v, float x, float y, float
 void createPrismatic(const PxTransform& t, PxVec3 v, const char* name, float x, float y, float z, PxVec3 startPos, PxVec3 endPos, PxTransform& pose) {
 	PxRigidDynamic* actor1 = createDynamicBox(false, t, v, x, y, z, pose, OrganType::prismaticRoad,PxVec3(0, 0, 0));
 	PxVec3 position = actor1->getGlobalPose().p;
-	PrismaticRoad* prismaticRoad = new PrismaticRoad("平移路面", position, x, y, z, startPos, endPos, actor1);
+	PrismaticRoad* prismaticRoad = new PrismaticRoad(name, position, x, y, z, startPos, endPos, actor1);
 	actor1->userData = prismaticRoad;
 	actor1->setName(name);
 	actor1->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);

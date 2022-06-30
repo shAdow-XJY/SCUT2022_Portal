@@ -267,16 +267,12 @@ void Role::changeCanMove(bool flag) {
 
 
 /**
-* @brief 角色边缘滑动
+* @brief 角色跷跷板边缘滑动
 **/
 void Role::edgeSliding() {
 	if (this->standingBlock->getType() == OrganType::seesaw) {
 		PxVec3 spliceSpeed = this->speed.isZero() ? this->sliceDir : this->getFaceDir();
-		this->setFootPosition(this->getFootPosition() + spliceSpeed * 1.0f);
-	}
-	else
-	{
-		this->setFootPosition(this->getFootPosition() + this->getFaceDir() * 3.0f); //边缘滑动
+		this->setFootPosition(this->getFootPosition() + spliceSpeed * 3.0f);
 	}
 }
 
@@ -509,7 +505,7 @@ bool Role::getRebirthing() {
 * @desc 每帧回调
 **/
 void Role::move() {
-	if (!this->isAlive && !canMove) return;
+	if (!this->isAlive || !canMove) return;
 	PxVec3 moveSpeed = PxVec3(0, 0, 0);
 	if (!this->stimulateObj) {
 		if (this->getHorizontalVelocity().isZero()) {
@@ -611,18 +607,18 @@ void Role::simulationGravity() {
 		if (isFall) {
 			this->touchGround();
 		}
-		//死亡逻辑 跑不到这段代码
-		if (actor->getName()) {
-			string name(actor->getName());
-			if (name == "Over" || name == "Ground0") {
-				this->canMove = false;
-				cout << name << endl;
-				if (this->isAlive) {
-					animation.setAnimation("dying");
-				}
-				return;
-			}
-		}
+		////死亡逻辑 跑不到这段代码
+		//if (actor->getName()) {
+		//	string name(actor->getName());
+		//	if (name == "Over" || name == "Ground0") {
+		//		this->canMove = false;
+		//		cout << name << endl;
+		//		if (this->isAlive) {
+		//			animation.setAnimation("dying");
+		//		}
+		//		return;
+		//	}
+		//}
 
 		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
 		this->sliceDir = PxVec3(0, 0, 0);
@@ -662,7 +658,7 @@ void Role::simulationGravity() {
 				//再次检测避免出现更新延迟
 				if (!RayCast(origin, PxVec3(0, -5.0f, 0))) {
 					std::cout << "边缘滑动" << endl;
-					//this->edgeSliding();
+					this->edgeSliding();
 				}
 				//else
 				//{
@@ -684,7 +680,7 @@ void Role::simulationGravity() {
 * @brief 角色跳跃
 **/
 bool Role::tryJump(bool release) {
-	if (!this->isAlive && !canMove) return false;
+	if (!this->isAlive || !canMove) return false;
 	if (!isJump && !isFall) {
 		if (!release) {
 			//蓄力跳
