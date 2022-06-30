@@ -272,11 +272,7 @@ void Role::changeCanMove(bool flag) {
 void Role::edgeSliding() {
 	if (this->standingBlock->getType() == OrganType::seesaw) {
 		PxVec3 spliceSpeed = this->speed.isZero() ? this->sliceDir : this->getFaceDir();
-		this->setFootPosition(this->getFootPosition() + spliceSpeed * 1.0f);
-	}
-	else
-	{
-		this->setFootPosition(this->getFootPosition() + this->getFaceDir() * 3.0f); //边缘滑动
+		this->setFootPosition(this->getFootPosition() + spliceSpeed * 3.0f);
 	}
 }
 
@@ -611,19 +607,6 @@ void Role::simulationGravity() {
 		if (isFall) {
 			this->touchGround();
 		}
-		//死亡逻辑 跑不到这段代码
-		if (actor->getName()) {
-			string name(actor->getName());
-			if (name == "Over" || name == "Ground0") {
-				this->canMove = false;
-				cout << name << endl;
-				if (this->isAlive) {
-					animation.setAnimation("dying");
-				}
-				return;
-			}
-		}
-
 		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
 		this->sliceDir = PxVec3(0, 0, 0);
 		if (basic != NULL) {
@@ -661,15 +644,8 @@ void Role::simulationGravity() {
 			if (this->standingBlock->getType() != OrganType::error) {
 				//再次检测避免出现更新延迟
 				if (!RayCast(origin, PxVec3(0, -5.0f, 0))) {
-					std::cout << "边缘滑动" << endl;
-					//this->edgeSliding();
+					this->edgeSliding();
 				}
-				//else
-				//{
-				//	//防止CCT边缘卡住模拟滑动一下
-				//	PxVec3 slide = this->getFaceDir().getNormalized() * 0.045;
-				//	roleController->move(slide * deltaClock, PxF32(0.00001), deltaClock, NULL);
-				//}
 			}
 			this->standingBlock = errorGameSceneBasic;
 			this->standingOnBlock = false;
