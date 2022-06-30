@@ -980,12 +980,12 @@ PxVec3* createPositions(PxVec3 &p)
 	{
 		positions[x] = p;
 	}
-	while(t<=4000)
+	while(t<=2000)
 	for (float m = -2; m <= 5; m += 1.6)
 	{
 		for (float l = -18; l <= 15; l += 1.6)
 		{
-			for (float n = -30; n <= 30; n+=1.6)
+			for (float n = -15; n <= 14; n+=1.6)
 			{
 					positions[t].x += n;
 					positions[t].y += m;
@@ -1021,7 +1021,7 @@ void createParticles(PxVec3 v)
 	PxParticleSystem* ps = gPhysics->createParticleSystem(maxParticles, perParticleRestOffset);
 
 	PxParticleCreationData particleCreationData;
-	particleCreationData.numParticles = 4000;
+	particleCreationData.numParticles = 2000;
 	PxVec3* p = createPositions(v);
 	PxU32* indic = createParticleIndices(maxParticles);
 	particleCreationData.indexBuffer = PxStrideIterator<const PxU32>(indic);
@@ -1383,7 +1383,7 @@ void createGameScene(const PxTransform& t) {
 	totalCheckpoint++;
 	
 	//水池
-	float poolLength = 50.0;
+	float poolLength = 30.0;
 	float poolHeight = 10.0;
 	float poolWidth = 25.0;
 	float bottom_x = gear1_x - gearLength - dx * 0.8 - poolLength - 2.0;
@@ -1394,7 +1394,7 @@ void createGameScene(const PxTransform& t) {
 	//水池底部的相对于场景原点t的位置 PxVec3 localPose(bottom_x,bottom_y,bottom_z)
 	//全局位置 t.transform(PxTransform(localPose)).p
 	//泳池关卡角落坐标添加到checkpoints
-	checkpoints.push_back(t.transform(PxVec3(bottom_x - 35.0f, bottom_y + 16.0f, bottom_z - 1.0f)));
+	checkpoints.push_back(t.transform(PxVec3(bottom_x + 35.0f, bottom_y + 16.0f, bottom_z - 1.0f)));
 
 	
 	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
