@@ -3,6 +3,7 @@
 #include "../Sphere/Pendulum.h"
 #include "../Block/Door.h"
 #include "../Block/Road.h"
+#include "../Block/PipeWall.h"
 #include "../Block/Seesaw.h"
 #include "../Block/RotateRod.h"
 #include "../Block/PrismaticRoad.h"
@@ -931,6 +932,198 @@ void createSyntheticLevel(const PxTransform& t, PxVec3 v, float halfExtend, floa
 	createSideSeesaw(pos, PxVec3(dx + 4 * halfExtend + 0.5 * dx, 0, -roadblock_width - dz), sideSeesaw_width, 1.0, sideSeesaw_length, pose);
 }
 
+//创建管道壁
+PxRigidStatic* createPipeWall(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose) {
+	PxRigidStatic* pipeWallActor = createStaticBox(t, v, x, y, z, pose, OrganType::pipeWall);
+	PxVec3 position = pipeWallActor->getGlobalPose().p;
+	PipeWall* pipeWall = new PipeWall("路面", position, x, y, z, pipeWallActor);
+	pipeWallActor->userData = pipeWall;
+	pipeWallActor->setName("PipeWall");
+	return pipeWallActor;
+}
+
+//创建z轴方向管道
+void createZPipe(const PxTransform& t, PxVec3 v,float pipeWidth, float pipeHeight, float length, PxTransform& pose) {
+	PxTransform pos(t.transform(v));
+	float tbWidth = pipeWidth + 1.0;
+	createPipeWall(pos, PxVec3(0, 0, 0), tbWidth, 0.5, length, pose);
+	createPipeWall(pos, PxVec3(0, 1.0 + 2 * pipeHeight, 0), tbWidth, 0.5, length, pose);
+	createPipeWall(pos, PxVec3(pipeWidth + 0.5, pipeHeight + 0.5, 0), 0.5, pipeHeight, length, pose);
+	createPipeWall(pos, PxVec3(-pipeWidth - 0.5, pipeHeight + 0.5, 0), 0.5, pipeHeight, length, pose);
+}
+
+//创建x轴方向管道
+void createXPipe(const PxTransform& t, PxVec3 v, float pipeWidth, float pipeHeight, float length, PxTransform& pose) {
+	PxTransform pos(t.transform(v));
+	float tbWidth = pipeWidth + 1.0;
+	createPipeWall(pos, PxVec3(0, 0, 0), length, 0.5, tbWidth, pose);
+	createPipeWall(pos, PxVec3(0, 1.0 + 2 * pipeHeight, 0), length, 0.5, tbWidth, pose);
+	createPipeWall(pos, PxVec3(0, 0.5 + pipeHeight, - 0.5 - pipeWidth), length, pipeHeight, 0.5, pose);
+	createPipeWall(pos, PxVec3(0, 0.5 + pipeHeight, 0.5 + pipeWidth), length, pipeHeight, 0.5, pose);
+}
+
+//创建y轴方向管道
+void createYPipe(const PxTransform& t, PxVec3 v, float pipeWidth, float pipeHeight, float length, PxTransform& pose) {
+	PxTransform pos(t.transform(v));
+	float tbWidth = pipeWidth + 1.0;
+	createPipeWall(pos, PxVec3(0, 0, 0.5+pipeWidth), tbWidth, length, 0.5, pose);
+	createPipeWall(pos, PxVec3(0, 0, -0.5-pipeWidth), tbWidth, length, 0.5, pose);
+	createPipeWall(pos, PxVec3(0.5+pipeWidth, 0, 0), 0.5, length, pipeWidth, pose);
+	createPipeWall(pos, PxVec3(-0.5-pipeWidth, 0, 0), 0.5, length, pipeWidth, pose);
+}
+
+
+void createPipeLevel(const PxTransform& t, PxVec3 v, PxTransform& pose) {
+	PxTransform pos(t.transform(v));
+	float pipeWidth = 4.0;
+	float pipeHeight = 4.0;
+	float standHeight = 6.0;
+	float heightDistance = 15.0;
+	//上下管壁的宽度
+	float tbWidth = pipeWidth + 1.0;
+	float p0_x = 0;
+	float p0_y = 0;
+	float p0_width = 20.0;
+	float p0_z = p0_width;
+	//入口分支0
+	createZPipe(pos,PxVec3(p0_x, p0_y, p0_z), pipeWidth, pipeHeight, p0_width, pose);
+	/*createPipeWall(pos, PxVec3(0, 0, p0_z), tbWidth, 0.5, p0_width, pose);
+	createPipeWall(pos, PxVec3(0, 1.0 + 2 * pipeHeight, p0_z), tbWidth, 0.5, p0_width, pose);
+	createPipeWall(pos, PxVec3(pipeWidth+0.5, pipeHeight+0.5, p0_z), 0.5, pipeHeight, p0_width, pose);
+	createPipeWall(pos, PxVec3(-pipeWidth - 0.5, pipeHeight + 0.5, p0_z), 0.5, pipeHeight, p0_width, pose);*/
+	//第一个分岔口 cross
+	float cross_x = p0_x;
+	float cross_y = p0_y;
+	float cross_z = p0_z + p0_width + pipeWidth;
+	createPipeWall(pos, PxVec3(cross_x, cross_y, cross_z), tbWidth, 0.5, pipeWidth, pose);
+	createPipeWall(pos, PxVec3(cross_x, cross_y+ 1.0 + 2 * pipeHeight, cross_z), tbWidth, 0.5, pipeWidth, pose);
+	createPipeWall(pos, PxVec3(cross_x - pipeWidth - 0.5, cross_y + pipeHeight + 0.5, cross_z), 0.5, pipeHeight, pipeWidth, pose);
+	//第一个分岔口左边分支1
+	float p1_l = 20.0;
+	float p1_x = cross_x + 1.0 + pipeWidth + p1_l;
+	float p1_y = cross_y;
+	float p1_z = cross_z;
+	createXPipe(pos, PxVec3(p1_x, p1_y, p1_z), pipeWidth, pipeHeight, p1_l, pose);
+	//分支1分岔口cross1
+	float cross1_x = p1_x + p1_l + pipeWidth;
+	float cross1_y = p1_y;
+	float cross1_z = p1_z;
+	createPipeWall(pos, PxVec3(cross1_x, cross1_y, cross1_z), pipeWidth, 0.5, tbWidth, pose);
+	createPipeWall(pos, PxVec3(cross1_x, cross1_y + 1.0 + 2 * pipeHeight, cross1_z), pipeWidth, 0.5, tbWidth, pose);
+	createPipeWall(pos, PxVec3(cross1_x+pipeWidth+0.5, cross1_y + 0.5 + pipeHeight, cross1_z), 0.5, tbWidth, tbWidth, pose);
+	createPipeWall(pos, PxVec3(cross1_x, cross1_y + 0.5 + pipeHeight, cross1_z - pipeWidth-0.5), pipeWidth, pipeHeight, 0.5, pose);
+	float p2_width = 15.0;
+	float p2_x = cross1_x;
+	float p2_y = cross1_y;
+	float p2_z = cross1_z + 1.0 + pipeWidth + p2_width;
+	createZPipe(pos, PxVec3(p2_x, p2_y, p2_z), pipeWidth, pipeHeight, p2_width, pose);
+	//分支1分岔口cross2
+	float cross2_x = p2_x;
+	float cross2_y = p2_y;
+	float cross2_z = p2_z + p2_width + pipeWidth;
+	createPipeWall(pos, PxVec3(cross2_x, cross2_y, cross2_z), tbWidth, 0.5, pipeWidth, pose);
+	createPipeWall(pos, PxVec3(cross2_x, cross2_y + 1.0 + 2 * pipeHeight, cross2_z), tbWidth, 0.5, pipeWidth, pose);
+	createPipeWall(pos, PxVec3(cross2_x, cross2_y+0.5+pipeHeight, cross2_z+pipeWidth+0.5), tbWidth, tbWidth, 0.5, pose);
+	createPipeWall(pos, PxVec3(cross2_x - pipeWidth - 0.5, cross2_y + 0.5 +pipeHeight, cross2_z), 0.5, pipeHeight, pipeWidth, pose);
+	float p3_l = 15.0;
+	float p3_x = cross2_x + 1.0 + pipeWidth + p3_l;
+	float p3_y = cross2_y;
+	float p3_z = cross2_z;
+	float pr3_l = 6.0;
+	float pr3_w = 6.0;
+	PxVec3 pos1(t.transform(PxTransform(PxVec3(p3_x+p3_l+pr3_l+0.2*dx, p3_y-2.0, p3_z))).p);
+	createXPipe(pos, PxVec3(p3_x, p3_y, p3_z), pipeWidth, pipeHeight, p3_l, pose);
+	//分支2
+	float p4_width = 35.0;
+	float p4_x = cross_x;
+	float p4_y = cross_y;
+	float p4_z = cross_z + pipeWidth + p4_width;
+	createZPipe(pos, PxVec3(p4_x, p4_y, p4_z), pipeWidth, pipeHeight, p4_width, pose);
+	//分支2分岔口cross3
+	float cross3_x = p4_x;
+	float cross3_y = p4_y;
+	float cross3_z = p4_z + p4_width + pipeWidth;
+	createPipeWall(pos, PxVec3(cross3_x, cross3_y, cross3_z), pipeWidth, 0.5, pipeWidth, pose);
+	createPipeWall(pos, PxVec3(cross3_x, cross3_y + 0.5 + pipeHeight, cross3_z + 0.5 + pipeWidth), tbWidth, pipeHeight + 1.0, 0.5, pose);
+	createPipeWall(pos, PxVec3(cross3_x + pipeWidth + 0.5, cross3_y + 0.5 + pipeHeight, cross3_z), 0.5, pipeHeight + 1.0, pipeWidth, pose);
+	createPipeWall(pos, PxVec3(cross3_x - pipeWidth - 0.5, cross3_y + 0.5 + pipeHeight, cross3_z), 0.5, pipeHeight + 1.0, pipeWidth, pose);
+	//两层连接管道
+	float p5_x = cross3_x;
+	float p5_y = cross3_y + 2*pipeHeight + 1.0 + heightDistance;
+	float p5_z = cross3_z;
+	createYPipe(pos, PxVec3(p5_x, p5_y, p5_z), pipeWidth, pipeHeight, heightDistance, pose);
+	//连接管道另一头cross4
+	float cross4_x = p5_x;
+	float cross4_y = p5_y + heightDistance + pipeWidth;
+	float cross4_z = p5_z;
+	createPipeWall(pos, PxVec3(cross4_x, cross4_y+0.5+pipeWidth, cross4_z), tbWidth, 0.5, tbWidth, pose);
+	createPipeWall(pos, PxVec3(cross4_x, cross4_y, cross4_z+0.5+pipeWidth), tbWidth, pipeWidth, 0.5, pose);
+	createPipeWall(pos, PxVec3(cross4_x, cross4_y, cross4_z-0.5-pipeWidth), tbWidth, pipeWidth, 0.5, pose);
+	createPipeWall(pos, PxVec3(cross4_x-0.5-pipeWidth, cross4_y, cross4_z), 0.5, pipeWidth, pipeWidth, pose);
+	//二层入一层前连接管道
+	float p6_l = 10.0;
+	float p6_x = cross4_x + 1.0 + pipeWidth + p6_l;
+	float p6_y = cross4_y - pipeWidth - 0.5;
+	float p6_z = cross4_z;
+	createXPipe(pos, PxVec3(p6_x, p6_y, p6_z), pipeWidth, pipeWidth, p6_l, pose);
+	//第二层两分支交叉口cross5
+	float cross5_x = p6_x + p6_l + pipeWidth;
+	float cross5_y = p6_y;
+	float cross5_z = p6_z;
+	createPipeWall(pos, PxVec3(cross5_x, cross5_y, cross5_z), pipeWidth, 0.5, tbWidth, pose);
+	createPipeWall(pos, PxVec3(cross5_x, cross5_y+1.0+2*pipeWidth, cross5_z), pipeWidth, 0.5, tbWidth, pose);
+	createPipeWall(pos, PxVec3(cross5_x, cross5_y+0.5+pipeWidth, cross5_z-pipeWidth-0.5), pipeWidth, pipeWidth, 0.5, pose);
+	//分支3
+	float p7_l = p3_l+p1_l-p6_l;
+	float p7_x = cross5_x + pipeWidth + p7_l;
+	float p7_y = cross5_y;
+	float p7_z = cross5_z;
+	createXPipe(pos, PxVec3(p7_x, p7_y, p7_z), pipeWidth, pipeWidth, p7_l, pose);
+	float sr_l = 6.0;
+	float sr_w = 8.0;
+	createRoad(pos, PxVec3(p7_x + p7_l + sr_l, p7_y, p7_z), sr_l, 1.0, sr_w, pose);
+	PxVec3 pos2(t.transform(PxTransform(PxVec3(p7_x + p7_l + pr3_l+0.2*dx, p7_y-3.0, p7_z - 0.5 * dz - pr3_w-pipeWidth))).p);
+	createPrismatic(pos, PxVec3(p3_x + p3_l + pr3_l + 0.2 * dx, p3_y - 2.0, p3_z), "PrismaticRoad2", pr3_l, 1.0, pr3_w, pos1, pos2, pose);
+	//cout << "平移路段3:" << p3_y - 2.0 << "," << p7_y - 3.0 << "," << p3_z << "," << p7_z - 0.5 * dz - pr3_w - pipeWidth << endl;
+	//分支4
+	float p8_width = 20.0;
+	float p8_x = cross5_x;
+	float p8_y = cross5_y;
+	float p8_z = cross5_z + pipeWidth + p8_width;
+	createZPipe(pos, PxVec3(p8_x, p8_y, p8_z), pipeWidth, pipeWidth, p8_width, pose);
+	//分支4转弯 cross6
+	float cross6_x = p8_x;
+	float cross6_y = p8_y;
+	float cross6_z = p8_z + p8_width + pipeWidth;
+	createPipeWall(pos, PxVec3(cross6_x, cross6_y, cross6_z), tbWidth, 0.5, pipeWidth, pose);
+	createPipeWall(pos, PxVec3(cross6_x, cross6_y+1.0+2*pipeWidth, cross6_z), tbWidth, 0.5, pipeWidth, pose);
+	createPipeWall(pos, PxVec3(cross6_x, cross6_y+0.5+pipeWidth, cross6_z+0.5+pipeWidth), tbWidth, tbWidth, 0.5, pose);
+	createPipeWall(pos, PxVec3(cross6_x + pipeWidth + 0.5, cross6_y+0.5+pipeWidth, cross6_z), 0.5, pipeWidth, pipeWidth, pose);
+	float p9_l = 18.0;
+	float p9_x = cross6_x - pipeWidth - 1.0 - p9_l;
+	float p9_y = cross6_y;
+	float p9_z = cross6_z;
+	createXPipe(pos, PxVec3(p9_x, p9_y, p9_z), pipeWidth, pipeWidth, p9_l, pose);
+	//转弯cross7
+	float cross7_x = p9_x - p9_l - pipeWidth;
+	float cross7_y = p9_y;
+	float cross7_z = p9_z;
+	createPipeWall(pos, PxVec3(cross7_x, cross7_y, cross7_z), pipeWidth, 0.5, tbWidth, pose);
+	createPipeWall(pos, PxVec3(cross7_x, cross7_y+1.0+2*pipeWidth, cross7_z), pipeWidth, 0.5, tbWidth, pose);
+	createPipeWall(pos, PxVec3(cross7_x-0.5-pipeWidth, cross7_y+0.5+pipeWidth, cross7_z), 0.5, tbWidth, tbWidth, pose);
+	createPipeWall(pos, PxVec3(cross7_x, cross7_y+0.5+pipeWidth, cross7_z+0.5+pipeWidth), pipeWidth,pipeWidth,0.5, pose);
+	float p10_width = 35.0;
+	float p10_x = cross7_x;
+	float p10_y = cross7_y;
+	float p10_z = cross7_z-pipeWidth-1.0-p10_width;
+	createZPipe(pos, PxVec3(p10_x, p10_y, p10_z), pipeWidth, pipeWidth, p10_width, pose);
+	float p11_l = 6.0;
+	float p11_w = 8.0;
+	createRoad(pos, PxVec3(p10_x, p10_y-3.0, p10_z - p10_width - p11_w), p11_l, 1.0, p11_w, pose);
+	createPorp(pos, PxVec3(p10_x, p10_y, p10_z - p10_width - p11_w), 1.0, 1.0, 1.0);
+
+}
+
 //创建游戏场景
 void createGameScene(const PxTransform& t) {
 	PxTransform defaultPose(PxQuat(0, PxVec3(0, 1, 0)));  //刚体默认pose
@@ -947,7 +1140,6 @@ void createGameScene(const PxTransform& t) {
 	float c_1_y = 5.0 + boxHeight;  //the position of the center of road_1
 	// create road_1
 	createRoad(t, PxVec3(0, c_1_y, 0), r_1_l, boxHeight, r_1_w, defaultPose);
-	//createRoad(t, PxVec3(0, c_1_y, 0), 100, boxHeight, 100, defaultPose);
 
 	//初始位置
 	checkpoints.push_back(t.transform(PxVec3(0, c_1_y + 7.0, 0)));
@@ -960,7 +1152,8 @@ void createGameScene(const PxTransform& t) {
 	createRoad(t, PxVec3(c_2_x, c_2_y, c_2_z), r_2_l , boxHeight, r_2_w, defaultPose);
 
 	//创建道具类场景
-	createPorp(t, PxVec3(c_2_x, c_2_y + boxHeight + 1.0, c_2_z), 1.0, 1.0, 1.0);
+	//createPorp(t, PxVec3(c_2_x, c_2_y + boxHeight + 1.0, c_2_z), 1.0, 1.0, 1.0);
+	createPipeLevel(t, PxVec3(c_2_x, c_2_y+boxHeight-0.5, c_2_z+r_2_w), defaultPose);
 
 	//stairs
 	float stairsWidth = 6.0; //4
@@ -1199,7 +1392,6 @@ void createGameScene(const PxTransform& t) {
 	PxVec3 pr0_startPos(t.transform(PxVec3(pr0_x, pr0_y, pr0_z)));
 	PxVec3 pr0_endPos(t.transform(PxVec3(pr0_x - 4.0 * dx, pr0_y, pr0_z)));
 	createPrismatic(t, PxVec3(pr0_x, pr0_y, pr0_z), "PrismaticRoad0", prismaticRoad0_length, boxHeight, prismaticRoad0_width, pr0_startPos, pr0_endPos, defaultPose);
-	createPorp(t, PxVec3(pr0_x, pr0_y + 1.0+boxHeight, pr0_z), 1.0, 1.0, 1.0);
 
 	//#Checkpoint7
 	totalCheckpoint++;
