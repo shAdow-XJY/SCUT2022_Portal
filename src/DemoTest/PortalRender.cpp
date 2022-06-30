@@ -428,7 +428,7 @@ namespace Callbacks
 				//连接旋转杆与水池的齿轮（滚筒）
 				else if (actors[i]->getName() == "Gear") {
 					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
-					actor->setAngularVelocity(PxVec3(0, 0, 1) * 0.3 * deltaClock);
+					actor->setAngularVelocity(PxVec3(0, 0, 1) * 0.08 * deltaClock);
 				}
 			}
 			Snippets::renderActors(&actors[0], static_cast<PxU32>(actors.size()), true);
