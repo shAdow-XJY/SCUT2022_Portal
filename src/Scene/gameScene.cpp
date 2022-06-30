@@ -981,11 +981,11 @@ PxVec3* createPositions(PxVec3 &p)
 		positions[x] = p;
 	}
 	while(t<=2000)
-	for (float m = -2; m <= 5; m += 1.6)
+	for (float m = -2; m <= 5; m += 1.2)
 	{
-		for (float l = -18; l <= 15; l += 1.6)
+		for (float l = -10; l <= 10; l += 1.2)
 		{
-			for (float n = -15; n <= 14; n+=1.6)
+			for (float n = -15; n <= 10; n+=1.2)
 			{
 					positions[t].x += n;
 					positions[t].y += m;
@@ -1051,7 +1051,7 @@ void createParticles(PxVec3 v)
 				// access particle position
 				const PxVec3& position = *positionIt;
 				std::cout << position.x << "," << position.y << "," << position.z << std::endl;
-				createParticleSphere(position, 0.8);
+				createParticleSphere(position, 0.6);
 			}
 		}
 
@@ -1383,9 +1383,9 @@ void createGameScene(const PxTransform& t) {
 	totalCheckpoint++;
 	
 	//水池
-	float poolLength = 30.0;
+	float poolLength = 20.0;
 	float poolHeight = 10.0;
-	float poolWidth = 25.0;
+	float poolWidth = 20.0;
 	float bottom_x = gear1_x - gearLength - dx * 0.8 - poolLength - 2.0;
 	float bottom_y = gear0_y + boxHeight - 2 * poolHeight - 1.0;
 	float bottom_z = gear0_z;
@@ -1394,7 +1394,7 @@ void createGameScene(const PxTransform& t) {
 	//水池底部的相对于场景原点t的位置 PxVec3 localPose(bottom_x,bottom_y,bottom_z)
 	//全局位置 t.transform(PxTransform(localPose)).p
 	//泳池关卡角落坐标添加到checkpoints
-	checkpoints.push_back(t.transform(PxVec3(bottom_x + 35.0f, bottom_y + 16.0f, bottom_z - 1.0f)));
+	checkpoints.push_back(t.transform(PxVec3(bottom_x + 20.0f, bottom_y + 22.0f, bottom_z - 1.0f)));
 
 	
 	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
