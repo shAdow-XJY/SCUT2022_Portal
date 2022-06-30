@@ -31,6 +31,7 @@ PxDefaultCpuDispatcher*	gDispatcher = NULL;
 PxScene*				gScene		= NULL;
 
 PxMaterial*				gMaterial	= NULL;
+PxMaterial*				pMaterial	= NULL;
 
 PxPvd*                  gPvd        = NULL;
 
@@ -44,6 +45,7 @@ PxControllerManager* cManager = NULL;
 extern PxVec3 ScenetoWorld(int xCord, int yCord);
 
 const PxTransform t = PxTransform(PxVec3(-50, 0, -250));
+
 
 //材质贴图ID数组
 std::map<string, unsigned int> textureMap;
@@ -104,7 +106,7 @@ void initGame() {
 	//旋转杆关卡角落位置
 	//role->setFootPosition(checkpoints[6]);
 	//游泳池位置
-	//role->setFootPosition(checkpoints[7]);
+	role->setFootPosition(checkpoints[7]);
 	role->fall();
 
 	animation.attachRole(*role);
@@ -149,6 +151,7 @@ void initPhysics(bool interactive)
 	cManager->setOverlapRecoveryModule(true);
 	//静摩擦，动摩擦，restitution恢复原状(弹性)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
+	pMaterial = gPhysics->createMaterial(0.3f, 0.3f, 0.2f);
 
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	groundPlane->setName("Over");

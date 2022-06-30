@@ -150,7 +150,6 @@ void Animation::display()
     /*PxMat44 yRotate(PxQuat(-PxHalfPi, PxVec3(0.0f, 1.0f, 0.0f)));*/
     
     PxMat44 modelMatrix(PxShapeExt::getGlobalPose(*attachedRole->getShape(), *attachedRole->getActor()));
-    
     PxMat44 rotate(PxQuat(-PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
     
     PxMat44 translate = PxMat44(PxTransform(PxVec3(0.0f, -1.5f, 0.0f)));

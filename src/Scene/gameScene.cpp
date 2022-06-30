@@ -9,14 +9,20 @@
 #include<vector>
 #include<iostream>
 #include <glut.h>
+#include <../Particles/PxParticleGeometry.h>
 #include <Render/BMPLoader.h>
 #include <map>
 #include <time.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 
 using namespace physx;
 
 extern PxScene* gScene;
 extern PxMaterial* gMaterial;
+extern PxMaterial* pMaterial;
 extern PxPhysics* gPhysics;
 extern vector<PxVec3> checkpoints;
 extern int primaryJumpHeight;
@@ -565,6 +571,25 @@ PxRigidStatic* createStaticSphere(const PxTransform& t, const PxVec3& v, PxReal 
 	return sceneBox;
 }
 
+
+/*创建球体形状的粒子
+halfExtend球体半径
+velocity 刚体的初始速度，默认为0*/
+PxRigidDynamic* createParticleSphere(const PxVec3& v, PxReal halfExtend, const PxVec3& velocity = PxVec3(0)) {
+	PxTransform local(v);
+	PxShape* shape = gPhysics->createShape(PxSphereGeometry(halfExtend), *pMaterial);
+	shape->setQueryFilterData(collisionGroup);
+	PxRigidDynamic* sceneBox = gPhysics->createRigidDynamic(local);
+	sceneBox->attachShape(*shape);
+	sceneBox->setAngularDamping(1.0f);
+	sceneBox->setLinearVelocity(velocity);
+	sceneBox->setName("Particle");
+	PxRigidBodyExt::updateMassAndInertia(*sceneBox, 10.0f);
+	gScene->addActor(*sceneBox);
+	return sceneBox;
+}
+
+
 /*摆锤
 halfExtend 摆锤底部球体的半径
 rod_x,rod_y,rod_z 连接杆的长高宽
@@ -744,9 +769,9 @@ poolLength, poolHeight, poolWidth为杆的长、高、宽
 pose刚体初始姿态*/
 void createPool(const PxTransform& t, PxVec3 bottom, float poolLength, float poolHeight,float poolWidth, PxTransform& pose) {
 	PxTransform pos(t.transform(PxTransform(bottom)));
-	PxTransform rotate = PxTransform(PxQuat(PxHalfPi / 10, PxVec3(0, 0, -1.0f)));
+	//PxTransform rotate = PxTransform(PxQuat(PxHalfPi / 10, PxVec3(0, 0, -1.0f)));
 	//底部
-	createStaticBox(pos, PxVec3(0, poolHeight + 3.0f, 0), poolLength + 2.0, 1.0, poolWidth + 2.0, rotate, OrganType::poolWall);
+	createStaticBox(pos, PxVec3(0, poolHeight + 6.0f, 0), poolLength + 2.0, 1.0, poolWidth + 2.0, pose, OrganType::poolWall);
 	//左侧
 	createStaticBox(pos, PxVec3(1.0 + poolLength, 1.0 + poolHeight, 0), 1.0, poolHeight, poolWidth + 2.0, pose, OrganType::poolWall);
 	//右侧
@@ -944,6 +969,101 @@ void createSyntheticLevel(const PxTransform& t, PxVec3 v, float halfExtend, floa
 	createNewPendulum(pos, PxVec3(dx + 4 * halfExtend, boxHeight + halfExtend + 0.5, 0), halfExtend, 0.6, 10.0, 0.6, "Pendulum1", pose, PxVec3(0, 0, 2));
 	createSideSeesaw(pos, PxVec3(dx + 4 * halfExtend + 0.5 * dx, 0, -roadblock_width - dz), sideSeesaw_width, 1.0, sideSeesaw_length, pose);
 }
+
+PxVec3 positions[20000];
+//为每一个粒子生成坐标信息
+PxVec3* createPositions(PxVec3 &p)
+{
+	int t = 0;
+
+	for (int x = 0; x < 20000; x++)
+	{
+		positions[x] = p;
+	}
+	while(t<=2000)
+	for (float m = -2; m <= 5; m += 1.2)
+	{
+		for (float l = -10; l <= 10; l += 1.2)
+		{
+			for (float n = -15; n <= 10; n+=1.2)
+			{
+					positions[t].x += n;
+					positions[t].y += m;
+					positions[t].z += l;
+					t++;
+			}
+
+		}
+	}
+	return positions;
+}
+
+PxU32 indices[20000];
+//为每一个粒子生成索引
+PxU32* createParticleIndices(PxU32 num)
+{
+	
+	for (PxU32 k = 0; k < num; k++)
+	{
+		indices[k] = k;
+	}
+	return indices;
+}
+
+//创建粒子
+void createParticles(PxVec3 v)
+{
+	// set immutable properties.
+	PxU32 maxParticles = 5000;
+	bool perParticleRestOffset = false;
+
+	// create particle system in PhysX SDK
+	PxParticleSystem* ps = gPhysics->createParticleSystem(maxParticles, perParticleRestOffset);
+
+	PxParticleCreationData particleCreationData;
+	particleCreationData.numParticles = 2000;
+	PxVec3* p = createPositions(v);
+	PxU32* indic = createParticleIndices(maxParticles);
+	particleCreationData.indexBuffer = PxStrideIterator<const PxU32>(indic);
+	particleCreationData.positionBuffer = PxStrideIterator<const PxVec3>(p);
+
+	// create particles in *PxParticleSystem* ps
+	bool success = ps->createParticles(particleCreationData);
+	std::cout << "创建粒子成功！" << std::endl;
+
+	// add particle system to scene, in case creation was successful
+	if (ps)
+		gScene->addActor(*ps);
+
+	// lock SDK buffers of *PxParticleSystem* ps for reading
+	PxParticleReadData* rd = ps->lockParticleReadData();
+
+	// access particle data from PxParticleReadData
+	if (rd)
+	{
+		PxStrideIterator<const PxParticleFlags> flagsIt(rd->flagsBuffer);
+		PxStrideIterator<const PxVec3> positionIt(rd->positionBuffer);
+
+		for (unsigned i = 0; i < rd->validParticleRange; ++i, ++positionIt)
+		{
+			if (*flagsIt & PxParticleFlag::eVALID)
+			{
+				// access particle position
+				const PxVec3& position = *positionIt;
+				std::cout << position.x << "," << position.y << "," << position.z << std::endl;
+				createParticleSphere(position, 0.6);
+			}
+		}
+
+		// return ownership of the buffers back to the SDK
+		rd->unlock();
+	}
+
+}
+
+
+
+
 
 //创建游戏场景
 void createGameScene(const PxTransform& t) {
@@ -1263,9 +1383,9 @@ void createGameScene(const PxTransform& t) {
 	totalCheckpoint++;
 	
 	//水池
-	float poolLength = 50.0;
+	float poolLength = 20.0;
 	float poolHeight = 10.0;
-	float poolWidth = 25.0;
+	float poolWidth = 20.0;
 	float bottom_x = gear1_x - gearLength - dx * 0.8 - poolLength - 2.0;
 	float bottom_y = gear0_y + boxHeight - 2 * poolHeight - 1.0;
 	float bottom_z = gear0_z;
@@ -1274,9 +1394,13 @@ void createGameScene(const PxTransform& t) {
 	//水池底部的相对于场景原点t的位置 PxVec3 localPose(bottom_x,bottom_y,bottom_z)
 	//全局位置 t.transform(PxTransform(localPose)).p
 	//泳池关卡角落坐标添加到checkpoints
-	checkpoints.push_back(t.transform(PxVec3(bottom_x - 1.0f, bottom_y + 8.0f, bottom_z - 1.0f)));
+	checkpoints.push_back(t.transform(PxVec3(bottom_x + 20.0f, bottom_y + 22.0f, bottom_z - 1.0f)));
 
 	
 	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
 	//createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
+
+	//createParticleSphere(t.transform(PxVec3(bottom_x, bottom_y + 15.0f, bottom_z)), 5.0);
+	createParticles(t.transform(PxVec3(bottom_x, bottom_y + 25.0f, bottom_z)));
+
 }

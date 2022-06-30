@@ -189,8 +189,8 @@ namespace Callbacks
 
 		string currentAnimation = animation.getCurrentAnimation();
 
-		if (currentAnimation == "idle") {
-			animation.update(0.5);
+		if (currentAnimation == "swimming") {
+			animation.update(1.3);
 		}
 		else if (currentAnimation == "openDoor")
 		{
@@ -222,7 +222,7 @@ namespace Callbacks
 		}
 		else if (currentAnimation == "jumping")
 		{
-			if (animation.update(1.1, true)) {
+			if (animation.update(1.5, true)) {
 				animation.setAnimation("idle");
 			}
 		}
