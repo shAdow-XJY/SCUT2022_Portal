@@ -48,7 +48,7 @@ extern SoundTool soundtool;
 //动态渲染圈
 PxVec3 roleWorldPosition = PxVec3(0);
 //是否开启动态渲染圈（场景机关据此设置不同速度）
-bool openDynamicBall = true;
+bool openDynamicBall = false;
 DynamicBall dynamicBall = DynamicBall(openDynamicBall);
 
 
@@ -212,7 +212,7 @@ namespace Callbacks
 		}
 		else if (currentAnimation == "jumping")
 		{
-			if (animation.update(1.8, true)) {
+			if (animation.update(1.1, true)) {
 				animation.setAnimation("idle");
 			}
 		}
