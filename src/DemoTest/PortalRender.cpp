@@ -206,7 +206,7 @@ namespace Callbacks
 		{
 			PxVec3 tempPosition = role->keyDoorActor->getGlobalPose().p;
 			PxQuat tempQuat = role->keyDoorActor->getGlobalPose().q;
-			role->keyDoorActor->setGlobalPose(PxTransform(PxVec3(tempPosition.x, tempPosition.y + 0.25f, tempPosition.z), tempQuat), false);
+			role->keyDoorActor->setGlobalPose(PxTransform(PxVec3(tempPosition.x, tempPosition.y + 0.15f, tempPosition.z), tempQuat), false);
 			if (animation.update(1.5, true)) {
 				animation.setAnimation("idle");
 			}

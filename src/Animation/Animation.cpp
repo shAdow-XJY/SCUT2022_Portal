@@ -153,15 +153,15 @@ void Animation::display()
     
     PxMat44 rotate(PxQuat(-PxHalfPi, PxVec3(0.0f, 0.0f, 1.0f)));
     
-    PxMat44 translate = PxMat44(PxTransform(PxVec3(0.0f, -3.8f, 0.0f)));
+    PxMat44 translate = PxMat44(PxTransform(PxVec3(0.0f, -1.5f, 0.0f)));
     if (this->current_animation == "crouchedWalking") {
-        translate = PxMat44(PxTransform(PxVec3(0.0f, 0.0f, 0.0f)));
+        translate = PxMat44(PxTransform(PxVec3(0.0f, 0.5f, 0.0f)));
     }
     else if (this->current_animation == "crouching") {
-        translate = PxMat44(PxTransform(PxVec3(0.0f, -2.0f, 0.0f)));
+        translate = PxMat44(PxTransform(PxVec3(0.0f, -1.5f, 0.0f)));
     }
     else if (this->current_animation == "swimming" || this->current_animation == "swimIdle") {
-        translate = PxMat44(PxTransform(PxVec3(0.0f, -10.0f, 0.0f)));
+        translate = PxMat44(PxTransform(PxVec3(0.0f, -7.5f, 0.0f)));
     }
     renderDisplay(this->scene, this->scene->mRootNode, std::map<int, int>(), modelMatrix * rotate * translate *yRotate);
 
