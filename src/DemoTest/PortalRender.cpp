@@ -375,10 +375,10 @@ namespace Callbacks
 					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
 					GameSceneBasic* gsb = (GameSceneBasic*)actor->userData;
 					PrismaticRoad* pr = (PrismaticRoad*)gsb;
-					if (actor->getGlobalPose().p.y >= pr->getEndPosition().y) {
+					if (actor->getGlobalPose().p.z >= pr->getEndPosition().z) {
 						actor->setLinearVelocity(PxVec3(0, -1.48, -1.0) * 0.3 * deltaClock);
 					}
-					else if (actor->getGlobalPose().p.y <= pr->getStartPosition().y) {
+					else if (actor->getGlobalPose().p.z <= pr->getStartPosition().z) {
 						actor->setLinearVelocity(PxVec3(0, 1.48, 1.0) * 0.3 * deltaClock);
 					}
 				}
