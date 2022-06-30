@@ -150,12 +150,7 @@ void renderGeometry(const PxGeometryHolder& h, string name,bool shadow)
 	case PxGeometryType::eSPHERE:		
 		{
 		if (name == "Particle") {
-			//glColor4f(1.f, 1.f, 1.f, 0.5);
-			float black[3] = { 0, 0, 0 };
-			glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, black);
-			glEnable(GL_COLOR_MATERIAL);
-			glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+			glColor4f(1.f, 1.f, 1.f, 0.5);
 		}
 		else
 		{

@@ -90,7 +90,7 @@ void initGame() {
 	role = new Role();
 
 	//初始位置
-	//role->setFootPosition(checkpoints[0]);
+	role->setFootPosition(checkpoints[0]);
 	//摆锤前位置
     //role->setFootPosition(checkpoints[1]);
 	//摩天轮前位置
@@ -104,7 +104,7 @@ void initGame() {
 	//旋转杆关卡角落位置
 	//role->setFootPosition(checkpoints[6]);
 	//游泳池位置
-	role->setFootPosition(checkpoints[7]);
+	//role->setFootPosition(checkpoints[7]);
 	role->fall();
 
 	animation.attachRole(*role);
