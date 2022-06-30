@@ -384,7 +384,7 @@ void createMaze(const PxTransform& t, PxVec3 v, float scale, PxTransform& pose) 
 	srand(time(NULL));
 	int index = rand() % keyPositions.size();
 	std::cout << "钥匙" << index << endl;
-	createPorp(t, keyPositions[index], 1.0, 1.0, 1.0);
+	createPorp(t, keyPositions[3], 1.0, 1.0, 1.0);
 
 	//正门逻辑
 	//从左到右
@@ -759,6 +759,23 @@ void createPool(const PxTransform& t, PxVec3 bottom, float poolLength, float poo
 	//后侧
 	createStaticBox(pos, PxVec3(0,  1.0 + poolHeight, 1.0 + poolWidth), poolLength, poolHeight, 1.0, pose, OrganType::poolWall);
 }
+/*创建泳池球体形状的动态刚体
+*/
+PxRigidDynamic* createParticleSphere(const PxTransform& t, const PxVec3& v, PxReal halfExtend) {
+	PxTransform local(v);
+	PxShape* shape = gPhysics->createShape(PxSphereGeometry(halfExtend), *gMaterial);
+	shape->setQueryFilterData(collisionGroup);
+	PxRigidDynamic* sceneBox;
+	for (int i = 0; i < 100; i++) {
+		sceneBox = gPhysics->createRigidDynamic(t.transform(local));
+		sceneBox->attachShape(*shape);
+		sceneBox->setAngularDamping(1.0f);
+		sceneBox->setName("Particle");
+		gScene->addActor(*sceneBox);
+	}
+	return sceneBox;
+}
+
 
 /*旋转杆关卡与水池连接处的齿轮
 t为该刚体构建的相对原点
@@ -937,7 +954,7 @@ void createGameScene(const PxTransform& t) {
 	
 	//地面 接触判定死亡用
 	PxRigidStatic* ground = createStaticBox(t, PxVec3(50, 1.0, 300), 500, 1.0, 500, defaultPose,OrganType::ground);
-	ground->setName("Ground");
+	ground->setName("Ground0");
 
 	//#Checkpoint1
 	totalCheckpoint = 1;
@@ -1199,7 +1216,7 @@ void createGameScene(const PxTransform& t) {
 	PxVec3 pr0_startPos(t.transform(PxVec3(pr0_x, pr0_y, pr0_z)));
 	PxVec3 pr0_endPos(t.transform(PxVec3(pr0_x - 4.0 * dx, pr0_y, pr0_z)));
 	createPrismatic(t, PxVec3(pr0_x, pr0_y, pr0_z), "PrismaticRoad0", prismaticRoad0_length, boxHeight, prismaticRoad0_width, pr0_startPos, pr0_endPos, defaultPose);
-	createPorp(t, PxVec3(pr0_x, pr0_y + 1.0+boxHeight, pr0_z), 1.0, 1.0, 1.0);
+	//createPorp(t, PxVec3(pr0_x, pr0_y + 1.0+boxHeight, pr0_z), 1.0, 1.0, 1.0);
 
 	//#Checkpoint7
 	totalCheckpoint++;
@@ -1257,10 +1274,11 @@ void createGameScene(const PxTransform& t) {
 	float bottom_y = gear0_y + boxHeight - 2 * poolHeight - 1.0;
 	float bottom_z = gear0_z;
 	createPool(t, PxVec3(bottom_x, bottom_y, bottom_z), poolLength, poolHeight, poolWidth, defaultPose);
+	createParticleSphere(t, PxVec3(bottom_x, bottom_y + 15.0f , bottom_z), 0.6f);
 	//水池底部的相对于场景原点t的位置 PxVec3 localPose(bottom_x,bottom_y,bottom_z)
 	//全局位置 t.transform(PxTransform(localPose)).p
 	//泳池关卡角落坐标添加到checkpoints
-	checkpoints.push_back(t.transform(PxVec3(bottom_x, bottom_y + 4.0f , bottom_z)));
+	checkpoints.push_back(t.transform(PxVec3(bottom_x - 1.0f, bottom_y + 8.0f, bottom_z - 1.0f)));
 
 	float r_9_l = 15.0;
 	float r_9_w = 6.0;

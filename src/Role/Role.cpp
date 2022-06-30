@@ -8,7 +8,7 @@ extern clock_t deltaClock;
 #define MAX_NUM_ACTOR_SHAPES 128
 
 Role::Role() {
-	PxCapsuleControllerDesc desc;
+	
 	desc.radius = roleRadius;
 	desc.height = roleHeight;
 	desc.material = gMaterial;
@@ -178,6 +178,13 @@ void Role::roleCrouch() {
 void Role::roleNoCrouch() {
 	this->roleController->resize(roleHeight + roleRadius);
 	this->isCrouch = false;
+}
+
+/**
+* @brief 角色下蹲时的高度
+**/
+float Role::getRoleHeight() {
+	return this->roleHeight / 2.5 + this->roleRadius * 2;
 }
 
 /**
@@ -401,6 +408,7 @@ void Role::rayAround() {
 					if (gsb->getType() == OrganType::pendulum) {
 						//cout << "撞到了" << endl;
 						Pendulum* pendulem = (Pendulum*)gsb;
+						animation.setAnimation("roll");
 						int flag = pendulem->getPendulumActor()->getAngularVelocity().x > 0 ? 1 : -1;
 						if (!this->stimulateObj) {
 							PxShape* shape = gPhysics->createShape(PxCapsuleGeometry(0.01, 0.1), *gMaterial);
@@ -421,8 +429,8 @@ void Role::rayAround() {
 						this->roleController->move(PxVec3(0, 1.5f, 0), 0.0001, 1.0f / 120.0f, NULL);
 						return;
 					}
-					else if (gsb->getType() == OrganType::ground) {
-						cout << "ground" << endl;
+					else if (gsb->getType() == OrganType::poolWall) {
+						this->nowCheckpoint = 8;
 						return;
 					}
 				}
@@ -599,17 +607,19 @@ void Role::simulationGravity() {
 		if (isFall) {
 			this->touchGround();
 		}
-		//死亡逻辑
+		//死亡逻辑 跑不到这段代码
 		if (actor->getName()) {
 			string name(actor->getName());
-			if (name == "Over" || name == "Ground") {
+			if (name == "Over" || name == "Ground0") {
 				this->canMove = false;
+				cout << name << endl;
 				if (this->isAlive) {
 					animation.setAnimation("dying");
 				}
 				return;
 			}
 		}
+
 		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
 		this->sliceDir = PxVec3(0, 0, 0);
 		if (basic != NULL) {

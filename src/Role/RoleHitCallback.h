@@ -69,6 +69,14 @@ public:
 				//cout << "PoolWall" << endl;
 				role->nowCheckpoint = 8;
 			}
+			else if (name == "Pendulum") {
+				cout << "Pendulum" << endl;
+				animation.setAnimation("roll");
+			}
+			else if (name == "Over" || name == "Ground0") {
+				//cout << "Over" << endl;
+				animation.setAnimation("dying");
+			}
 		}
 
 		return PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
