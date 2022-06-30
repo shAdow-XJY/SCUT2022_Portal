@@ -1134,7 +1134,7 @@ void createPipeLevel(const PxTransform& t, PxVec3 v, PxTransform& pose) {
 	float p3_z = cross2_z;
 	float pr3_l = 6.0;
 	float pr3_w = 6.0;
-	PxVec3 pos1(t.transform(PxTransform(PxVec3(p3_x+p3_l+pr3_l+0.2*dx, p3_y-2.0, p3_z))).p);
+	PxVec3 pos1(pos.transform(PxTransform(PxVec3(p3_x+p3_l+pr3_l+0.2*dx, p3_y-2.0, p3_z))).p);
 	createXPipe(pos, PxVec3(p3_x, p3_y, p3_z), pipeWidth, pipeHeight, p3_l, pose);
 	//分支2
 	float p4_width = 35.0;
@@ -1185,7 +1185,7 @@ void createPipeLevel(const PxTransform& t, PxVec3 v, PxTransform& pose) {
 	float sr_l = 6.0;
 	float sr_w = 8.0;
 	createRoad(pos, PxVec3(p7_x + p7_l + sr_l, p7_y, p7_z), sr_l, 1.0, sr_w, pose);
-	PxVec3 pos2(t.transform(PxTransform(PxVec3(p7_x + p7_l + pr3_l+0.2*dx, p7_y-3.0, p7_z - 0.5 * dz - pr3_w-pipeWidth))).p);
+	PxVec3 pos2(pos.transform(PxTransform(PxVec3(p7_x + p7_l + pr3_l+0.2*dx, p7_y-3.0, p7_z - 0.5 * dz - pr3_w-pipeWidth))).p);
 	createPrismatic(pos, PxVec3(p3_x + p3_l + pr3_l + 0.2 * dx, p3_y - 2.0, p3_z), "PrismaticRoad2", pr3_l, 1.0, pr3_w, pos1, pos2, pose);
 	//cout << "平移路段3:" << p3_y - 2.0 << "," << p7_y - 3.0 << "," << p3_z << "," << p7_z - 0.5 * dz - pr3_w - pipeWidth << endl;
 	//分支4
