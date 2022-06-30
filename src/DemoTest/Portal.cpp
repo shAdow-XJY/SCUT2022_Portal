@@ -52,8 +52,8 @@ std::map<string, unsigned int> textureMap;
 std::string texture[] = { "Door","Wall","Road",
 							"SeesawBox","Seesaw","Ice",
 							"KeyDoor","Prop", "RotateRod",
-							"PrismaticRoad0","PrismaticRoad1","PrismaticRoad2" ,"Gear",
-							"FerrisWheel","PoolWall","Ground","FinalLine"};
+							"PrismaticRoad0","PrismaticRoad1","Prismatic","Gear",
+							"FerrisWheel","PoolWall","Ground","FinalLine","PipeWall"};
 
 //“Ù∆µ¿‡
 SoundTool soundtool = SoundTool();
