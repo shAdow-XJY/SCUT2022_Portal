@@ -371,6 +371,17 @@ namespace Callbacks
 						actor->setLinearVelocity(PxVec3(-1, 0, 0) * 0.4 * deltaClock);
 					}
 				}
+				else if (actors[i]->getName() == "PrismaticRoad2") {
+					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();
+					GameSceneBasic* gsb = (GameSceneBasic*)actor->userData;
+					PrismaticRoad* pr = (PrismaticRoad*)gsb;
+					if (actor->getGlobalPose().p.y >= pr->getEndPosition().y) {
+						actor->setLinearVelocity(PxVec3(0, -1.48, -1.0) * 0.3 * deltaClock);
+					}
+					else if (actor->getGlobalPose().p.y <= pr->getStartPosition().y) {
+						actor->setLinearVelocity(PxVec3(0, 1.48, 1.0) * 0.3 * deltaClock);
+					}
+				}
 				//°Ú´¸
 				else if (actors[i]->getName() == "Pendulum0") {
 					PxRigidDynamic* actor = actors[i]->is<PxRigidDynamic>();

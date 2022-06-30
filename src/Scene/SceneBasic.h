@@ -27,7 +27,8 @@ enum OrganType
 	ground = 12,  //地面
 	keyDoor = 13, //需要钥匙的门
 	poolWall = 14,
-	finalLine = 15
+	finalLine = 15,
+	pipeWall = 16
 };
 
 static int totalCheckpoint = 1;

@@ -23,6 +23,7 @@
     <ClCompile Include="..\..\src\Animation\assimp_extras.cpp" />
     <ClCompile Include="..\..\src\Animation\MeshUtils.cpp" />
     <ClCompile Include="..\..\src\Block\Door.cpp" />
+    <ClCompile Include="..\..\src\Block\PipeWall.cpp" />
     <ClCompile Include="..\..\src\Block\PrismaticRoad.cpp" />
     <ClCompile Include="..\..\src\Block\Road.cpp" />
     <ClCompile Include="..\..\src\Block\RotateRod.cpp" />
@@ -58,6 +59,7 @@
     <ClInclude Include="..\..\src\Animation\MeshUtils.h" />
     <ClInclude Include="..\..\src\Block\Block.h" />
     <ClInclude Include="..\..\src\Block\Door.h" />
+    <ClInclude Include="..\..\src\Block\PipeWall.h" />
     <ClInclude Include="..\..\src\Block\PrismaticRoad.h" />
     <ClInclude Include="..\..\src\Block\Road.h" />
     <ClInclude Include="..\..\src\Block\RotateRod.h" />
