@@ -156,6 +156,7 @@ public:
 	bool getCrouch();
 	void roleCrouch();
 	void roleNoCrouch();
+	float getRoleHeight();
 
 	//是否可以移动人物
 	void changeCanMove(bool);

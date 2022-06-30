@@ -181,6 +181,13 @@ void Role::roleNoCrouch() {
 }
 
 /**
+* @brief 角色下蹲时的高度
+**/
+float Role::getRoleHeight() {
+	return this->roleHeight / 2.5 + this->roleRadius * 2;
+}
+
+/**
 * @brief 角色获得道具
 **/
 void Role::setEquiped(bool equip) {

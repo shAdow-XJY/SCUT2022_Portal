@@ -62,7 +62,8 @@ bool changePendulum0DirFlag = true;
 int changePendulum1Dir = 0;
 bool changePendulum1DirFlag = true;
 
-
+//机关门上升的高度
+float keyDoorUpHeight = 0.0;
 
 bool cameraMove = false;
 
@@ -182,6 +183,7 @@ namespace Callbacks
 		glutPostRedisplay();
 	}
 
+	
 	void animationRenderCallback() {
 		animation.display();
 
@@ -198,7 +200,7 @@ namespace Callbacks
 		}
 		else if (currentAnimation == "pickUp" || currentAnimation == "putDown" || currentAnimation == "notUseKey")
 		{
-			if (animation.update(1.2, true)) {
+			if (animation.update(1.6, true)) {
 				animation.setAnimation("idle");
 			}
 		}
@@ -206,8 +208,15 @@ namespace Callbacks
 		{
 			PxVec3 tempPosition = role->keyDoorActor->getGlobalPose().p;
 			PxQuat tempQuat = role->keyDoorActor->getGlobalPose().q;
-			role->keyDoorActor->setGlobalPose(PxTransform(PxVec3(tempPosition.x, tempPosition.y + 0.15f, tempPosition.z), tempQuat), false);
-			if (animation.update(1.5, true)) {
+			role->keyDoorActor->setGlobalPose(PxTransform(PxVec3(tempPosition.x, tempPosition.y + 0.1f, tempPosition.z), tempQuat), false);
+			keyDoorUpHeight += 0.1f;
+			if (animation.update(1.0, true)) {
+				float upHeight = role->getRoleHeight() - keyDoorUpHeight;
+				if (upHeight > 0) {
+					cout << "不是可以蹲下通过的高度" << endl;
+					role->keyDoorActor->setGlobalPose(PxTransform(PxVec3(tempPosition.x, tempPosition.y + 0.15f + upHeight, tempPosition.z), tempQuat), false);
+					keyDoorUpHeight = 0.0f;
+				}
 				animation.setAnimation("idle");
 			}
 		}
