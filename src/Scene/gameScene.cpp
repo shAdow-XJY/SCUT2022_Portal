@@ -756,6 +756,23 @@ void createPool(const PxTransform& t, PxVec3 bottom, float poolLength, float poo
 	//后侧
 	createStaticBox(pos, PxVec3(0,  1.0 + poolHeight, 1.0 + poolWidth), poolLength, poolHeight, 1.0, pose, OrganType::poolWall);
 }
+/*创建泳池球体形状的动态刚体
+*/
+PxRigidDynamic* createParticleSphere(const PxTransform& t, const PxVec3& v, PxReal halfExtend) {
+	PxTransform local(v);
+	PxShape* shape = gPhysics->createShape(PxSphereGeometry(halfExtend), *gMaterial);
+	shape->setQueryFilterData(collisionGroup);
+	PxRigidDynamic* sceneBox;
+	for (int i = 0; i < 100; i++) {
+		sceneBox = gPhysics->createRigidDynamic(t.transform(local));
+		sceneBox->attachShape(*shape);
+		sceneBox->setAngularDamping(1.0f);
+		sceneBox->setName("Particle");
+		gScene->addActor(*sceneBox);
+	}
+	return sceneBox;
+}
+
 
 /*旋转杆关卡与水池连接处的齿轮
 t为该刚体构建的相对原点
@@ -1253,6 +1270,7 @@ void createGameScene(const PxTransform& t) {
 	float bottom_y = gear0_y + boxHeight - 2 * poolHeight - 1.0;
 	float bottom_z = gear0_z;
 	createPool(t, PxVec3(bottom_x, bottom_y, bottom_z), poolLength, poolHeight, poolWidth, defaultPose);
+	createParticleSphere(t, PxVec3(bottom_x, bottom_y + 15.0f , bottom_z), 0.6f);
 	//水池底部的相对于场景原点t的位置 PxVec3 localPose(bottom_x,bottom_y,bottom_z)
 	//全局位置 t.transform(PxTransform(localPose)).p
 	//泳池关卡角落坐标添加到checkpoints

@@ -148,7 +148,14 @@ void renderGeometry(const PxGeometryHolder& h, string name,bool shadow)
 		break;
 	case PxGeometryType::eSPHERE:		
 		{
+		if (name == "Particle") {
+			glColor4f(1.f, 1.f, 1.f, 0.1);
+		}
+		else
+		{
 			glColor4f(0.102f, 0.102f, 0.102f, 1);
+		}
+			
 			glutSolidSphere(GLdouble(h.sphere().radius), 10, 10);
 		}
 		break;
