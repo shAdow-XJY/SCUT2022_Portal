@@ -603,7 +603,7 @@ void Role::simulationGravity() {
 		//ËÀÍöÂß¼­ ÅÜ²»µ½Õâ¶Î´úÂë
 		if (actor->getName()) {
 			string name(actor->getName());
-			if (name == "Over" || name == "Ground") {
+			if (name == "Over" || name == "Ground0") {
 				this->canMove = false;
 				cout << name << endl;
 				if (this->isAlive) {
@@ -612,6 +612,7 @@ void Role::simulationGravity() {
 				return;
 			}
 		}
+
 		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
 		this->sliceDir = PxVec3(0, 0, 0);
 		if (basic != NULL) {

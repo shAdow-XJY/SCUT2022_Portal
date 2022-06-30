@@ -217,6 +217,12 @@ namespace Callbacks
 				animation.setAnimation("idle");
 			}
 		}
+		else if (currentAnimation == "roll")
+		{
+			if (animation.update(1.0, true)) {
+				animation.setAnimation("dying");
+			}
+		}
 		else if (currentAnimation == "dying")
 		{
 			if (animation.update(0.5, true)) {
