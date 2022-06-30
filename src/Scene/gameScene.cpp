@@ -90,7 +90,10 @@ const char* typeMapName(OrganType type) {
 	}
 	case OrganType::ground: {
 		return "Ground";
-	}					
+	}	
+	case OrganType::finalLine: {
+		return "FinalLine";
+	}
 	default:
 		return "Block";
 		break;
@@ -1196,6 +1199,7 @@ void createGameScene(const PxTransform& t) {
 	PxVec3 pr0_startPos(t.transform(PxVec3(pr0_x, pr0_y, pr0_z)));
 	PxVec3 pr0_endPos(t.transform(PxVec3(pr0_x - 4.0 * dx, pr0_y, pr0_z)));
 	createPrismatic(t, PxVec3(pr0_x, pr0_y, pr0_z), "PrismaticRoad0", prismaticRoad0_length, boxHeight, prismaticRoad0_width, pr0_startPos, pr0_endPos, defaultPose);
+	createPorp(t, PxVec3(pr0_x, pr0_y + 1.0+boxHeight, pr0_z), 1.0, 1.0, 1.0);
 
 	//#Checkpoint7
 	totalCheckpoint++;
@@ -1258,7 +1262,22 @@ void createGameScene(const PxTransform& t) {
 	//Ó¾³Ø¹Ø¿¨½ÇÂä×ø±êÌí¼Óµ½checkpoints
 	checkpoints.push_back(t.transform(PxVec3(bottom_x, bottom_y + 4.0f , bottom_z)));
 
+	float r_9_l = 15.0;
+	float r_9_w = 6.0;
+	float c_9_x = bottom_x - poolLength - 2.0 - r_9_l * cos(PxHalfPi / 4);
+	float c_9_y = bottom_y + 2 * poolHeight + 1.0 + r_9_l * sin(PxHalfPi / 4);
+	float c_9_z = bottom_z;
+	PxTransform r_9_pose(PxQuat(PxHalfPi / 4, PxVec3(0, 0, -1)));
+	createRoad(t, PxVec3(c_9_x, c_9_y, c_9_z), r_9_l, 1.0, r_9_w, r_9_pose);
 	
+	//ÖÕµã
+	float finalLine_l = 10;
+	float finalLine_w = 10;
+	float finalLine_x = c_9_x - r_9_l * cos(PxHalfPi / 4) - finalLine_l;
+	float finalLine_y = c_9_y + r_9_l * sin(PxHalfPi / 4);
+	float finalLine_z = c_9_z;
+	createStaticBox(t, PxVec3(finalLine_x, finalLine_y, finalLine_z), finalLine_l, 1.0, finalLine_w, defaultPose, OrganType::finalLine);
+
 	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
 	//createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
 }

@@ -51,7 +51,7 @@ std::string texture[] = {	"Door","Wall","Road",
 							"SeesawBox","Seesaw","Ice",
 							"KeyDoor","Prop", "RotateRod",
 							"PrismaticRoad0","PrismaticRoad1","Gear",
-							"FerrisWheel","PoolWall","Ground"};
+							"FerrisWheel","PoolWall","Ground","FinalLine"};
 
 //音频类
 SoundTool soundtool = SoundTool();
@@ -92,7 +92,7 @@ void initGame() {
 	//初始位置
 	//role->setFootPosition(checkpoints[0]);
 	//摆锤前位置
-    role->setFootPosition(checkpoints[1]);
+    //role->setFootPosition(checkpoints[1]);
 	//摩天轮前位置
 	//role->setFootPosition(checkpoints[2]);
 	//旋转路关卡前位置
