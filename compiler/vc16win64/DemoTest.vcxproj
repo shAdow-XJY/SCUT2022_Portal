@@ -72,6 +72,7 @@
     <ClInclude Include="..\..\src\ImGui\imstb_textedit.h" />
     <ClInclude Include="..\..\src\ImGui\imstb_truetype.h" />
     <ClInclude Include="..\..\src\LoadModel\Model.h" />
+    <ClInclude Include="..\..\src\Particles\PxParticleGeometry.h" />
     <ClInclude Include="..\..\src\Render\BMPLoader.h" />
     <ClInclude Include="..\..\src\Render\Camera.h" />
     <ClInclude Include="..\..\src\Render\DynamicBall.h" />

@@ -32,6 +32,7 @@ PxDefaultCpuDispatcher*	gDispatcher = NULL;
 PxScene*				gScene		= NULL;
 
 PxMaterial*				gMaterial	= NULL;
+PxMaterial*				pMaterial	= NULL;
 
 PxPvd*                  gPvd        = NULL;
 
@@ -94,7 +95,7 @@ void initGame() {
 	//初始位置
 	//role->setFootPosition(checkpoints[0]);
 	//摆锤前位置
-	role->setFootPosition(checkpoints[1]);
+	//role->setFootPosition(checkpoints[1]);
 	//摩天轮前位置
 	//role->setFootPosition(checkpoints[2]);
 	//旋转路关卡前位置
@@ -106,7 +107,7 @@ void initGame() {
 	//旋转杆关卡角落位置
 	//role->setFootPosition(checkpoints[6]);
 	//游泳池位置
-	//role->setFootPosition(checkpoints[7]);
+	role->setFootPosition(checkpoints[7]);
 	role->fall();
 
 	animation.attachRole(*role);
@@ -151,6 +152,7 @@ void initPhysics(bool interactive)
 	cManager->setOverlapRecoveryModule(true);
 	//静摩擦，动摩擦，restitution恢复原状(弹性)
 	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.0f);
+	pMaterial = gPhysics->createMaterial(0.3f, 0.3f, 0.2f);
 
 	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
 	groundPlane->setName("Over");

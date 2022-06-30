@@ -9,6 +9,7 @@
 #include<vector>
 #include<iostream>
 #include <glut.h>
+#include <../Particles/PxParticleGeometry.h>
 #include <Render/BMPLoader.h>
 #include <map>
 #include <time.h>
@@ -16,10 +17,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+
 using namespace physx;
 
 extern PxScene* gScene;
 extern PxMaterial* gMaterial;
+extern PxMaterial* pMaterial;
 extern PxPhysics* gPhysics;
 extern vector<PxVec3> checkpoints;
 extern int primaryJumpHeight;
@@ -574,7 +577,7 @@ halfExtend球体半径
 velocity 刚体的初始速度，默认为0*/
 PxRigidDynamic* createParticleSphere(const PxVec3& v, PxReal halfExtend, const PxVec3& velocity = PxVec3(0)) {
 	PxTransform local(v);
-	PxShape* shape = gPhysics->createShape(PxSphereGeometry(halfExtend), *gMaterial);
+	PxShape* shape = gPhysics->createShape(PxSphereGeometry(halfExtend), *pMaterial);
 	shape->setQueryFilterData(collisionGroup);
 	PxRigidDynamic* sceneBox = gPhysics->createRigidDynamic(local);
 	sceneBox->attachShape(*shape);
@@ -950,27 +953,27 @@ void createSyntheticLevel(const PxTransform& t, PxVec3 v, float halfExtend, floa
 	createSideSeesaw(pos, PxVec3(dx + 4 * halfExtend + 0.5 * dx, 0, -roadblock_width - dz), sideSeesaw_width, 1.0, sideSeesaw_length, pose);
 }
 
-PxVec3 positions[1000];
+PxVec3 positions[5000];
 //为每一个粒子生成坐标信息
 PxVec3* createPositions(PxVec3 &p)
 {
 	int t = 0;
 
-	for (int x = 0; x < 1000; x++)
+	for (int x = 0; x < 5000; x++)
 	{
 		positions[x] = p;
 	}
-	while(t<1000)
-	for (float l = -0.05; l <= 0.04; l+=0.01)
+	while(t<=1000)
+	for (float l = -20; l <= 20; l+=5.0)
 	{
-		for (float m = -0.05; m <= 0.04; m+=0.01)
+		for (float m = -5; m <= 15; m+=5.0)
 		{
-			for (float n = -0.05; n <= 0.04; n+=0.01)
+			for (float n = -50; n <= 45; n+=5.0)
 			{
-				positions[t].x += n;
-				positions[t].y += m;
-				positions[t].z += l;
-				t++;
+					positions[t].x += n;
+					positions[t].y += m;
+					positions[t].z += l;
+					t++;
 			}
 
 		}
@@ -986,7 +989,6 @@ PxU32* createParticleIndices(PxU32 num)
 	for (PxU32 k = 0; k < num; k++)
 	{
 		indices[k] = k;
-		std::cout << indices[k] << std::endl;
 	}
 	return indices;
 }
@@ -1016,6 +1018,9 @@ void createParticles(PxVec3 v)
 	float fovy = 60.0;
 	float pointScale = 1.0f * GLdouble(glutGet(GLUT_WINDOW_WIDTH)) / aspect * (1.0f / tanf(glm::radians(fovy) * 0.5f));
 
+	// add particle system to scene, in case creation was successful
+	if (ps)
+		gScene->addActor(*ps);
 
 	// lock SDK buffers of *PxParticleSystem* ps for reading
 	PxParticleReadData* rd = ps->lockParticleReadData();
@@ -1033,18 +1038,13 @@ void createParticles(PxVec3 v)
 				// access particle position
 				const PxVec3& position = *positionIt;
 				std::cout << position.x << "," << position.y << "," << position.z << std::endl;
-				createParticleSphere(position, 0.01f);
+				createParticleSphere(position, 1.5);
 			}
 		}
 
 		// return ownership of the buffers back to the SDK
 		rd->unlock();
 	}
-
-
-	// add particle system to scene, in case creation was successful
-	if (ps)
-		gScene->addActor(*ps);
 
 }
 
@@ -1381,7 +1381,7 @@ void createGameScene(const PxTransform& t) {
 	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
 	//createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
 
-
-	createParticles(PxVec3(bottom_x, bottom_y+5.0f, bottom_z));
+	//createParticleSphere(t.transform(PxVec3(bottom_x, bottom_y + 15.0f, bottom_z)), 5.0);
+	createParticles(t.transform(PxVec3(bottom_x, bottom_y + 25.0f, bottom_z)));
 
 }
