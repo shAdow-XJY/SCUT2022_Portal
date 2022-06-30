@@ -583,8 +583,8 @@ PxRigidDynamic* createParticleSphere(const PxVec3& v, PxReal halfExtend, const P
 	sceneBox->attachShape(*shape);
 	sceneBox->setAngularDamping(1.0f);
 	sceneBox->setLinearVelocity(velocity);
-	sceneBox->setName("");
-	PxRigidBodyExt::updateMassAndInertia(*sceneBox, 5.0f);
+	sceneBox->setName("Particle");
+	PxRigidBodyExt::updateMassAndInertia(*sceneBox, 10.0f);
 	gScene->addActor(*sceneBox);
 	return sceneBox;
 }
@@ -1055,7 +1055,7 @@ void createParticles(PxVec3 v)
 				// access particle position
 				const PxVec3& position = *positionIt;
 				std::cout << position.x << "," << position.y << "," << position.z << std::endl;
-				createParticleSphere(position, 1.5);
+				createParticleSphere(position, 0.5);
 			}
 		}
 
