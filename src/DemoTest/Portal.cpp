@@ -49,10 +49,10 @@ const PxTransform t = PxTransform(PxVec3(-50, 0, -250));
 
 //材质贴图ID数组
 std::map<string, unsigned int> textureMap;
-std::string texture[] = {	"Door","Wall","Road",
+std::string texture[] = { "Door","Wall","Road",
 							"SeesawBox","Seesaw","Ice",
 							"KeyDoor","Prop", "RotateRod",
-							"PrismaticRoad0","PrismaticRoad1","Gear",
+							"PrismaticRoad0","PrismaticRoad1","PrismaticRoad2" ,"Gear",
 							"FerrisWheel","PoolWall","Ground","FinalLine"};
 
 //音频类
@@ -108,7 +108,7 @@ void initGame() {
 	//游泳池位置
 	//role->setFootPosition(checkpoints[7]);
 	//终点位置
-	role->setFootPosition(checkpoints[8]);
+	//role->setFootPosition(checkpoints[8]);
 	role->fall();
 
 	animation.attachRole(*role);
