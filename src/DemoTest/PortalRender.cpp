@@ -48,7 +48,7 @@ extern SoundTool soundtool;
 //动态渲染圈
 PxVec3 roleWorldPosition = PxVec3(0);
 //是否开启动态渲染圈（场景机关据此设置不同速度）
-bool openDynamicBall = false;
+bool openDynamicBall = true;
 DynamicBall dynamicBall = DynamicBall(openDynamicBall);
 
 
@@ -189,8 +189,8 @@ namespace Callbacks
 
 		string currentAnimation = animation.getCurrentAnimation();
 
-		if (currentAnimation == "idle") {
-			animation.update(0.5);
+		if (currentAnimation == "swimming") {
+			animation.update(1.3);
 		}
 		else if (currentAnimation == "openDoor")
 		{
@@ -222,7 +222,7 @@ namespace Callbacks
 		}
 		else if (currentAnimation == "jumping")
 		{
-			if (animation.update(1.1, true)) {
+			if (animation.update(1.5, true)) {
 				animation.setAnimation("idle");
 			}
 		}
@@ -263,7 +263,8 @@ namespace Callbacks
 		}
 
 		if (!sCamera->isFree() || beginGame) {
-			//printPxVecFun(role->getPosition());
+			printPxVecFun(role->getPosition());
+
 			//role->updateScore();
 			//cout << "checkpoint" << role->nowCheckpoint << endl;
 			if (beginGame) {

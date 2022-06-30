@@ -150,7 +150,8 @@ void renderGeometry(const PxGeometryHolder& h, string name,bool shadow)
 	case PxGeometryType::eSPHERE:		
 		{
 		if (name == "Particle") {
-			glColor4f(1.f, 1.f, 1.f, 0.1);
+			//88,195,224
+			glColor4f(0.344f, 0.762f, 0.875f, 0.1);
 		}
 		else
 		{
@@ -345,7 +346,7 @@ namespace Snippets
 		glutKeyboardUpFunc(Callbacks::keyboardUpCallback);
 		glutSpecialFunc(Callbacks::specialKeyDownCallback);
 		glutSpecialUpFunc(Callbacks::specialKeyUpCallback);
-		//glutMouseFunc(Callbacks::mouseCallback);
+		glutMouseFunc(Callbacks::mouseCallback);
 		glutMotionFunc(Callbacks::motionCallback);
 		glutReshapeFunc(reshape);
 
@@ -416,6 +417,19 @@ namespace Snippets
 		glLightfv(GL_LIGHT0, GL_SPECULAR, specularColor);
 		glLightfv(GL_LIGHT0, GL_POSITION, position);
 		glEnable(GL_LIGHT0);
+		// Setup lighting 光照设置
+		glEnable(GL_LIGHTING);
+		PxReal ambientColor1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		PxReal diffuseColor1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		PxReal specularColor1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		PxReal position1[] = { -137.841f, 155.0f,228.381f, 1.0f };
+		glLightfv(GL_LIGHT1, GL_AMBIENT, ambientColor1);
+		glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseColor1);
+		glLightfv(GL_LIGHT1, GL_SPECULAR, specularColor1);
+		glLightfv(GL_LIGHT1, GL_POSITION, position1);
+		glEnable(GL_LIGHT1);
+		//X:-137.841 Y : 149.557 Z : 228.381
+
 		/** 启用纹理 */
 		glEnable(GL_TEXTURE_2D);
 		//模型纹理贴图内嵌，开启法向量
@@ -680,6 +694,35 @@ namespace Snippets
 	}
 
 } //namespace Snippets
+
+void renderParticles(PxParticleSystem *ps) {
+	// lock SDK buffers of *PxParticleSystem* ps for reading
+	PxParticleReadData* rd = ps->lockParticleReadData();
+
+	// access particle data from PxParticleReadData
+	if (rd)
+	{
+		PxStrideIterator<const PxParticleFlags> flagsIt(rd->flagsBuffer);
+		PxStrideIterator<const PxVec3> positionIt(rd->positionBuffer);
+
+		for (unsigned i = 0; i < rd->validParticleRange; ++i, ++flagsIt, ++positionIt)
+		{
+			if (*flagsIt & PxParticleFlag::eVALID)
+			{
+				// access particle position
+				const PxVec3& position = *positionIt;
+
+				glBegin(GL_POINTS);
+				glColor4f(1,1,1,1);
+				glVertex3f(position.x, position.y, position.z);
+				glEnd();
+			}
+		}
+		// return ownership of the buffers back to the SDK
+		rd->unlock();
+	}
+
+}
 
 
 void renderGameOver() {
