@@ -54,6 +54,7 @@ bool helpMenu = false;
 extern void reshape(int width, int height);
 extern Snippets::Camera* sCamera;
 extern ImFont* emojiFont;
+extern ImFont* titleFont;
 
 namespace Callbacks {
 	extern void idleCallback();
@@ -148,7 +149,14 @@ void renderGeometry(const PxGeometryHolder& h, string name,bool shadow)
 		break;
 	case PxGeometryType::eSPHERE:		
 		{
-			glColor4f(0.102f, 0.102f, 0.102f,1);
+		if (name == "Particle") {
+			glColor4f(1.f, 1.f, 1.f, 0.1);
+		}
+		else
+		{
+			glColor4f(0.102f, 0.102f, 0.102f, 1);
+		}
+			
 			glutSolidSphere(GLdouble(h.sphere().radius), 10, 10);
 		}
 		break;
@@ -337,7 +345,7 @@ namespace Snippets
 		glutKeyboardUpFunc(Callbacks::keyboardUpCallback);
 		glutSpecialFunc(Callbacks::specialKeyDownCallback);
 		glutSpecialUpFunc(Callbacks::specialKeyUpCallback);
-		glutMouseFunc(Callbacks::mouseCallback);
+		//glutMouseFunc(Callbacks::mouseCallback);
 		glutMotionFunc(Callbacks::motionCallback);
 		glutReshapeFunc(reshape);
 
@@ -356,20 +364,22 @@ namespace Snippets
 		float button1Width = ImGui::CalcTextSize(button1.c_str()).x;
 		float button2Width = ImGui::CalcTextSize(button2.c_str()).x;
 		
-		float space = (windowWidth - button1Width - button2Width) / 3.f;
-		ImGui::SetCursorPosX(space);
-		if (ImGui::Button(button1.c_str())) {
+		//float space = (windowWidth - button1Width - button2Width) / 3.f;
+		ImGui::SetCursorPosX((windowWidth - button1Width) * 0.5f - 30);
+		ImGui::PushFont(titleFont);
+		if (ImGui::Button(button1.c_str(),ImVec2(90,59))) {
 			welcome = false;
 			defaultWindow = true;
 			fps = true;
 			installPlayFunc();
 		}
-		ImGui::SameLine();
-		ImGui::SetCursorPosX(2 * space + button1Width);
+		ImGui::NewLine();
+		ImGui::SetCursorPosX((windowWidth - button1Width) * 0.5f - 30);
 		
-		if (ImGui::Button(button2.c_str())) {
+		if (ImGui::Button(button2.c_str(), ImVec2(90, 59))) {
 			exit(0);
 		}
+		ImGui::PopFont();
 	}
 
     void setupDefaultWindow(const char *name)
@@ -425,9 +435,15 @@ namespace Snippets
 		if (welcome) {
 			ImGui::Begin(" ", &welcome, window_flags - 128);
 			ImGui::NewLine();
-			textCentered("Welcome to Portal's game");
-			
 			ImGui::NewLine();
+			ImGui::PushFont(titleFont);
+			textCentered("Welcome to Portal's game");
+			ImGui::PopFont();
+			ImGui::NewLine();
+			ImGui::NewLine();
+			ImGui::NewLine();
+			ImGui::NewLine();
+
 			menuButtonCentered2("Play", "Exit");
 				
 			ImGui::End();
@@ -450,8 +466,12 @@ namespace Snippets
 				--count;
 			}
 			ImGui::NewLine();
-			ImGui::Text("Checkpoint: %d", role->getCheckpoint());
-			//ImGui::Text("Life: %d", role->getHealth());
+			ImGui::NewLine();
+			for (int i = 0; i < role->getCheckpoint(); ++i) {
+				ImGui::Text(u8"⏩");
+				ImGui::SameLine();
+			}
+			ImGui::NewLine();
 			ImGui::Text("Score: %d", role->getScore());
 			ImGui::Text("Press H to open help menu");
 			if (!sCamera->isFree()) {
@@ -459,7 +479,6 @@ namespace Snippets
 				ImGui::Text("Camera is locked");
 				ImGui::PopFont();
 			}
-			//ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
 			ImGui::End();
 		}
 		
@@ -477,11 +496,18 @@ namespace Snippets
 			ImGui::Text("WASD: Free camera");
 			ImGui::End();
 
-			ImGui::Begin("Control the character and head to the end!", &helpMenu, flags);
-			ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
+			ImGui::Begin("Control the character and head to the end!", &helpMenu, flags-128);
+			ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 255, 255));
 			ImGui::Text("Control the character and head to the end!");
 			ImGui::PopStyleColor();
 			ImGui::End();
+
+			ImGui::Begin("help", &helpMenu,flags);
+			ImGui::Text(u8"← Chances to go");
+			ImGui::NewLine();
+			ImGui::Text(u8"← Checkpoints you've achieved");
+			ImGui::End();
+
 		}
 			
 	
@@ -687,6 +713,13 @@ void renderParticles(PxParticleSystem *ps) {
 
 void renderGameOver() {
 	const char* msg = "Game Over!";
+	bool die = true;
+	ImGui::PushFont(titleFont);
+	ImGui::Begin("gameover", &die, 3);
+
+	ImGui::Text("Game Over.");
+	ImGui::End();
+	ImGui::PopFont();
 	//int len = sizeof(msg) / sizeof(char);
-	Snippets::renderText(45, 50, msg, 10);
+	//Snippets::renderText(45, 50, msg, 10);
 }

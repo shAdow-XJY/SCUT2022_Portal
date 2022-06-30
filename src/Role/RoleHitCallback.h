@@ -65,15 +65,17 @@ public:
 					}
 				}
 			}
-			else if (name == "Over" || name == "Ground") {
-				if (role->getAliveStatus()) {
-					animation.setAnimation("dying");
-				}
-				//role->roleOver();
-			}
 			else if (name == "PoolWall") {
 				//cout << "PoolWall" << endl;
 				role->nowCheckpoint = 8;
+			}
+			else if (name == "Pendulum") {
+				cout << "Pendulum" << endl;
+				animation.setAnimation("roll");
+			}
+			else if (name == "Over" || name == "Ground0") {
+				//cout << "Over" << endl;
+				animation.setAnimation("dying");
 			}
 		}
 
