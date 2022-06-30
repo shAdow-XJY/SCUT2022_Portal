@@ -48,7 +48,7 @@ extern SoundTool soundtool;
 //动态渲染圈
 PxVec3 roleWorldPosition = PxVec3(0);
 //是否开启动态渲染圈（场景机关据此设置不同速度）
-bool openDynamicBall = false;
+bool openDynamicBall = true;
 DynamicBall dynamicBall = DynamicBall(openDynamicBall);
 
 
@@ -263,7 +263,7 @@ namespace Callbacks
 		}
 
 		if (!sCamera->isFree() || beginGame) {
-			//printPxVecFun(role->getPosition());
+			printPxVecFun(role->getPosition());
 			//role->updateScore();
 			//cout << "checkpoint" << role->nowCheckpoint << endl;
 			if (beginGame) {
