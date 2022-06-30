@@ -90,7 +90,9 @@ void keyPress(unsigned char key, const PxTransform& camera)
 	//½ÇÉ«ÇÐ»»¶¯»­£»ÔÝÊ±
 	case 'Q':
 	{
-		animation.setAnimation("dancing");
+		if (role->nowCheckpoint == 9) {
+			animation.setAnimation("dancing");
+		}
 		break;
 	}
 	case 'H': {

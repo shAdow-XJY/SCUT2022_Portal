@@ -1034,7 +1034,7 @@ void createParticles(PxVec3 v)
 	// create particles in *PxParticleSystem* ps
 	bool success = ps->createParticles(particleCreationData);
 	std::cout << "创建粒子成功！" << std::endl;
-
+}
 //创建管道壁
 PxRigidStatic* createPipeWall(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose) {
 	PxRigidStatic* pipeWallActor = createStaticBox(t, v, x, y, z, pose, OrganType::pipeWall);
@@ -1556,6 +1556,11 @@ void createGameScene(const PxTransform& t) {
 	//水池底部的相对于场景原点t的位置 PxVec3 localPose(bottom_x,bottom_y,bottom_z)
 	//全局位置 t.transform(PxTransform(localPose)).p
 	//泳池关卡角落坐标添加到checkpoints
+	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
+	//createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
+
+	//createParticleSphere(t.transform(PxVec3(bottom_x, bottom_y + 15.0f, bottom_z)), 5.0);
+	createParticles(t.transform(PxVec3(bottom_x, bottom_y + 25.0f, bottom_z)));
 	checkpoints.push_back(t.transform(PxVec3(bottom_x + 20.0f, bottom_y + 22.0f, bottom_z - 1.0f)));
 
 	float r_9_l = 15.0;
@@ -1566,6 +1571,8 @@ void createGameScene(const PxTransform& t) {
 	PxTransform r_9_pose(PxQuat(PxHalfPi / 4, PxVec3(0, 0, -1)));
 	createRoad(t, PxVec3(c_9_x, c_9_y, c_9_z), r_9_l, 1.0, r_9_w, r_9_pose);
 	
+	//#Checkpoint9
+	totalCheckpoint++;
 	//终点
 	float finalLine_l = 10;
 	float finalLine_w = 10;
@@ -1574,10 +1581,6 @@ void createGameScene(const PxTransform& t) {
 	float finalLine_z = c_9_z;
 	createStaticBox(t, PxVec3(finalLine_x, finalLine_y, finalLine_z), finalLine_l, 1.0, finalLine_w, defaultPose, OrganType::finalLine);
 
-	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
-	//createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
-
-	//createParticleSphere(t.transform(PxVec3(bottom_x, bottom_y + 15.0f, bottom_z)), 5.0);
-	createParticles(t.transform(PxVec3(bottom_x, bottom_y + 25.0f, bottom_z)));
-
+	
+	checkpoints.push_back(t.transform(PxVec3(finalLine_x, finalLine_y, finalLine_z)));
 }

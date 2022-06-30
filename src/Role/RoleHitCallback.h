@@ -69,6 +69,10 @@ public:
 				//cout << "PoolWall" << endl;
 				role->nowCheckpoint = 8;
 			}
+			else if (name == "FinalLine") {
+				//cout << "PoolWall" << endl;
+				role->nowCheckpoint = 9;
+			}
 			else if (name == "Pendulum") {
 				cout << "Pendulum" << endl;
 				animation.setAnimation("roll");

@@ -107,6 +107,8 @@ void initGame() {
 	//role->setFootPosition(checkpoints[6]);
 	//游泳池位置
 	//role->setFootPosition(checkpoints[7]);
+	//终点位置
+	role->setFootPosition(checkpoints[8]);
 	role->fall();
 
 	animation.attachRole(*role);

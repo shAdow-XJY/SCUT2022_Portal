@@ -168,7 +168,7 @@ bool Role::getCrouch(){
 void Role::roleCrouch() {
 	if (!isJump && !isFall) {
 		this->isCrouch = true;
-		this->roleController->resize(roleHeight / 2.5);
+		this->roleController->resize(roleHeight / 5.0);
 	}
 }
 
@@ -431,6 +431,10 @@ void Role::rayAround() {
 					}
 					else if (gsb->getType() == OrganType::poolWall) {
 						this->nowCheckpoint = 8;
+						return;
+					}
+					else if (gsb->getType() == OrganType::finalLine) {
+						this->nowCheckpoint = 9;
 						return;
 					}
 				}
