@@ -1045,6 +1045,34 @@ void createParticles(PxVec3 v)
 	// create particles in *PxParticleSystem* ps
 	bool success = ps->createParticles(particleCreationData);
 	std::cout << "创建粒子成功！" << std::endl;
+
+	// add particle system to scene, in case creation was successful
+	if (ps)
+		gScene->addActor(*ps);
+
+	// lock SDK buffers of *PxParticleSystem* ps for reading
+	PxParticleReadData* rd = ps->lockParticleReadData();
+
+	// access particle data from PxParticleReadData
+	if (rd)
+	{
+		PxStrideIterator<const PxParticleFlags> flagsIt(rd->flagsBuffer);
+		PxStrideIterator<const PxVec3> positionIt(rd->positionBuffer);
+
+		for (unsigned i = 0; i < rd->validParticleRange; ++i, ++positionIt)
+		{
+			if (*flagsIt & PxParticleFlag::eVALID)
+			{
+				// access particle position
+				const PxVec3& position = *positionIt;
+				std::cout << position.x << "," << position.y << "," << position.z << std::endl;
+				createParticleSphere(position, 0.6);
+			}
+		}
+
+		// return ownership of the buffers back to the SDK
+		rd->unlock();
+	}
 }
 //创建管道壁
 PxRigidStatic* createPipeWall(const PxTransform& t, const PxVec3& v, PxReal x, PxReal y, PxReal z, PxTransform& pose) {
@@ -1573,7 +1601,11 @@ void createGameScene(const PxTransform& t) {
 	//createParticleSphere(t.transform(PxVec3(bottom_x, bottom_y + 15.0f, bottom_z)), 5.0);
 	createParticles(t.transform(PxVec3(bottom_x, bottom_y + 25.0f, bottom_z)));
 	checkpoints.push_back(t.transform(PxVec3(bottom_x + 20.0f, bottom_y + 22.0f, bottom_z - 1.0f)));
-
+	
+	
+	//#Checkpoint9
+	totalCheckpoint++;
+	//终点
 	float r_9_l = 15.0;
 	float r_9_w = 6.0;
 	float c_9_x = bottom_x - poolLength - 2.0 - r_9_l * cos(PxHalfPi / 4);
@@ -1581,10 +1613,7 @@ void createGameScene(const PxTransform& t) {
 	float c_9_z = bottom_z;
 	PxTransform r_9_pose(PxQuat(PxHalfPi / 4, PxVec3(0, 0, -1)));
 	createRoad(t, PxVec3(c_9_x, c_9_y, c_9_z), r_9_l, 1.0, r_9_w, r_9_pose);
-	
-	//#Checkpoint9
-	totalCheckpoint++;
-	//终点
+
 	float finalLine_l = 10;
 	float finalLine_w = 10;
 	float finalLine_x = c_9_x - r_9_l * cos(PxHalfPi / 4) - finalLine_l;

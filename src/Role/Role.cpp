@@ -431,6 +431,7 @@ void Role::rayAround() {
 					}
 					else if (gsb->getType() == OrganType::finalLine) {
 						this->nowCheckpoint = 9;
+						animation.setAnimation("dancing");
 						return;
 					}
 				}

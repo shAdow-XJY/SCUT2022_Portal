@@ -114,8 +114,8 @@ void keyRelease(unsigned char key)
 	{
 		//soundtool.pauseSound();
 		if (role->tryJump(true)) {
-			soundtool.playSound("jump.wav");
 			animation.setAnimation("jumping");
+			soundtool.playSound("jump.wav");
 		}
 		break;
 	}

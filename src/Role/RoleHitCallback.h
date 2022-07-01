@@ -71,7 +71,8 @@ public:
 			}
 			else if (name == "FinalLine") {
 				//cout << "PoolWall" << endl;
-				role->nowCheckpoint = 9;
+				//role->nowCheckpoint = 9;
+				animation.setAnimation("dancing");
 			}
 			else if (name == "Pendulum") {
 				cout << "Pendulum" << endl;
@@ -80,6 +81,9 @@ public:
 			else if (name == "Over" || name == "Ground0") {
 				//cout << "Over" << endl;
 				animation.setAnimation("dying");
+			}
+			else if (animation.getCurrentAnimation() == "swimming" && name == "Road") {
+				role->nowCheckpoint = 9;
 			}
 		}
 

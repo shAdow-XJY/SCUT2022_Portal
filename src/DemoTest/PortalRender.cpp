@@ -222,7 +222,7 @@ namespace Callbacks
 		}
 		else if (currentAnimation == "jumping")
 		{
-			if (animation.update(1.5, true)) {
+			if (animation.update(1.8, true)) {
 				animation.setAnimation("idle");
 			}
 		}
