@@ -263,7 +263,7 @@ namespace Callbacks
 		}
 
 		if (!sCamera->isFree() || beginGame) {
-			printPxVecFun(role->getPosition());
+			//printPxVecFun(role->getPosition());
 
 			//role->updateScore();
 			//cout << "checkpoint" << role->nowCheckpoint << endl;

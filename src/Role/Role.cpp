@@ -431,6 +431,7 @@ void Role::rayAround() {
 					}
 					else if (gsb->getType() == OrganType::finalLine) {
 						this->nowCheckpoint = 9;
+						this->canMove = false;
 						animation.setAnimation("dancing");
 						return;
 					}
@@ -610,17 +611,17 @@ void Role::simulationGravity() {
 			this->touchGround();
 		}
 		////ËÀÍöÂß¼­ ÅÜ²»µ½Õâ¶Î´úÂë
-		//if (actor->getName()) {
-		//	string name(actor->getName());
-		//	if (name == "Over" || name == "Ground0") {
-		//		this->canMove = false;
-		//		cout << name << endl;
-		//		if (this->isAlive) {
-		//			animation.setAnimation("dying");
-		//		}
-		//		return;
-		//	}
-		//}
+		if (actor->getName()) {
+			string name(actor->getName());
+			if (name == "Over" || name == "Ground0") {
+				this->canMove = false;
+				cout << name << endl;
+				if (this->isAlive) {
+					animation.setAnimation("dying");
+				}
+				return;
+			}
+		}
 
 		GameSceneBasic* basic = (GameSceneBasic*)actor->userData;
 		this->sliceDir = PxVec3(0, 0, 0);
