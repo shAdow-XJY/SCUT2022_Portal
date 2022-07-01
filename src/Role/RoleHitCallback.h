@@ -65,7 +65,7 @@ public:
 					}
 				}
 			}
-			else if (name == "PoolWall") {
+			else if (name == "Particle") {
 				//cout << "PoolWall" << endl;
 				role->nowCheckpoint = 8;
 			}

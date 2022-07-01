@@ -407,6 +407,9 @@ void createMaze(const PxTransform& t, PxVec3 v, float scale, PxTransform& pose) 
 			if (frontDoorCanOpen[i][j]) {
 				if ((i == 7 && j == 8)||(i == 2 && j == 0)) {
 					createFrontDoor(t, PxVec3(door_x, door_y, door_z), scale, pose, true, true);
+					//创建道具类场景
+					/*if(i == 2 && j == 0)
+					createPorp(t, PxVec3(door_x + 5.0f , door_y , door_z-5.0f), 1.0, 1.0, 1.0);*/
 				}
 				else
 				{
@@ -781,9 +784,9 @@ void createPool(const PxTransform& t, PxVec3 bottom, float poolLength, float poo
 	//底部
 	createStaticBox(pos, PxVec3(0, poolHeight + 6.0f, 0), poolLength + 2.0, 1.0, poolWidth + 2.0, pose, OrganType::poolWall);
 	//左侧
-	createStaticBox(pos, PxVec3(1.0 + poolLength, 1.0 + poolHeight, 0), 1.0, poolHeight, poolWidth + 2.0, pose, OrganType::poolWall);
+	createStaticBox(pos, PxVec3(1.0 + poolLength, 1.0 + poolHeight, 0), 5.0, poolHeight, poolWidth + 2.0, pose, OrganType::poolWall);
 	//右侧
-	createStaticBox(pos, PxVec3(- 1.0 - poolLength,  1.0 + poolHeight, 0), 1.0, poolHeight, poolWidth + 2.0, pose, OrganType::poolWall);
+	createStaticBox(pos, PxVec3(- 1.0 - poolLength,  1.0 + poolHeight, 0), 1.0, poolHeight, poolWidth + 2.0 , pose, OrganType::poolWall);
 	//前侧
 	createStaticBox(pos, PxVec3(0,  1.0 + poolHeight, - 1.0 - poolWidth), poolLength, poolHeight, 1.0, pose, OrganType::poolWall);
 	//后侧
@@ -1293,8 +1296,6 @@ void createGameScene(const PxTransform& t) {
 	float c_2_z = r_1_w + r_2_w;
 	createRoad(t, PxVec3(c_2_x, c_2_y, c_2_z), r_2_l , boxHeight, r_2_w, defaultPose);
 
-	//创建道具类场景
-	//createPorp(t, PxVec3(c_2_x, c_2_y + boxHeight + 1.0, c_2_z), 1.0, 1.0, 1.0);
 	createPipeLevel(t, PxVec3(c_2_x, c_2_y+boxHeight-0.5, c_2_z+r_2_w), defaultPose);
 
 	//stairs
@@ -1455,6 +1456,9 @@ void createGameScene(const PxTransform& t) {
 
 	checkpoints.push_back(t.transform(PxVec3(c_7_x, c_7_y + 7.0, c_7_z)));
 
+	//创建道具类场景
+	//createPorp(t, PxVec3(c_2_x, c_2_y + boxHeight + 1.0, c_2_z), 1.0, 1.0, 1.0);
+	
 	//#Checkpoint5
 	totalCheckpoint++;
 	//迷宫边长缩放系数
@@ -1598,7 +1602,7 @@ void createGameScene(const PxTransform& t) {
 	//createSideSeesaw(t, PxVec3(-2, 20, 0), 5.0, 1.0, 15.0, defaultPose);
 	//createPlane(PxVec3(0, 0, 0), PxVec3(0, 1, 0));
 
-	//createParticleSphere(t.transform(PxVec3(bottom_x, bottom_y + 15.0f, bottom_z)), 5.0);
+	
 	createParticles(t.transform(PxVec3(bottom_x, bottom_y + 25.0f, bottom_z)));
 	checkpoints.push_back(t.transform(PxVec3(bottom_x + 20.0f, bottom_y + 22.0f, bottom_z - 1.0f)));
 	

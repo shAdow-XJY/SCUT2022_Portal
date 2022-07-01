@@ -463,6 +463,7 @@ void Role::protal() {
 		srand((int)time(0));
 		int protalCheckpoint = rand() % this->arrivedCheckpoint;
 		this->setFootPosition(checkpoints[protalCheckpoint]);
+		//this->setFootPosition(checkpoints[6]);
 		this->updatePosition();
 		this->life--;
 		this->resetStatus();
