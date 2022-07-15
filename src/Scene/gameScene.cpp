@@ -999,11 +999,11 @@ PxVec3* createPositions(PxVec3 &p)
 		positions[x] = p;
 	}
 	while(t<=2000)
-	for (float m = -2; m <= 5; m += 1.2)
+	for (float m = -2; m <= 5; m += 4.0)
 	{
-		for (float l = -10; l <= 10; l += 1.2)
+		for (float l = -10; l <= 10; l += 4.0)
 		{
-			for (float n = -15; n <= 10; n+=1.2)
+			for (float n = -15; n <= 10; n += 4.0)
 			{
 					positions[t].x += n;
 					positions[t].y += m;
@@ -1039,7 +1039,7 @@ void createParticles(PxVec3 v)
 	PxParticleSystem* ps = gPhysics->createParticleSystem(maxParticles, perParticleRestOffset);
 
 	PxParticleCreationData particleCreationData;
-	particleCreationData.numParticles = 2000;
+	particleCreationData.numParticles = 42;
 	PxVec3* p = createPositions(v);
 	PxU32* indic = createParticleIndices(maxParticles);
 	particleCreationData.indexBuffer = PxStrideIterator<const PxU32>(indic);
@@ -1069,7 +1069,7 @@ void createParticles(PxVec3 v)
 				// access particle position
 				const PxVec3& position = *positionIt;
 				std::cout << position.x << "," << position.y << "," << position.z << std::endl;
-				createParticleSphere(position, 0.6);
+				createParticleSphere(position, 2.0);
 			}
 		}
 

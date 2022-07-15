@@ -446,6 +446,8 @@ namespace Snippets
 		window_flags |= ImGuiWindowFlags_NoTitleBar;
 		window_flags |= ImGuiWindowFlags_NoResize;
 	
+		
+
 		if (welcome) {
 			ImGui::Begin(" ", &welcome, window_flags - 128);
 			ImGui::NewLine();
@@ -503,11 +505,14 @@ namespace Snippets
 			flags |= ImGuiWindowFlags_NoBackground;
 			flags |= ImGuiWindowFlags_NoResize;
 
+			
 			ImGui::Begin("Play Guide", &helpMenu, flags - 128);
-			ImGui::Text("Arraw keys: Move the player");
-			ImGui::Text("Hold/Release space: Charge/Jump");
-			ImGui::Text("T: Unlock/Lock camera");
-			ImGui::Text("WASD: Free camera");
+			
+			ImGui::Text("Shift: run; Z: crounch; ");
+			ImGui::Text("E: use key; space: jump");
+			ImGui::Text("up/down/right/left: walk");
+			ImGui::Text("T: change to people/camera");
+			ImGui::Text("W/A/S/D: move camera");
 			ImGui::End();
 
 			ImGui::Begin("Control the character and head to the end!", &helpMenu, flags-128);
@@ -737,3 +742,4 @@ void renderGameOver() {
 	//int len = sizeof(msg) / sizeof(char);
 	//Snippets::renderText(45, 50, msg, 10);
 }
+

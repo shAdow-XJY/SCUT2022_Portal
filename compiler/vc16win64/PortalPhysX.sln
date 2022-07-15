@@ -4,7 +4,7 @@ VisualStudioVersion = 16.0.31702.278
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utils", "Utils.vcxproj", "{F44672D8-5198-BBA4-87E8-C790415E403C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DemoTest", "DemoTest.vcxproj", "{809F8893-32BA-4FD4-86B6-F825B7778A82}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Portal", "DemoTest.vcxproj", "{809F8893-32BA-4FD4-86B6-F825B7778A82}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F44672D8-5198-BBA4-87E8-C790415E403C} = {F44672D8-5198-BBA4-87E8-C790415E403C}
 	EndProjectSection
@@ -27,11 +27,11 @@ Global
 		{F44672D8-5198-BBA4-87E8-C790415E403C}.debug|x64.ActiveCfg = debug|x64
 		{F44672D8-5198-BBA4-87E8-C790415E403C}.debug|x64.Build.0 = debug|x64
 		{F44672D8-5198-BBA4-87E8-C790415E403C}.debug|x86.ActiveCfg = debug|x64
-		{F44672D8-5198-BBA4-87E8-C790415E403C}.profile|x64.ActiveCfg = profile|x64
-		{F44672D8-5198-BBA4-87E8-C790415E403C}.profile|x64.Build.0 = profile|x64
+		{F44672D8-5198-BBA4-87E8-C790415E403C}.profile|x64.ActiveCfg = release|x64
+		{F44672D8-5198-BBA4-87E8-C790415E403C}.profile|x64.Build.0 = release|x64
 		{F44672D8-5198-BBA4-87E8-C790415E403C}.profile|x86.ActiveCfg = profile|x64
-		{F44672D8-5198-BBA4-87E8-C790415E403C}.release|x64.ActiveCfg = release|x64
-		{F44672D8-5198-BBA4-87E8-C790415E403C}.release|x64.Build.0 = release|x64
+		{F44672D8-5198-BBA4-87E8-C790415E403C}.release|x64.ActiveCfg = debug|x64
+		{F44672D8-5198-BBA4-87E8-C790415E403C}.release|x64.Build.0 = debug|x64
 		{F44672D8-5198-BBA4-87E8-C790415E403C}.release|x86.ActiveCfg = release|x64
 		{809F8893-32BA-4FD4-86B6-F825B7778A82}.checked|x64.ActiveCfg = Release|x64
 		{809F8893-32BA-4FD4-86B6-F825B7778A82}.checked|x64.Build.0 = Release|x64
@@ -45,8 +45,8 @@ Global
 		{809F8893-32BA-4FD4-86B6-F825B7778A82}.profile|x64.Build.0 = Release|x64
 		{809F8893-32BA-4FD4-86B6-F825B7778A82}.profile|x86.ActiveCfg = Release|Win32
 		{809F8893-32BA-4FD4-86B6-F825B7778A82}.profile|x86.Build.0 = Release|Win32
-		{809F8893-32BA-4FD4-86B6-F825B7778A82}.release|x64.ActiveCfg = Release|x64
-		{809F8893-32BA-4FD4-86B6-F825B7778A82}.release|x64.Build.0 = Release|x64
+		{809F8893-32BA-4FD4-86B6-F825B7778A82}.release|x64.ActiveCfg = Debug|x64
+		{809F8893-32BA-4FD4-86B6-F825B7778A82}.release|x64.Build.0 = Debug|x64
 		{809F8893-32BA-4FD4-86B6-F825B7778A82}.release|x86.ActiveCfg = Release|Win32
 		{809F8893-32BA-4FD4-86B6-F825B7778A82}.release|x86.Build.0 = Release|Win32
 	EndGlobalSection

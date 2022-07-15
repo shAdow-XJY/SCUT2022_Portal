@@ -10,6 +10,8 @@ extern Role* role;
 extern SoundTool soundtool;
 extern Animation animation;
 
+extern vector<PxVec3> checkpoints;
+
 // 右键鼠标按下
 bool press = false;
 
@@ -87,16 +89,54 @@ void keyPress(unsigned char key, const PxTransform& camera)
 		}
 		break;
 	}
-	//角色切换动画；暂时
-	case 'Q':
-	{
-		if (role->nowCheckpoint == 9) {
-			animation.setAnimation("dancing");
-		}
-		break;
-	}
 	case 'H': {
 		helpMenu = !helpMenu;
+		break;
+	}
+	case '1': {
+		//初始位置
+		role->setFootPosition(checkpoints[0]);
+		break;
+	}
+	case '2': {
+		//摆锤前位置
+		role->setFootPosition(checkpoints[1]);
+		break;
+	}
+	case '3': {
+		//摩天轮前位置
+		role->setFootPosition(checkpoints[2]);
+		break;
+	}
+	case '4': {
+		//旋转路关卡前位置
+		role->setFootPosition(checkpoints[3]);
+		break;
+	}
+	case '5': {
+		//迷宫前位置
+		role->setFootPosition(checkpoints[4]);
+		break;
+	}
+	case '6': {
+		//迷宫出口位置 
+		role->setFootPosition(checkpoints[5]);
+		break;
+	}
+	case '7': {
+		//旋转杆关卡角落位置
+		role->setFootPosition(checkpoints[6]);
+		break;
+	}
+	case '8': {
+		//游泳池位置
+		role->setFootPosition(checkpoints[7]);
+		break;
+	}
+	case '9': {
+		//终点位置
+		role->setFootPosition(checkpoints[8]);
+		break;
 	}
 	default:
 		break;
