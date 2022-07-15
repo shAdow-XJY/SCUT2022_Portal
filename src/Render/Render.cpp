@@ -450,6 +450,10 @@ namespace Snippets
 
 		if (welcome) {
 			ImGui::Begin(" ", &welcome, window_flags - 128);
+
+			ImGui::SetWindowPos(ImVec2(300, 150), ImGuiCond_Always);
+			ImGui::SetWindowSize(ImVec2(500, 500), ImGuiCond_Always);
+
 			ImGui::NewLine();
 			ImGui::NewLine();
 			ImGui::PushFont(titleFont);
@@ -470,7 +474,7 @@ namespace Snippets
 			//ImGui::ShowDemoWindow(&demo);
 
 			ImGui::Begin("Monitoring", &defaultWindow, window_flags);
-
+			ImGui::SetWindowPos(ImVec2(20, 10), ImGuiCond_Always);
 			//ImGui::Text("ImGui successfully deployed.");           
 
 			//ImGui::SameLine();
@@ -507,21 +511,26 @@ namespace Snippets
 
 			
 			ImGui::Begin("Play Guide", &helpMenu, flags - 128);
-			
-			ImGui::Text("Shift: run; Z: crounch; ");
-			ImGui::Text("E: use key; space: jump");
+			ImGui::SetWindowPos(ImVec2(10, 500), ImGuiCond_Always);
+			ImGui::SetWindowSize(ImVec2(300, 230), ImGuiCond_Always);
+			ImGui::Text("Shift: run");
+			ImGui::Text("Z: crounch; ");
+			ImGui::Text("E: use key");
+			ImGui::Text("space: jump");
 			ImGui::Text("up/down/right/left: walk");
 			ImGui::Text("T: change to people/camera");
 			ImGui::Text("W/A/S/D: move camera");
 			ImGui::End();
 
 			ImGui::Begin("Control the character and head to the end!", &helpMenu, flags-128);
+			ImGui::SetWindowPos(ImVec2(10, 450), ImGuiCond_Always);
 			ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 255, 255));
 			ImGui::Text("Control the character and head to the end!");
 			ImGui::PopStyleColor();
 			ImGui::End();
 
 			ImGui::Begin("help", &helpMenu,flags);
+			ImGui::SetWindowPos(ImVec2(300, 10), ImGuiCond_Always);
 			ImGui::Text(u8"← Chances to go");
 			ImGui::NewLine();
 			ImGui::Text(u8"← Checkpoints you've achieved");
@@ -532,6 +541,7 @@ namespace Snippets
 	
 		if (fps) {
 			ImGui::Begin("FPS check", &fps, window_flags);
+			ImGui::SetWindowPos(ImVec2(20, 180), ImGuiCond_Always);
 			ImGui::Text("%.1f FPS", ImGui::GetIO().Framerate);
 			ImGui::End();
 		}
