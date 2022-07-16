@@ -747,6 +747,9 @@ void renderGameOver() {
 	ImGui::PushFont(titleFont);
 	ImGui::Begin("gameover", &die, 3);
 
+	ImGui::SetWindowPos(ImVec2(20, 240), ImGuiCond_Always);
+	ImGui::SetWindowSize(ImVec2(200, 50), ImGuiCond_Always);
+
 	ImGui::Text("Game Over.");
 	ImGui::End();
 	ImGui::PopFont();
