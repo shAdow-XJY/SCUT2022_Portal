@@ -559,6 +559,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
@@ -575,6 +583,22 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
+            }
         }
     }
     "Deployable"
@@ -2481,7 +2505,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:PortalGame"
         "ProductCode" = "8:{AD07061A-C964-4949-9ABE-A2FE93BEBEB8}"
-        "PackageCode" = "8:{E3EA149E-2347-4E8A-BE36-ED54EA21CC4E}"
+        "PackageCode" = "8:{F64C6B3A-45B4-4FDD-80BD-664639962715}"
         "UpgradeCode" = "8:{21C7DF3B-9316-440C-97B4-B7B755A1773D}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -2601,6 +2625,20 @@
         }
         "Shortcut"
         {
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_5465F4B7A4E74B068A27D61E762124A8"
+            {
+            "Name" = "8:PortalGame"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_D03201E40BD445B4AB1347731AE3C49E"
+            "Folder" = "8:_063E861E9BFC44289AFFDDB2576AA587"
+            "WorkingFolder" = "8:_13817DBF64D0491FB0A25D886DFC3DC9"
+            "Icon" = "8:_62828507DB36464CB268C7620E3A98CE"
+            "Feature" = "8:"
+            }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_9C8264A3FB6A4B32BA9B3C6B3FE17F9B"
             {
             "Name" = "8:PortalGame"

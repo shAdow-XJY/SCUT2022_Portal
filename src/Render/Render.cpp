@@ -515,7 +515,8 @@ namespace Snippets
 			ImGui::SetWindowSize(ImVec2(300, 230), ImGuiCond_Always);
 			ImGui::Text("Shift: run");
 			ImGui::Text("Z: crounch; ");
-			ImGui::Text("E: use key");
+			ImGui::Text("E: take key");
+			ImGui::Text("R: use key");
 			ImGui::Text("space: jump");
 			ImGui::Text("up/down/right/left: walk");
 			ImGui::Text("T: change to people/camera");
